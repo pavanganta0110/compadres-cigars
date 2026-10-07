@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Compadres Cigars
 
-## Getting Started
+Regulated tobacco e-commerce on Next.js (App Router) + Supabase. Port of the verified WordPress/WooCommerce build.
 
-First, run the development server:
-
+## Run locally
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local        # fill from `npx supabase status -o env`
+npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,mailpit,realtime,storage-api,postgres-meta
+npm run dev -- -p 3100
+npm test && npm run test:e2e
 ```
+`supabase db reset` re-applies `supabase/migrations` and `supabase/seed.sql`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Status
+- **Phase 1 (this PR):** schema + RLS on every table, seed (2 products, **placeholder prices**), 21+ signed-cookie gate, storefront, brand pages, placeholder legal pages.
+- Phases 2-6: see the project brief (cart/compliance, payments, admin, FedEx/email, hardening).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Warnings
+- The 21+ gate is a notice, not identity verification. Checkout self-attestation (phase 2) carries regulatory and underwriting risk; confirm with the processor before launch.
+- Legal pages are placeholders marked "Legal review required".
+- Prices and Sugarhill story copy are drafts pending owner approval. Unknown cigar specs are intentionally blank.
+- Nothing here is approved for production; provider gating arrives with the integrations.
