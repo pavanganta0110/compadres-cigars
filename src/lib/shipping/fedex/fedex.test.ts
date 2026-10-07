@@ -100,6 +100,32 @@ function fake(handlers: Record<string, { status: number; body: unknown }>) {
 }
 const oauth = { "/oauth/token": { status: 200, body: { access_token: "TOK" } } };
 
+describe("FedExClient with a separate tracking project", () => {
+  it("authorizes rates and tracking with their own keys", async () => {
+    const calls: { url: string; body: string }[] = [];
+    const t: Transport = async (url, init) => {
+      calls.push({ url, body: init.body });
+      if (url.endsWith("/oauth/token")) return { status: 200, text: JSON.stringify({ access_token: new URLSearchParams(init.body).get("client_id") === "track-id" ? "TRACKTOK" : "RATETOK" }) };
+      if (url.endsWith("/rate/v1/rates/quotes")) return { status: 200, text: JSON.stringify(rateBody()) };
+      return { status: 200, text: JSON.stringify({ output: { completeTrackResults: [{ trackResults: [{ latestStatusDetail: { code: "IT", statusByLocale: "In transit" } }] }] } }) };
+    };
+    const c = new FedExClient(cfg({ COMPADRES_FEDEX_TRACK_CLIENT_ID: "track-id", COMPADRES_FEDEX_TRACK_CLIENT_SECRET: "track-secret" }), t);
+    await c.rates({ country: "US", state: "KS", postalCode: "66101", weight: 3, weightUnit: "LB" });
+    await c.track("794644790132");
+    const ids = calls.filter((x) => x.url.endsWith("/oauth/token")).map((x) => new URLSearchParams(x.body).get("client_id"));
+    expect(ids).toEqual(["cid", "track-id"]);
+  });
+  it("falls back to the main key when no tracking key is set", async () => {
+    const ids: (string | null)[] = [];
+    const t: Transport = async (url, init) => {
+      if (url.endsWith("/oauth/token")) { ids.push(new URLSearchParams(init.body).get("client_id")); return { status: 200, text: JSON.stringify({ access_token: "T" }) }; }
+      return { status: 200, text: JSON.stringify({ output: { completeTrackResults: [{ trackResults: [{ latestStatusDetail: { code: "DL", statusByLocale: "Delivered" } }] }] } }) };
+    };
+    await new FedExClient(cfg(), t).track("794644790132");
+    expect(ids).toEqual(["cid"]);
+  });
+});
+
 describe("FedExClient", () => {
   const req = { country: "US", state: "KS", postalCode: "66101", weight: 3, weightUnit: "LB" as const };
   it("authorizes once with client credentials, then rates with ACCOUNT + ADULT signature", async () => {

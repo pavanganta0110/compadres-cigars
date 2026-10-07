@@ -4,7 +4,7 @@ import { testFedExAction } from "./actions";
 
 export const metadata = { title: "Settings" };
 
-export default async function Settings({ searchParams }: { searchParams: Promise<{ ok?: string; step?: string; msg?: string; code?: string }> }) {
+export default async function Settings({ searchParams }: { searchParams: Promise<{ ok?: string; step?: string; msg?: string; code?: string; track?: string }> }) {
   await requireStaff("manage_restrictions");
   const env = process.env.APP_ENV ?? "unset";
   const t = await searchParams;
@@ -18,7 +18,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <form action={testFedExAction}><button className="adm-btn" type="submit">Test FedEx connection</button></form>
       {t.msg && (
         <p className={t.ok === "1" ? "adm-note" : "adm-alert"} role={t.ok === "1" ? "status" : "alert"}>
-          <strong>{t.ok === "1" ? "OK" : `Failed at: ${t.step}`}.</strong> {t.msg.slice(0, 400)} {t.code && <code>{t.code.slice(0, 80)}</code>}
+          <strong>{t.ok === "1" ? "OK" : `Failed at: ${t.step}`}.</strong> {t.msg.slice(0, 400)} {t.code && <code>{t.code.slice(0, 80)}</code>}<br />{t.track?.slice(0, 200)}
         </p>
       )}
       <h2>Sales tax</h2>

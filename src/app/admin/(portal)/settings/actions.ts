@@ -10,6 +10,6 @@ export async function testFedExAction() {
   try { d = await diagnoseFedEx(process.env, fetchTransport); }
   catch { d = { ok: false, step: "config" as const, summary: "Could not reach FedEx (network error or timeout)." }; }
   await auditAdmin(staff.id, "shipping.fedex_tested", "settings", null, { ok: d.ok, step: d.step, code: d.fedexCode });
-  const q = new URLSearchParams({ ok: d.ok ? "1" : "0", step: d.step, msg: d.summary, ...(d.fedexCode ? { code: d.fedexCode } : {}) });
+  const q = new URLSearchParams({ ok: d.ok ? "1" : "0", step: d.step, msg: d.summary, ...(d.fedexCode ? { code: d.fedexCode } : {}), ...(d.tracking ? { track: d.tracking } : {}) });
   redirect(`/admin/settings?${q.toString()}`);
 }
