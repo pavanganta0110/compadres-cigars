@@ -27,7 +27,9 @@ jobs:
           {
             echo "NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321"
             echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(npx supabase status -o env | grep ^ANON_KEY | cut -d= -f2- | tr -d '\"')"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$(npx supabase status -o env | grep ^SERVICE_ROLE_KEY | cut -d= -f2- | tr -d '\"')"
             echo "AGE_GATE_SECRET=$(openssl rand -hex 32)"
+            echo "APP_ENV=local"
           } > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
