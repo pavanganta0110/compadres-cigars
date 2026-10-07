@@ -14,11 +14,13 @@ async function makeStaff(email: string, role: string) {
   if (error) throw error;
   await c.from("staff").insert({ user_id: data.user.id, role });
 }
-async function login(page: Page, email: string, password = PASSWORD) {
+async function login(page: Page, email: string, password = PASSWORD, expectSuccess = true) {
   await page.goto("/admin/login");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
+  if (expectSuccess) await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  else await expect(page.locator(".adm-alert")).toBeVisible();
 }
 async function makeOrder(status: string, hoursAgo: number, state = "MO") {
   const at = new Date(Date.now() - hoursAgo * 3600_000).toISOString();
@@ -41,9 +43,9 @@ test("anonymous visitors are sent to the login page, not the age gate, and canno
 });
 
 test("wrong password gives one generic message", async ({ page }) => {
-  await login(page, users.owner, "not-the-password-123");
+  await login(page, users.owner, "not-the-password-123", false);
   await expect(page.locator(".adm-alert")).toContainText("did not work");
-  await login(page, `nobody-${run}@example.com`, "whatever-12345");
+  await login(page, `nobody-${run}@example.com`, "whatever-12345", false);
   await expect(page.locator(".adm-alert")).toContainText("did not work");
 });
 
@@ -70,9 +72,11 @@ test("packed workflow: alert, bulk mark packed, audit, dashboard counts and tax 
   await page.getByLabel(`Select order ${late.number}`).check();
   await page.getByLabel(`Select order ${fresh.number}`).check();
   await page.getByRole("button", { name: "Mark selected as packed" }).click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-  const { data: rows } = await db().from("orders").select("status, packed_at").in("id", [late.id, fresh.id]);
-  expect(rows!.every((r) => r.status === "packed" && r.packed_at)).toBe(true);
+  await expect.poll(async () => {
+    const { data } = await db().from("orders").select("status, packed_at").in("id", [late.id, fresh.id]);
+    return data!.every((r) => r.status === "packed" && r.packed_at);
+  }).toBe(true);
+  await expect.poll(async () => (await db().from("audit_log").select("id").eq("action", "orders.marked_packed")).data!.length).toBeGreaterThan(0);
   const { data: audit } = await db().from("audit_log").select("detail").eq("action", "orders.marked_packed").order("id", { ascending: false }).limit(1);
   expect((audit![0].detail as { packed: number }).packed).toBe(2);
   await page.goto(`/admin/orders/${late.id}`);
@@ -146,7 +150,7 @@ test("the last owner cannot be demoted", async ({ page }) => {
 
 for (const path of ["/admin/login", "/admin"]) {
   test(`axe: ${path}`, async ({ page }) => {
-    if (path === "/admin") await login(page, users.owner); else await page.goto(path);
+    if (path === "/admin") await login(page, users.owner);
     await page.goto(path);
     const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(r.violations.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
