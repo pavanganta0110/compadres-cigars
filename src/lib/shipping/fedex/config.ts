@@ -5,6 +5,8 @@ export const FEDEX_SANDBOX_ORIGIN = "https://apis-sandbox.fedex.com";
 export type FedExConfig = {
   appEnv: string; productionApproved: boolean; apiBaseUrl: string; clientId: string; clientSecret: string;
   accountNumber: string; originCountry: string; originState: string; originPostalCode: string;
+  /** Optional: FedEx keys are per project. Rates and Track can live in different projects. */
+  trackClientId: string; trackClientSecret: string;
 };
 
 export function fedexConfigFromEnv(env: Record<string, string | undefined>): FedExConfig {
@@ -15,6 +17,7 @@ export function fedexConfigFromEnv(env: Record<string, string | undefined>): Fed
     clientSecret: t(env.COMPADRES_FEDEX_CLIENT_SECRET), accountNumber: t(env.COMPADRES_FEDEX_ACCOUNT_NUMBER),
     originCountry: t(env.COMPADRES_FEDEX_ORIGIN_COUNTRY).toUpperCase(), originState: t(env.COMPADRES_FEDEX_ORIGIN_STATE).toUpperCase(),
     originPostalCode: t(env.COMPADRES_FEDEX_ORIGIN_POSTAL_CODE).toUpperCase(),
+    trackClientId: t(env.COMPADRES_FEDEX_TRACK_CLIENT_ID), trackClientSecret: t(env.COMPADRES_FEDEX_TRACK_CLIENT_SECRET),
   };
 }
 

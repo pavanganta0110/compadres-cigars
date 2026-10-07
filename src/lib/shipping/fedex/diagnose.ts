@@ -1,7 +1,7 @@
 import { fedexConfigFromEnv, isConfigured, type FedExConfig } from "./config";
 import type { Transport } from "./client";
 
-export type Diagnosis = { ok: boolean; step: "config" | "authorization" | "rates" | "done"; summary: string; fedexCode?: string };
+export type Diagnosis = { ok: boolean; step: "config" | "authorization" | "rates" | "done"; summary: string; fedexCode?: string; tracking?: string };
 
 /** Names of settings that are missing or malformed. Never returns values. */
 export function configProblems(c: FedExConfig): string[] {
@@ -51,8 +51,27 @@ export async function diagnoseFedEx(env: Record<string, string | undefined>, tra
   }
   let adult = 0;
   try { adult = (JSON.parse(rate.text).output?.rateReplyDetails ?? []).filter((d: { signatureOptionType?: string }) => d.signatureOptionType === "ADULT").length; } catch { /* count stays 0 */ }
-  return adult > 0 ? { ok: true, step: "done", summary: `Working: FedEx returned ${adult} adult-signature rate(s).` }
+  const tracking = await diagnoseTracking(cfg, transport);
+  return adult > 0 ? { ok: true, step: "done", summary: `Working: FedEx returned ${adult} adult-signature rate(s).`, tracking }
     : { ok: false, step: "rates", summary: "FedEx answered, but none of the rates support adult signature." };
+}
+
+async function diagnoseTracking(cfg: FedExConfig, transport: Transport): Promise<string> {
+  const own = Boolean(cfg.trackClientId && cfg.trackClientSecret);
+  const label = own ? "tracking project key" : "main key";
+  try {
+    const auth = await transport(`${cfg.apiBaseUrl}/oauth/token`, {
+      method: "POST", headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ grant_type: "client_credentials", client_id: own ? cfg.trackClientId : cfg.clientId, client_secret: own ? cfg.trackClientSecret : cfg.clientSecret }).toString(),
+    });
+    if (auth.status !== 200) return `Tracking: FedEx rejected the ${label} (HTTP ${auth.status}).`;
+    const token = String(JSON.parse(auth.text).access_token ?? "");
+    const r = await transport(`${cfg.apiBaseUrl}/track/v1/trackingnumbers`, {
+      method: "POST", headers: { Accept: "application/json", Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ includeDetailedScans: false, trackingInfo: [{ trackingNumberInfo: { trackingNumber: "794644790132" } }] }),
+    });
+    return r.status === 200 ? `Tracking: working (${label}).` : `Tracking: FedEx refused the request with the ${label} (HTTP ${r.status}${codeOf(r.text) ? `, ${codeOf(r.text)}` : ""}).`;
+  } catch { return "Tracking: could not reach FedEx."; }
 }
 
 const codeOf = (text: string): string | undefined => {
