@@ -41,7 +41,7 @@ test("browse: home, shop (no filter bar), brands, product", async ({ page }) => 
   await expect(page.getByRole("heading", { level: 1, name: "Sugarhill" })).toBeVisible();
   await page.goto("/products/the-plug-box-of-10");
   await expect(page.getByText("$149.00").first()).toBeVisible();
-  await expect(page.getByRole("button", { name: "Add to Cart" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Add to Cart" })).toBeEnabled();
 });
 
 for (const path of ["/", "/shop", "/brands/ronald-isley", "/brands/sugarhill", "/products/rappers-delight-box-of-10", "/legal/privacy"]) {
