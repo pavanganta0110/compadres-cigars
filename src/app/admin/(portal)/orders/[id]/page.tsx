@@ -36,7 +36,7 @@ export default async function OrderDetail({ params, searchParams }: { params: Pr
       {sp.saved && <p className="adm-note" role="status">Tracking number saved.</p>}
       {sp.error === "tracking" && <p className="adm-alert" role="alert">Tracking numbers are 6 to 34 letters or digits.</p>}
       {sp.error === "status" && <p className="adm-alert" role="alert">Mark the order as packed before recording a tracking number.</p>}
-      {o.tracking_number && <p>FedEx: <a href={fedexTrackUrl(o.tracking_number)} rel="noreferrer noopener" target="_blank">{o.tracking_number}</a> · status {o.carrier_status_code ?? "not checked yet"}</p>}
+      {o.tracking_number && <p>FedEx: <a href={fedexTrackUrl(o.tracking_number)} rel="noreferrer noopener" target="_blank">{o.tracking_number}</a> · status {o.carrier_status_text ?? o.carrier_status_code ?? "not checked yet"}</p>}
       {can(staff.role, "fulfill") && (
         <form action={saveTrackingAction} className="adm-inline">
           <input type="hidden" name="orderId" value={o.id} />

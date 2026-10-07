@@ -5,6 +5,7 @@ import { z } from "zod";
 import { isTrackingNumber } from "@/lib/domain/operations";
 import { serviceClient } from "@/lib/server/db";
 import { auditAdmin, requireStaff } from "@/lib/server/staff";
+import { refreshTracking } from "@/lib/server/tracking-sync";
 
 const Ids = z.array(z.string().uuid()).min(1).max(200);
 
@@ -31,6 +32,7 @@ export async function saveTrackingAction(formData: FormData) {
     .eq("id", id.data).in("status", ["packed", "completed"]).select("number").maybeSingle();
   if (!data) redirect(`/admin/orders/${id.data}?error=status`);
   await auditAdmin(staff.id, "order.tracking_recorded", "orders", id.data, { tracking_length: tracking.length });
+  await refreshTracking({ orderId: id.data }).catch(() => undefined);   // best effort; never blocks saving
   revalidatePath(`/admin/orders/${id.data}`);
   redirect(`/admin/orders/${id.data}?saved=1`);
 }

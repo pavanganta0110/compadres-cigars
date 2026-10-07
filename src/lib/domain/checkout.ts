@@ -3,7 +3,17 @@ import { evaluateDestination, type RestrictionStatus } from "./restrictions";
 import { eligibleService, type ShippingProvider, type ShippingRate } from "./shipping";
 import { calculateTax, type TaxSnapshot } from "./tax";
 
-export type CartLine = { productId: string; sku: string; name: string; quantity: number; unitPriceCents: number; stock: number };
+export type CartLine = { productId: string; sku: string; name: string; quantity: number; unitPriceCents: number; stock: number; weightOz?: number | null };
+/** Total shipment weight in ounces. Any unknown or non-positive item weight makes the total 0 (rating fails closed). */
+export function totalWeightOz(lines: CartLine[]): number {
+  let total = 0;
+  for (const l of lines) {
+    if (typeof l.weightOz !== "number" || !Number.isFinite(l.weightOz) || l.weightOz <= 0) return 0;
+    total += l.weightOz * l.quantity;
+  }
+  return total;
+}
+
 export type Destination = { country: string; state: string; postalCode: string };
 
 export type CheckoutStep = "cart_stock" | "geography" | "age_verification" | "shipping_eligibility" | "tax";
@@ -38,7 +48,7 @@ export async function evaluateCheckout(i: CheckoutInput): Promise<CheckoutFailur
   if (!allowsCheckout(age, i.now)) return fail("age_verification", "age_not_verified", "You must confirm that you are 21 years of age or older to continue.");
 
   const totalUnits = i.lines.reduce((n, l) => n + l.quantity, 0);
-  const rates = await i.shippingProvider.rates({ state: i.destination.state, postalCode: i.destination.postalCode, totalUnits });
+  const rates = await i.shippingProvider.rates({ state: i.destination.state, postalCode: i.destination.postalCode, totalUnits, weightOz: totalWeightOz(i.lines) });
   const ship = eligibleService(i.chosenService, rates);
   if (!ship.ok) return fail("shipping_eligibility", ship.code, ship.message);
 

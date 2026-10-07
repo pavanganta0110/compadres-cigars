@@ -35,6 +35,10 @@ async function fillCheckout(page: Page, email: string, state: string) {
   await page.getByLabel("State").selectOption(state);
   await page.getByLabel("ZIP code").fill("64131");
 }
+async function getRates(page: Page) {
+  await page.getByRole("button", { name: "Get shipping rates" }).click();
+  await expect(page.getByRole("radio").first()).toBeVisible();
+}
 
 test.beforeEach(async ({ page }) => { await passGate(page); });
 
@@ -43,9 +47,9 @@ test("a blocked state is refused and nothing is created", async ({ page }) => {
   const email = `blocked-${Date.now()}@example.com`;
   const before = await stock();
   await fillCheckout(page, email, "TX");
-  await page.getByLabel("I confirm I am 21 years of age or older").check();
-  await page.getByRole("button", { name: /Place order/ }).click();
+  await page.getByRole("button", { name: "Get shipping rates" }).click();
   await expect(page.locator(".notice-error")).toContainText("cannot ship tobacco products");
+  await expect(page.getByRole("button", { name: /Place order/ })).toBeDisabled();
   expect(await ordersFor(email)).toHaveLength(0);
   expect(await stock()).toBe(before);
 });
@@ -54,6 +58,7 @@ test("checkout is blocked without the age confirmation, even if the client forge
   await setStates(["MO"]);
   const email = `noage-${Date.now()}@example.com`;
   await fillCheckout(page, email, "MO");
+  await getRates(page);
   await page.evaluate(() => {
     const box = document.querySelector<HTMLInputElement>('input[name="ageAttest"]')!;
     box.required = false; box.checked = false;
@@ -71,6 +76,7 @@ test("a sandbox order succeeds with Adult Signature, estimated tax and a complia
   const email = `ok-${Date.now()}@example.com`;
   const before = await stock();
   await fillCheckout(page, email, "MO");
+  await getRates(page);
   await page.getByLabel("I confirm I am 21 years of age or older").check();
   await page.getByRole("button", { name: /Place order/ }).click();
   await expect(page.getByRole("heading", { name: /received/ })).toBeVisible();
@@ -85,6 +91,7 @@ test("double submit creates one order", async ({ page }) => {
   await setStates(["MO"]);
   const email = `dup-${Date.now()}@example.com`;
   await fillCheckout(page, email, "MO");
+  await getRates(page);
   await page.getByLabel("I confirm I am 21 years of age or older").check();
   await page.evaluate(() => { const f = document.querySelector("form.form-grid") as HTMLFormElement; f.requestSubmit(); f.requestSubmit(); });
   await page.waitForTimeout(3000);

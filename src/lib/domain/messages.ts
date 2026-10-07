@@ -6,6 +6,7 @@ export const CHECKOUT_MESSAGES: Record<string, string> = {
   geo_blocked: "We cannot ship tobacco products to this destination.",
   age_not_verified: "You must confirm that you are 21 years of age or older to place an order.",
   shipping_ineligible: "Please choose an available shipping service that supports adult signature delivery.",
+  no_rates: "Shipping rates are not available for this destination right now. Please check the address or try again shortly.",
   tax_unsupported: "We cannot calculate tax for this destination.",
   tax_mismatch: "Pricing changed while you were checking out. Please review and try again.",
   price_changed: "Pricing changed while you were checking out. Please review and try again.",
