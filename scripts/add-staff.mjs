@@ -18,13 +18,25 @@ function askHidden(q) {
     rl.question(q, (a) => { rl.close(); process.stdout.write("\n"); resolve(a); });
   });
 }
-const password = await askHidden("Password (min 12 characters): ");
-if (password.length < 12) { console.error("Password too short."); process.exit(1); }
-
 const db = createClient(url, key, { auth: { persistSession: false } });
-const { data, error } = await db.auth.admin.createUser({ email: email.toLowerCase(), password, email_confirm: true });
-if (error) { console.error("Could not create user:", error.message); process.exit(1); }
-const { error: e2 } = await db.from("staff").insert({ user_id: data.user.id, role });
+const lower = email.toLowerCase();
+let userId;
+for (let page = 1; !userId; page++) {
+  const { data: list, error: le } = await db.auth.admin.listUsers({ page, perPage: 200 });
+  if (le) { console.error("Could not list users:", le.message); process.exit(1); }
+  userId = list.users.find((u) => u.email?.toLowerCase() === lower)?.id;
+  if (list.users.length < 200) break;
+}
+if (userId) {
+  console.log("That user already exists; granting the role without changing the password.");
+} else {
+  const password = await askHidden("Password (min 12 characters): ");
+  if (password.length < 12) { console.error("Password too short."); process.exit(1); }
+  const { data, error } = await db.auth.admin.createUser({ email: lower, password, email_confirm: true });
+  if (error) { console.error("Could not create user:", error.message); process.exit(1); }
+  userId = data.user.id;
+}
+const { error: e2 } = await db.from("staff").upsert({ user_id: userId, role });
 if (e2) { console.error("User created but staff row failed:", e2.message); process.exit(1); }
-await db.from("audit_log").insert({ actor: "system", action: "staff.added", entity: "staff", entity_id: data.user.id, detail: { role } });
+await db.from("audit_log").insert({ actor: "system", action: "staff.added", entity: "staff", entity_id: userId, detail: { role } });
 console.log(`Added ${email} as ${role}.`);

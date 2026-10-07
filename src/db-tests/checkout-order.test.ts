@@ -90,6 +90,22 @@ describe("create_checkout_order", () => {
   });
 });
 
+describe("service_role privileges (hosted Supabase does not grant these by default)", () => {
+  it("server can read/write app tables and call the order function; browsers cannot touch staff or orders", async () => {
+    await db.exec("insert into auth.users(id) values ('00000000-0000-4000-8000-0000000000aa')");
+    await db.exec("set role service_role");
+    await db.exec("insert into staff(user_id, role) values ('00000000-0000-4000-8000-0000000000aa', 'owner')");
+    expect((await db.query("select * from orders")).rows).toEqual([]);
+    await db.exec("update restriction_rules set status = 'blocked' where state = 'MO'");
+    await db.exec("insert into audit_log(actor, action) values ('system', 'test')");
+    await db.exec("reset role");
+    await db.exec("set role authenticated");
+    await expect(db.exec("insert into staff(user_id, role) values ('00000000-0000-4000-8000-0000000000bb', 'owner')")).rejects.toThrow();
+    await expect(db.query("select * from audit_log")).rejects.toThrow();
+    await db.exec("reset role");
+  });
+});
+
 describe("immutability + audit", () => {
   it("compliance snapshot cannot change once written; audit_log is append-only", async () => {
     await allow("MO");
