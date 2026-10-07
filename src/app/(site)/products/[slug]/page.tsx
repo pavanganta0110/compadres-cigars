@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProduct, specRows } from "@/lib/catalog";
 import { formatUsd } from "@/lib/domain/money";
+import { addToCartAction } from "@/app/(site)/cart/actions";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const p = await getProduct((await params).slug);
@@ -27,8 +28,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <p className="price price-lg">{formatUsd(product.price_cents)}</p>
         {product.placeholder_price && <p className="fine" role="note">Placeholder price, pending owner approval.</p>}
         <p>{product.description}</p>
-        {/* Cart arrives in phase 2; the control is rendered but inert until then. */}
-        <button className="btn" type="button" disabled aria-disabled="true">Add to Cart</button>
+        {product.stock > 0 ? (
+          <form action={addToCartAction}>
+            <input type="hidden" name="productId" value={product.id} />
+            <button className="btn" type="submit">Add to Cart</button>
+          </form>
+        ) : (
+          <button className="btn" type="button" disabled aria-disabled="true">Sold out</button>
+        )}
         <p className="fine">Sold by the box. Adult signature required on delivery. Must be 21+.</p>
         <h2>Specifications</h2>
         <dl className="specs">
