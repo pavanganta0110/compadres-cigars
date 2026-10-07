@@ -23,11 +23,13 @@ export async function diagnoseFedEx(env: Record<string, string | undefined>, tra
   if (env.COMPADRES_SHIPPING_PROVIDER !== "fedex") return { ok: false, step: "config", summary: "COMPADRES_SHIPPING_PROVIDER is not set to fedex, so the site uses mock rates." };
   const cfg = fedexConfigFromEnv(env);
   if (!isConfigured(cfg)) return { ok: false, step: "config", summary: `Not configured: ${configProblems(cfg).join("; ") || "unknown"}` };
+  // Identifiers only (never the secret): lets staff see WHICH FedEx project's key is configured.
+  const keyHint = `key ${cfg.clientId.slice(0, 4)}…, account …${cfg.accountNumber.slice(-3)}`;
   const auth = await transport(`${cfg.apiBaseUrl}/oauth/token`, {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ grant_type: "client_credentials", client_id: cfg.clientId, client_secret: cfg.clientSecret }).toString(),
   });
-  if (auth.status !== 200) return { ok: false, step: "authorization", summary: `FedEx rejected the API key and secret (HTTP ${auth.status}). Check the key and secret come from the same FedEx project and the key has no extra spaces.`, fedexCode: codeOf(auth.text) };
+  if (auth.status !== 200) return { ok: false, step: "authorization", summary: `FedEx rejected the API key and secret (HTTP ${auth.status}; ${keyHint}). Check the key and secret come from the same FedEx project and the key has no extra spaces.`, fedexCode: codeOf(auth.text) };
   let token = "";
   try { token = String(JSON.parse(auth.text).access_token ?? ""); } catch { /* handled below */ }
   if (!token) return { ok: false, step: "authorization", summary: "FedEx returned no access token." };
@@ -47,12 +49,12 @@ export async function diagnoseFedEx(env: Record<string, string | undefined>, tra
   if (rate.status !== 200) {
     const code = codeOf(rate.text);
     const hint = code === "ACCOUNT.NUMBER.MISMATCH" ? " The account number does not belong to this API key's FedEx project." : "";
-    return { ok: false, step: "rates", summary: `FedEx accepted the key but refused the rate request (HTTP ${rate.status}).${hint}`, fedexCode: code };
+    return { ok: false, step: "rates", summary: `FedEx accepted the key but refused the rate request (HTTP ${rate.status}; ${keyHint}).${hint}${rate.status === 403 ? " HTTP 403 means this key's FedEx project is not allowed to use the Rates API. Rates need the project of type Rate, Ship, Other." : ""}`, fedexCode: code };
   }
   let adult = 0;
   try { adult = (JSON.parse(rate.text).output?.rateReplyDetails ?? []).filter((d: { signatureOptionType?: string }) => d.signatureOptionType === "ADULT").length; } catch { /* count stays 0 */ }
   const tracking = await diagnoseTracking(cfg, transport);
-  return adult > 0 ? { ok: true, step: "done", summary: `Working: FedEx returned ${adult} adult-signature rate(s).`, tracking }
+  return adult > 0 ? { ok: true, step: "done", summary: `Working: FedEx returned ${adult} adult-signature rate(s) (${keyHint}).`, tracking }
     : { ok: false, step: "rates", summary: "FedEx answered, but none of the rates support adult signature." };
 }
 
