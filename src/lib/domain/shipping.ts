@@ -3,7 +3,7 @@ export type ShippingRate = { service: string; label: string; cents: number; adul
 export interface ShippingProvider {
   readonly name: string;
   /** Server-computed rates only. The browser can choose among them but never supply one. */
-  rates(ctx: { state: string; postalCode: string; totalUnits: number }): Promise<ShippingRate[]>;
+  rates(ctx: { state: string; postalCode: string; totalUnits: number; weightOz: number }): Promise<ShippingRate[]>;
 }
 
 /** Local/staging stand-in until FedEx (phase 5). Never used when APP_ENV=production. */
@@ -26,4 +26,10 @@ export function eligibleService(chosen: string, rates: readonly ShippingRate[]):
     return { ok: false, code: "shipping_ineligible", message: "Please choose an available shipping service that supports adult signature delivery." };
   }
   return { ok: true, rate };
+}
+
+/** Used when a configured provider is unavailable. Returns no rates, so checkout fails closed. */
+export class UnavailableShippingProvider implements ShippingProvider {
+  readonly name = "unavailable";
+  async rates(): Promise<ShippingRate[]> { return []; }
 }

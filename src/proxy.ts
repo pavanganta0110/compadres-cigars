@@ -14,5 +14,5 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   // Everything except the gate itself, static assets and crawler files.
-  matcher: ["/((?!age-gate|admin|_next/|images/|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!age-gate|admin|api/cron|_next/|images/|favicon.ico|robots.txt).*)"],
 };

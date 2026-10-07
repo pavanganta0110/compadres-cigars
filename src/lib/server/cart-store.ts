@@ -19,7 +19,7 @@ export async function writeCart(items: CartItem[]) {
 export async function resolveLines(items: CartItem[]): Promise<(CartLine & { slug: string; image: string | null })[]> {
   if (items.length === 0) return [];
   const { data, error } = await serviceClient()
-    .from("products").select("id, slug, sku, name, price_cents, stock, product_images(path, position)")
+    .from("products").select("id, slug, sku, name, price_cents, stock, weight_oz, product_images(path, position)")
     .in("id", items.map((i) => i.productId)).eq("active", true);
   if (error) throw error;
   const byId = new Map((data ?? []).map((p) => [p.id as string, p]));
@@ -27,6 +27,6 @@ export async function resolveLines(items: CartItem[]): Promise<(CartLine & { slu
     const p = byId.get(i.productId);
     if (!p) return [];
     const imgs = [...((p.product_images as { path: string; position: number }[]) ?? [])].sort((a, b) => a.position - b.position);
-    return [{ productId: p.id, slug: p.slug, sku: p.sku, name: p.name, quantity: i.quantity, unitPriceCents: p.price_cents, stock: p.stock, image: imgs[0]?.path ?? null }];
+    return [{ productId: p.id, slug: p.slug, sku: p.sku, name: p.name, quantity: i.quantity, unitPriceCents: p.price_cents, stock: p.stock, weightOz: p.weight_oz === null ? null : Number(p.weight_oz), image: imgs[0]?.path ?? null }];
   });
 }
