@@ -35,3 +35,25 @@
 .adm-login-card .adm-alert { border-left: 4px solid #ff8a65; padding: 10px 14px; margin: 0; }
 @media (max-width: 860px) { .adm { grid-template-columns: 1fr; } .adm-side { position: static; height: auto; } .adm-side nav { flex-direction: row; flex-wrap: wrap; } .adm-user { margin-top: 0; } }
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---- design pass ---- */
+.adm { font-family: var(--font-sans), system-ui, sans-serif; background: radial-gradient(1200px 500px at 80% -10%, #2a1d15 0%, var(--a-ink) 60%); }
+.adm-main { max-width: 1280px; }
+.adm-main h1, .adm-main h2 { letter-spacing: .01em; }
+.adm-main h2 { border-bottom: 1px solid var(--a-esp); padding-bottom: .4rem; font-size: 1.35rem; }
+.adm-logo { display: grid; gap: 10px; justify-items: start; padding-bottom: 16px; border-bottom: 1px solid var(--a-esp); }
+.adm-logo img { width: 56px; height: 56px; object-fit: contain; border-radius: 8px; }
+.adm-side nav a { border-radius: 0 6px 6px 0; transition: background .15s, border-color .15s; }
+.adm-side nav a[aria-current="page"] { background: var(--a-esp); border-left-color: var(--a-brass); color: var(--a-brass); font-weight: 600; }
+/* Lining numerals: the serif's old-style digits made 0 look like the letter O */
+.adm-card strong, .adm-table td, .adm-table th, .adm-note strong { font-family: var(--font-sans), system-ui, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
+.adm-card { border-top: 3px solid var(--a-brass); border-radius: 4px; display: grid; gap: 4px; }
+.adm-card strong { font-size: 2.6rem; font-weight: 700; line-height: 1.1; }
+.adm-card span { font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: #cbbfae; }
+.adm-card.alert { border-top-color: var(--a-red); background: rgba(255, 138, 101, .07); }
+.adm-health li { border-left: 4px solid var(--a-brass); border-radius: 4px; }
+.adm-health li:has(.adm-pill.warn) { border-left-color: #b66d3d; }
+.adm-table tbody tr:hover td { background: rgba(214, 173, 104, .05); }
+.adm-table th { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+.adm-btn { border-radius: 4px; letter-spacing: .04em; }
+.adm-login-card { border-radius: 6px; border-top: 3px solid #d6ad68; }
