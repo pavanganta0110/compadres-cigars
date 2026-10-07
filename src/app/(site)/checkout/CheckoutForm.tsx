@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { formatUsd } from "@/lib/domain/money";
 import { placeOrderAction, quoteAction, type QuoteState } from "./actions";
 
@@ -10,6 +10,13 @@ export function CheckoutForm({ error }: { error?: string }) {
   const [quote, quoteForm, quoting] = useActionState(quoteAction, initial);
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
+  // Call the action directly: submitting the form through formAction makes React 19 reset every field.
+  const getRates = () => {
+    const fd = new FormData();
+    fd.set("state", state);
+    fd.set("postalCode", zip);
+    startTransition(() => quoteForm(fd));
+  };
   const stale = quote.rates.length > 0 && quote.quotedFor !== `${state}|${zip.trim()}`;
   const ready = quote.rates.length > 0 && !stale;
 
@@ -30,7 +37,7 @@ export function CheckoutForm({ error }: { error?: string }) {
       <label>ZIP code<input name="postalCode" inputMode="numeric" autoComplete="postal-code" required value={zip} onChange={(e) => setZip(e.target.value)} /></label>
 
       <div className="wide">
-        <button className="btn" type="submit" formAction={quoteForm} formNoValidate disabled={quoting}>{quoting ? "Getting rates…" : "Get shipping rates"}</button>
+        <button className="btn" type="button" onClick={getRates} disabled={quoting}>{quoting ? "Getting rates…" : "Get shipping rates"}</button>
         {quote.error && <p className="notice notice-error" role="alert">{quote.error}</p>}
       </div>
 
