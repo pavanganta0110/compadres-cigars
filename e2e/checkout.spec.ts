@@ -45,7 +45,7 @@ test("a blocked state is refused and nothing is created", async ({ page }) => {
   await fillCheckout(page, email, "TX");
   await page.getByLabel("I confirm I am 21 years of age or older").check();
   await page.getByRole("button", { name: /Place order/ }).click();
-  await expect(page.getByRole("alert")).toContainText("cannot ship tobacco products");
+  await expect(page.locator(".notice-error")).toContainText("cannot ship tobacco products");
   expect(await ordersFor(email)).toHaveLength(0);
   expect(await stock()).toBe(before);
 });
@@ -62,7 +62,7 @@ test("checkout is blocked without the age confirmation, even if the client forge
     }
   });
   await page.getByRole("button", { name: /Place order/ }).click();
-  await expect(page.getByRole("alert")).toContainText("21 years of age or older");
+  await expect(page.locator(".notice-error")).toContainText("21 years of age or older");
   expect(await ordersFor(email)).toHaveLength(0);
 });
 
