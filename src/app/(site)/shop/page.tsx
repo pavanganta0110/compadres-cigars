@@ -16,3 +16,5 @@ export default async function Shop() {
     </main>
   );
 }
+
+export const revalidate = 60;
