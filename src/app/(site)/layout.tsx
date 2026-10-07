@@ -15,6 +15,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           </Link>
           <nav aria-label="Primary">
             <Link href="/shop">Shop</Link>
+            <Link href="/cart">Cart</Link>
             {brands.map((b) => <Link key={b.id} href={`/brands/${b.slug}`}>{b.name}</Link>)}
           </nav>
         </header>
