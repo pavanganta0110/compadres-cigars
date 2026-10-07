@@ -1,7 +1,8 @@
-import Link from "next/link";
+import Image from "next/image";
 import { can, type Permission } from "@/lib/domain/permissions";
 import { requireStaff } from "@/lib/server/staff";
 import { logoutAction } from "../login/actions";
+import { AdminNav } from "./AdminNav";
 import "../admin.css";
 
 export const metadata = { title: { default: "Compadres Cigars Admin Portal", template: "%s | Compadres Cigars Admin Portal" }, robots: { index: false, follow: false } };
@@ -26,10 +27,11 @@ export default async function PortalLayout({ children }: { children: React.React
     <div className="adm">
       <a className="skip" href="#main">Skip to content</a>
       <aside className="adm-side">
-        <p className="adm-brand">Compadres Cigars Admin Portal</p>
-        <nav aria-label="Admin">
-          {NAV.filter((n) => can(staff.role, n.perm)).map((n) => <Link key={n.href} href={n.href}>{n.label}</Link>)}
-        </nav>
+        <div className="adm-logo">
+          <Image src="/images/crest.png" alt="" width={56} height={56} />
+          <p className="adm-brand">Compadres Cigars Admin Portal</p>
+        </div>
+        <AdminNav items={NAV.filter((n) => can(staff.role, n.perm)).map(({ href, label }) => ({ href, label }))} />
         <form action={logoutAction} className="adm-user">
           <p>{staff.email}<br /><span>{staff.role}</span></p>
           <button className="adm-link" type="submit">Sign out</button>

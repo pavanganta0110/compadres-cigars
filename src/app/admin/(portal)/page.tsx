@@ -54,11 +54,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <h2>Orders and fulfillment</h2>
       <p className="adm-note">Paid orders received: <strong>{s.received.today}</strong> today · <strong>{s.received.days7}</strong> in 7 days · <strong>{s.received.days30}</strong> in 30 days</p>
       <div className="adm-cards">
-        <div className="adm-card"><strong>{s.notPacked}</strong>Not packed</div>
-        <div className="adm-card"><strong>{s.packedNeedsLabel}</strong>Packed (needs a label)</div>
-        <div className="adm-card"><strong>{s.shipped}</strong>Shipped (in transit)</div>
-        <div className="adm-card"><strong>{s.delivered30}</strong>Delivered (30 days)</div>
-        {s.unpackedOver24h > 0 && <div className="adm-card alert" role="alert"><strong>{s.unpackedOver24h}</strong>Unpacked over 24 hours</div>}
+        <div className="adm-card"><strong>{s.notPacked}</strong><span>Not packed</span></div>
+        <div className="adm-card"><strong>{s.packedNeedsLabel}</strong><span>Packed (needs a label)</span></div>
+        <div className="adm-card"><strong>{s.shipped}</strong><span>Shipped (in transit)</span></div>
+        <div className="adm-card"><strong>{s.delivered30}</strong><span>Delivered (30 days)</span></div>
+        {s.unpackedOver24h > 0 && <div className="adm-card alert" role="alert"><strong>{s.unpackedOver24h}</strong><span>Unpacked over 24 hours</span></div>}
       </div>
 
       <h2>Orders to pack and ship</h2>
