@@ -35,6 +35,12 @@ async function fillCheckout(page: Page, email: string, state: string) {
   await page.getByLabel("State").selectOption(state);
   await page.getByLabel("ZIP code").fill("64131");
 }
+async function fillCard(page: Page, number = "4242 4242 4242 4242") {
+  await page.getByLabel("Name on card").fill("Test Buyer");
+  await page.getByLabel("Card number").fill(number);
+  await page.getByLabel("Expiry (MM/YY)").fill("12/34");
+  await page.getByLabel("Security code").fill("123");
+}
 async function getRates(page: Page) {
   await page.getByRole("button", { name: "Get shipping rates" }).click();
   await expect(page.getByRole("radio").first()).toBeVisible();
@@ -66,22 +72,25 @@ test("checkout is blocked without the age confirmation, even if the client forge
       const h = document.createElement("input"); h.type = "hidden"; h.name = n; h.value = v; box.form!.appendChild(h);
     }
   });
+  await fillCard(page);
   await page.getByRole("button", { name: /Place order/ }).click();
   await expect(page.locator(".notice-error")).toContainText("21 years of age or older");
   expect(await ordersFor(email)).toHaveLength(0);
 });
 
-test("a sandbox order succeeds with Adult Signature, estimated tax and a compliance snapshot", async ({ page }) => {
+test("a sandbox order is paid, with Adult Signature, estimated tax and a compliance snapshot", async ({ page }) => {
   await setStates(["MO"]);
   const email = `ok-${Date.now()}@example.com`;
   const before = await stock();
   await fillCheckout(page, email, "MO");
   await getRates(page);
   await page.getByLabel("I confirm I am 21 years of age or older").check();
+  await fillCard(page);
   await page.getByRole("button", { name: /Place order/ }).click();
   await expect(page.getByRole("heading", { name: /received/ })).toBeVisible();
+  await expect(page.getByText("Payment received")).toBeVisible();
   const [order] = await ordersFor(email);
-  expect(order.status).toBe("pending");
+  expect(order.status).toBe("processing");
   expect(order.tax_cents).toBe(1258);
   expect((order.compliance_snapshot as { shipping: { adult_signature_required: boolean } }).shipping.adult_signature_required).toBe(true);
   expect(await stock()).toBe(before - 1);
@@ -93,6 +102,7 @@ test("double submit creates one order", async ({ page }) => {
   await fillCheckout(page, email, "MO");
   await getRates(page);
   await page.getByLabel("I confirm I am 21 years of age or older").check();
+  await fillCard(page);
   await page.evaluate(() => { const f = document.querySelector("form.form-grid") as HTMLFormElement; f.requestSubmit(); f.requestSubmit(); });
   await page.waitForTimeout(3000);
   expect(await ordersFor(email)).toHaveLength(1);

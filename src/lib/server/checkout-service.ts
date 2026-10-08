@@ -8,6 +8,7 @@ import { redact } from "@/lib/domain/audit";
 import type { RestrictionStatus } from "@/lib/domain/restrictions";
 import { readCart, resolveLines } from "./cart-store";
 import { serviceClient } from "./db";
+import { payOrder, type PayResult } from "./payment-service";
 import { ageProvider, shippingProvider } from "./providers";
 
 export const CHECKOUT_SESSION_COOKIE = "cc_chk";
@@ -21,6 +22,8 @@ export const CheckoutForm = z.object({
   state: z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/),
   postalCode: z.string().trim().regex(/^\d{5}(-\d{4})?$/),
   shippingService: z.string().trim().min(1).max(60),
+  /** Opaque, single-use processor token produced in the browser. Never a card number (payOrder refuses PAN-shaped values). */
+  paymentToken: z.string().trim().max(300).optional().default(""),
 });
 
 export async function loadRestrictions(): Promise<Map<string, RestrictionStatus>> {
@@ -33,7 +36,7 @@ async function audit(action: string, detail: Record<string, unknown>) {
   await serviceClient().from("audit_log").insert({ actor: "system", action, entity: "checkout", detail: redact(detail) as object });
 }
 
-export type PlaceResult = { ok: true; orderId: string } | { ok: false; code: string; step?: string };
+export type PlaceResult = { ok: true; orderId: string; payment: PayResult } | { ok: false; code: string; step?: string };
 
 /**
  * Server-authoritative order placement. Ignores every client-supplied "passed"/price/tax value:
@@ -78,5 +81,8 @@ export async function placeOrder(input: z.infer<typeof CheckoutForm>, attested: 
     await audit("checkout.blocked", { step: "order_creation", code: r.code, state: input.state });
     return { ok: false, code: r.code ?? "unexpected", step: "order_creation" };
   }
-  return { ok: true, orderId: r.order_id! };
+  // The order exists (pending) and every check passed. payOrder re-runs the checks, then charges. A failed payment
+  // leaves the order pending so the customer can retry on the order page.
+  const payment = await payOrder(r.order_id!, input.paymentToken);
+  return { ok: true, orderId: r.order_id!, payment };
 }

@@ -6,6 +6,7 @@ import { messageFor } from "@/lib/domain/messages";
 import type { ShippingRate } from "@/lib/domain/shipping";
 import { writeCart } from "@/lib/server/cart-store";
 import { CHECKOUT_SESSION_COOKIE, CheckoutForm, placeOrder } from "@/lib/server/checkout-service";
+import { payOrder } from "@/lib/server/payment-service";
 import { quoteShipping } from "@/lib/server/quote";
 
 export type QuoteState = { rates: ShippingRate[]; quotedFor: string; error?: string };
@@ -33,5 +34,13 @@ export async function placeOrderAction(formData: FormData) {
   const r = await placeOrder(parsed.data, attested);
   if (!r.ok) redirect(`/checkout?error=${encodeURIComponent(r.code)}`);
   await writeCart([]);
-  redirect(`/order/${r.orderId}`);
+  redirect(r.payment.ok ? `/order/${r.orderId}` : `/order/${r.orderId}?error=${encodeURIComponent(r.payment.code)}`);
+}
+
+/** Retry payment on an existing pending order (after a decline). Compliance re-runs inside payOrder. */
+export async function payOrderAction(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("orderId"));
+  if (!id.success) redirect("/shop");
+  const r = await payOrder(id.data, formData.get("paymentToken"));
+  redirect(r.ok ? `/order/${id.data}` : `/order/${id.data}?error=${encodeURIComponent(r.code)}`);
 }

@@ -1,9 +1,9 @@
 export type Role = "owner" | "manager" | "fulfillment" | "viewer";
-export type Permission = "view" | "fulfill" | "manage_products" | "view_reports" | "view_audit" | "manage_restrictions" | "manage_users";
+export type Permission = "view" | "fulfill" | "manage_products" | "view_reports" | "view_audit" | "manage_restrictions" | "manage_users" | "refund" | "manage_payments";
 
 const MATRIX: Record<Role, readonly Permission[]> = {
-  owner: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "manage_restrictions", "manage_users"],
-  manager: ["view", "fulfill", "manage_products", "view_reports", "view_audit"],
+  owner: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "manage_restrictions", "manage_users", "refund", "manage_payments"],
+  manager: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "refund"],
   fulfillment: ["view", "fulfill"],
   viewer: ["view"],
 };

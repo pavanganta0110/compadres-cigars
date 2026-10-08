@@ -14,7 +14,7 @@ export async function taxReportFor(from: Date, to: Date) {
   const db = serviceClient();
   const [o, r] = await Promise.all([
     db.from("orders").select("status, created_at, tax_cents, subtotal_cents, shipping_cents, total_cents, shipping_address").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
-    db.from("refunds").select("amount_cents, created_at, orders(shipping_address)").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
+    db.from("refunds").select("amount_cents, created_at, orders(shipping_address)").eq("status", "completed").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
   ]);
   if (o.error) throw o.error;
   if (r.error) throw r.error;

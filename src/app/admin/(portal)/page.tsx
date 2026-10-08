@@ -4,20 +4,21 @@ import { formatWaiting, packQueue, summarizeOps } from "@/lib/domain/operations"
 import { can } from "@/lib/domain/permissions";
 import { loadOrders } from "@/lib/server/admin-data";
 import { serviceClient } from "@/lib/server/db";
-import { shippingProvider } from "@/lib/server/providers";
+import { paymentSetup, shippingProvider } from "@/lib/server/providers";
 import { requireStaff } from "@/lib/server/staff";
 import { markPackedAction } from "./orders/actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
 
-function healthRows() {
+async function healthRows() {
   const ship = shippingProvider();
+  const pay = await paymentSetup();
   const detail = ship.name === "fedex" ? "FedEx REST (adult signature rates, tracking)." : ship.name === "mock" ? "Mock rates (not FedEx)." : `Unavailable: ${ship.name}. Checkout cannot quote shipping.`;
   return [
     { name: "Age verification", mode: "sandbox", detail: "Self-attestation (checkbox). Not identity verification; carries regulatory and underwriting risk.", prod: false },
     { name: "Shipping", mode: ship.mode, detail, prod: ship.mode === "live" },
-    { name: "Payments", mode: "disabled", detail: "Not connected yet.", prod: false },
+    { name: "Payments", mode: pay.mode, detail: pay.detail, prod: pay.productionReady },
   ];
 }
 
@@ -29,7 +30,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const [orders, blocked, refunds] = await Promise.all([
     loadOrders({ sinceDays: 120 }),
     db.from("audit_log").select("id, at, detail").eq("action", "checkout.blocked").in("detail->>code", ["age_not_verified", "shipping_ineligible"]).gte("at", new Date(now.getTime() - 7 * 86400_000).toISOString()).order("at", { ascending: false }).limit(10),
-    db.from("refunds").select("id, amount_cents, created_at, order_id").order("created_at", { ascending: false }).limit(5),
+    db.from("refunds").select("id, amount_cents, created_at, order_id").eq("status", "completed").order("created_at", { ascending: false }).limit(5),
   ]);
   const s = summarizeOps(orders, now);
   const queue = packQueue(orders, now);
@@ -43,7 +44,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
       <h2>Integration health</h2>
       <ul className="adm-health">
-        {healthRows().map((h) => (
+        {(await healthRows()).map((h) => (
           <li key={h.name}>
             <span><strong>{h.name}</strong><br /><small>{h.detail}</small></span>
             <span><span className={`adm-pill ${h.mode === "disabled" ? "warn" : ""}`}>{h.mode}</span>{" "}<span className={`adm-pill ${h.prod ? "" : "warn"}`}>{h.prod ? "production-ready" : "not production-ready"}</span></span>
