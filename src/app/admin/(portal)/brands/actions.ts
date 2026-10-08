@@ -68,3 +68,21 @@ export async function updateBrandAction(formData: FormData) {
   bust();
   redirect("/admin/brands?saved=1");
 }
+
+/** Removes a brand only when it has no products (products must be removed or moved first). Requires the confirmation box. */
+export async function removeBrandAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("brandId"));
+  if (!id.success) redirect("/admin/brands?error=invalid");
+  if (formData.get("confirm") !== "on") redirect("/admin/brands?error=confirm");
+  const db = serviceClient();
+  const { data: brand } = await db.from("brands").select("name, logo_path, hero_path, products(id)").eq("id", id.data).maybeSingle();
+  if (!brand) redirect("/admin/brands?error=invalid");
+  if ((brand.products as unknown[]).length > 0) redirect(`/admin/brands?error=has_products&n=${encodeURIComponent(brand.name.slice(0, 60))}`);
+  const { error } = await db.from("brands").delete().eq("id", id.data);
+  if (error) redirect("/admin/brands?error=invalid");
+  await deleteImage(brand.logo_path); await deleteImage(brand.hero_path);
+  await auditAdmin(staff.id, "brand.removed", "brands", id.data, { name: brand.name });
+  bust();
+  redirect("/admin/brands?removed=1");
+}

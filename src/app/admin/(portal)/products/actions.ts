@@ -120,3 +120,30 @@ export async function removeProductImageAction(formData: FormData) {
   revalidatePath("/admin/products"); revalidatePath("/shop");
   redirect("/admin/products?saved=1");
 }
+
+/**
+ * Permanently removes a product that was never ordered. A product that appears on any order is kept (order records
+ * point at it) and is unpublished instead. Requires the confirmation box.
+ */
+export async function removeProductAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("productId"));
+  if (!id.success) redirect("/admin/products?error=invalid");
+  if (formData.get("confirm") !== "on") redirect("/admin/products?error=confirm");
+  const db = serviceClient();
+  const { data: product } = await db.from("products").select("name, sku, product_images(path)").eq("id", id.data).maybeSingle();
+  if (!product) redirect("/admin/products?error=invalid");
+  const { count } = await db.from("order_items").select("id", { count: "exact", head: true }).eq("product_id", id.data);
+  if ((count ?? 0) > 0) {
+    await db.from("products").update({ active: false }).eq("id", id.data);
+    await auditAdmin(staff.id, "product.unpublished", "products", id.data, { reason: "has orders; kept for order records", removeRequested: true });
+    revalidatePath("/admin/products"); revalidatePath("/shop");
+    redirect(`/admin/products?error=has_orders&n=${encodeURIComponent(product.name.slice(0, 80))}`);
+  }
+  const { error } = await db.from("products").delete().eq("id", id.data);
+  if (error) redirect("/admin/products?error=invalid");
+  for (const im of product.product_images as { path: string }[]) await deleteImage(im.path);
+  await auditAdmin(staff.id, "product.removed", "products", id.data, { sku: product.sku, name: product.name });
+  revalidatePath("/admin/products"); revalidatePath("/shop"); revalidatePath("/admin");
+  redirect("/admin/products?removed=1");
+}

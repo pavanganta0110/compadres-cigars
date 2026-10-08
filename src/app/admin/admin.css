@@ -107,3 +107,5 @@
 .adm-thumb .adm-link { min-height: 0; padding: 0; font-size: .8rem; }
 .adm-photo-form { margin-top: 10px; } .adm-photo-form input[type=file] { max-width: 220px; font-size: .8rem; }
 .adm-stack { display: grid; gap: 14px; } .adm-plain { border: 0 !important; margin: 0 0 4px !important; padding: 0 !important; font-size: 1.3rem !important; }
+.adm-btn.adm-danger { background: transparent; color: var(--a-red); border: 1px solid var(--a-red); }
+.adm-btn.adm-danger:hover { background: var(--a-red); color: var(--a-ink); }
