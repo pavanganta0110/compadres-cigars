@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { can } from "@/lib/domain/permissions";
 import { serviceClient } from "@/lib/server/db";
+import { ImagePicker } from "@/components/ImagePicker";
 import { requireStaff } from "@/lib/server/staff";
 import { updateBrandAction } from "./actions";
 
@@ -38,8 +39,8 @@ export default async function Brands({ searchParams }: { searchParams: Promise<{
                 <label>Story<textarea name="story" rows={4} defaultValue={b.story ?? ""} maxLength={6000} /></label>
                 <div className="adm-row">
                   <label>Accent color<input name="accentColor" defaultValue={b.accent_color ?? "#d6ad68"} pattern="#[0-9a-fA-F]{6}" /></label>
-                  <label>Replace banner image<input name="hero" type="file" accept="image/jpeg,image/png,image/webp" /></label>
-                  <label>Replace logo<input name="logo" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+                  <ImagePicker name="hero" label="Replace banner image" />
+                  <ImagePicker name="logo" label="Replace logo" />
                 </div>
                 <label className="adm-check"><input type="checkbox" name="publish" defaultChecked={b.active} />Published</label>
                 <p><button className="adm-btn" type="submit" aria-label={`Save ${b.name}`}>Save</button></p>

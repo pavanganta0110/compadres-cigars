@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { serviceClient } from "@/lib/server/db";
+import { ImagePicker } from "@/components/ImagePicker";
 import { requireStaff } from "@/lib/server/staff";
 import { createProductAction } from "../actions";
 
@@ -41,8 +42,8 @@ export default async function NewProduct({ searchParams }: { searchParams: Promi
         </div>
         <label>Short description<input name="shortDescription" maxLength={300} /></label>
         <label>Description<textarea name="description" rows={5} maxLength={4000} /></label>
-        <label>Photo (optional)<input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
-        <p className="adm-muted">JPEG, PNG or WebP, up to 4 MB. You can add more photos from the product list.</p>
+        <ImagePicker name="imageFile" label="Photo (optional)" />
+        <p className="adm-muted">JPEG, PNG or WebP. Large photos are reduced automatically. You can add more photos from the product list.</p>
         <label className="adm-check"><input type="checkbox" name="publish" />Publish now (visible in the store)</label>
         <p><button className="adm-btn" type="submit">Create product</button></p>
       </form>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ImagePicker } from "@/components/ImagePicker";
 import { requireStaff } from "@/lib/server/staff";
 import { createBrandAction } from "../actions";
 
@@ -26,10 +27,10 @@ export default async function NewBrand({ searchParams }: { searchParams: Promise
         <label>Story<textarea name="story" rows={5} maxLength={6000} /></label>
         <div className="adm-row">
           <label>Accent color<input name="accentColor" defaultValue="#d6ad68" pattern="#[0-9a-fA-F]{6}" /></label>
-          <label>Banner image (optional)<input name="hero" type="file" accept="image/jpeg,image/png,image/webp" /></label>
-          <label>Logo (optional)<input name="logo" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+          <ImagePicker name="hero" label="Banner image (optional)" />
+          <ImagePicker name="logo" label="Logo (optional)" />
         </div>
-        <p className="adm-muted">JPEG, PNG or WebP, up to 4 MB each.</p>
+        <p className="adm-muted">JPEG, PNG or WebP. Large photos are reduced automatically.</p>
         <label className="adm-check"><input type="checkbox" name="publish" />Publish now (visible in the store)</label>
         <p><button className="adm-btn" type="submit">Create brand</button></p>
       </form>

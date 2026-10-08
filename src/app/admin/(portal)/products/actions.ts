@@ -25,7 +25,10 @@ export async function updateProductAction(formData: FormData) {
   const p = Form.safeParse(Object.fromEntries(formData));
   if (!p.success) redirect("/admin/products?error=invalid");
   const active = p.data.active === "on";
-  if (needsWeight(active, p.data.weightOz)) redirect("/admin/products?error=weight");
+  if (needsWeight(active, p.data.weightOz)) {
+    const { data: prod } = await serviceClient().from("products").select("name").eq("id", p.data.productId).maybeSingle();
+    redirect(`/admin/products?error=weight&n=${encodeURIComponent((prod?.name ?? "").slice(0, 80))}`);
+  }
   const price_cents = Math.round(Number(p.data.price) * 100);
   if (active && price_cents <= 0) redirect("/admin/products?error=price");
   const db = serviceClient();
