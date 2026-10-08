@@ -59,7 +59,7 @@ test.describe("tax rates", () => {
     expect(audit![0].detail).toMatchObject({ from_bps: MO_APPROVED, to_bps: 1000 });
 
     await page.getByRole("button", { name: "Reset to 8.44%" }).click();
-    expect((await db().from("tax_rates").select("rate_bps").eq("state", "MO").single()).data!.rate_bps).toBe(MO_APPROVED);
+    await expect.poll(async () => (await db().from("tax_rates").select("rate_bps").eq("state", "MO").single()).data!.rate_bps).toBe(MO_APPROVED);
   });
 });
 
