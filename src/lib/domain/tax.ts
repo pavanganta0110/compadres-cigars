@@ -64,27 +64,48 @@ export const TAX_RATES_BPS: Readonly<Record<string, number>> = Object.freeze({
 
 export type TaxSnapshot = {
   state: string; rate_bps: number; taxable_cents: number; tax_cents: number; shipping_taxable: false;
-  basis: "avg_combined_reference"; source_document: string; source_sha256: string;
-  effective_date: string; rule_version: number; is_average_reference: true; estimate: true;
+  basis: "avg_combined_reference" | "admin_override"; source_document: string; source_sha256: string;
+  effective_date: string; rule_version: number; is_average_reference: boolean; estimate: true;
 };
+
+/** A row of the tax_rates table. The database is the authority at checkout; admins can edit it. */
+export type TaxRateRow = { rate_bps: number; source_sha256: string; effective_date: string };
+/** Marker stored in tax_rates.matrix_sha256 when a rate was changed in the admin portal. */
+export const ADMIN_OVERRIDE = "admin-edit";
+export const MAX_RATE_BPS = 3000;
+
+/** "8.44" -> 844. Strict: at most 2 decimals, 0 to 30 percent. */
+export function parsePercentToBps(input: string): number | null {
+  const t = input.trim().replace(/%$/, "");
+  if (!/^\d{1,2}(\.\d{1,2})?$/.test(t)) return null;
+  const [w, f = ""] = t.split(".");
+  const bps = Number(w) * 100 + Number(f.padEnd(2, "0"));
+  return bps <= MAX_RATE_BPS ? bps : null;
+}
+export const formatBps = (bps: number): string => (bps / 100).toFixed(2);
 
 export type TaxResult = { ok: true; snapshot: TaxSnapshot } | { ok: false; code: "tax_unsupported" };
 
-export function calculateTax(state: string, taxableCents: number): TaxResult {
+export function calculateTax(state: string, taxableCents: number, rates?: ReadonlyMap<string, TaxRateRow>): TaxResult {
   const s = state.trim().toUpperCase();
   if (!Number.isInteger(taxableCents) || taxableCents < 0) return { ok: false, code: "tax_unsupported" };
-  if (!Object.hasOwn(TAX_RATES_BPS, s)) return { ok: false, code: "tax_unsupported" };
-  const rate = TAX_RATES_BPS[s];
+  // With a rates map (the live tax_rates table) that map is authoritative; a state missing from it fails closed.
+  const row: TaxRateRow | undefined = rates
+    ? rates.get(s)
+    : Object.hasOwn(TAX_RATES_BPS, s) ? { rate_bps: TAX_RATES_BPS[s], source_sha256: TAX_MATRIX_SHA256, effective_date: TAX_EFFECTIVE_DATE } : undefined;
+  if (!row || !Number.isInteger(row.rate_bps) || row.rate_bps < 0 || row.rate_bps > MAX_RATE_BPS) return { ok: false, code: "tax_unsupported" };
+  const rate = row.rate_bps;
+  const override = row.source_sha256 === ADMIN_OVERRIDE;
   return {
     ok: true,
     snapshot: {
       state: s, rate_bps: rate, taxable_cents: taxableCents,
       // round half up; identical formula to create_checkout_order() in Postgres
       tax_cents: Math.floor((taxableCents * rate + 5000) / 10000),
-      shipping_taxable: false, basis: "avg_combined_reference",
-      source_document: "Compadres_Cigars_50_State_Tobacco_Tax_Matrix_2026.xlsx - 50-State Tax Matrix.pdf",
-      source_sha256: TAX_MATRIX_SHA256, effective_date: TAX_EFFECTIVE_DATE, rule_version: TAX_RULE_VERSION,
-      is_average_reference: true, estimate: true,
+      shipping_taxable: false, basis: override ? "admin_override" : "avg_combined_reference",
+      source_document: override ? "Rate set by an administrator in the admin portal" : "Compadres_Cigars_50_State_Tobacco_Tax_Matrix_2026.xlsx - 50-State Tax Matrix.pdf",
+      source_sha256: row.source_sha256, effective_date: row.effective_date, rule_version: TAX_RULE_VERSION,
+      is_average_reference: !override, estimate: true,
     },
   };
 }

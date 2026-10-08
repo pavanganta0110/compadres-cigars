@@ -2,7 +2,8 @@ import Link from "next/link";
 import { formatUsd } from "@/lib/domain/money";
 import { formatWaiting, packQueue, summarizeOps } from "@/lib/domain/operations";
 import { can } from "@/lib/domain/permissions";
-import { loadOrders } from "@/lib/server/admin-data";
+import { loadOrders, loadSalesLines, loadStockAlerts } from "@/lib/server/admin-data";
+import { SalesPanel, StockAlerts } from "./SalesPanel";
 import { serviceClient } from "@/lib/server/db";
 import { paymentSetup, shippingProvider } from "@/lib/server/providers";
 import { requireStaff } from "@/lib/server/staff";
@@ -27,10 +28,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { denied } = await searchParams;
   const now = new Date();
   const db = serviceClient();
-  const [orders, blocked, refunds] = await Promise.all([
+  const canReports = can(staff.role, "view_reports");
+  const [orders, blocked, refunds, lines, alerts] = await Promise.all([
     loadOrders({ sinceDays: 120 }),
     db.from("audit_log").select("id, at, detail").eq("action", "checkout.blocked").in("detail->>code", ["age_not_verified", "shipping_ineligible"]).gte("at", new Date(now.getTime() - 7 * 86400_000).toISOString()).order("at", { ascending: false }).limit(10),
     db.from("refunds").select("id, amount_cents, created_at, order_id").eq("status", "completed").order("created_at", { ascending: false }).limit(5),
+    canReports ? loadSalesLines(30) : Promise.resolve([]),
+    loadStockAlerts(),
   ]);
   const s = summarizeOps(orders, now);
   const queue = packQueue(orders, now);
@@ -41,6 +45,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     <>
       <h1>Dashboard</h1>
       {denied && <p className="adm-alert" role="alert">Your role does not allow that.</p>}
+
+      {canReports
+        ? <><h2>Sales</h2><SalesPanel orders={orders} lines={lines} alerts={alerts} now={now} /></>
+        : alerts.length > 0 && <><h2>Inventory alerts</h2><StockAlerts alerts={alerts} /></>}
 
       <h2>Integration health</h2>
       <ul className="adm-health">

@@ -1,7 +1,7 @@
 import { allowsCheckout, type AgeVerificationProvider, type VerificationResult } from "./age";
 import { evaluateDestination, type RestrictionStatus } from "./restrictions";
 import { eligibleService, type ShippingProvider, type ShippingRate } from "./shipping";
-import { calculateTax, type TaxSnapshot } from "./tax";
+import { calculateTax, type TaxRateRow, type TaxSnapshot } from "./tax";
 
 export type CartLine = { productId: string; sku: string; name: string; quantity: number; unitPriceCents: number; stock: number; weightOz?: number | null };
 /** Total shipment weight in ounces. Any unknown or non-positive item weight makes the total 0 (rating fails closed). */
@@ -25,6 +25,8 @@ export type CheckoutPass = {
 export type CheckoutInput = {
   lines: CartLine[]; destination: Destination; restrictions: ReadonlyMap<string, RestrictionStatus>;
   attested: boolean; chosenService: string; ageProvider: AgeVerificationProvider; shippingProvider: ShippingProvider; now: Date;
+  /** The live tax_rates table. Omitted only in unit tests (falls back to the built-in approved matrix). */
+  taxRates?: ReadonlyMap<string, TaxRateRow>;
 };
 
 const fail = (step: CheckoutStep, code: string, message: string): CheckoutFailure => ({ ok: false, step, code, message });
@@ -53,7 +55,7 @@ export async function evaluateCheckout(i: CheckoutInput): Promise<CheckoutFailur
   if (!ship.ok) return fail("shipping_eligibility", ship.code, ship.message);
 
   const subtotalCents = i.lines.reduce((n, l) => n + l.unitPriceCents * l.quantity, 0);
-  const tax = calculateTax(i.destination.state, subtotalCents);
+  const tax = calculateTax(i.destination.state, subtotalCents, i.taxRates);
   if (!tax.ok) return fail("tax", tax.code, "We cannot calculate tax for this destination.");
   return { ok: true, subtotalCents, shipping: ship.rate, tax: tax.snapshot, totalCents: subtotalCents + ship.rate.cents + tax.snapshot.tax_cents, age };
 }
