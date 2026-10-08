@@ -27,6 +27,13 @@ describe("diagnoseFedEx", () => {
     expect(d).toMatchObject({ ok: false, step: "rates", fedexCode: "ACCOUNT.NUMBER.MISMATCH" });
     expect(d.summary).toMatch(/does not belong/);
   });
+  it("shows which key is configured (first 4 chars) and explains HTTP 403", async () => {
+    const d = await diagnoseFedEx({ ...ENV, COMPADRES_FEDEX_CLIENT_ID: "l737abcdef" }, t({ status: 403, body: { errors: [{ code: "FORBIDDEN.ERROR" }] } }));
+    expect(d.summary).toContain("key l737…");
+    expect(d.summary).toContain("account …073");
+    expect(d.summary).toMatch(/not allowed to use the Rates API/);
+    expect(d.summary).not.toContain("l737abcdef");
+  });
   it("never includes the secret in any output", async () => {
     for (const rate of [{ status: 200, body: okRates }, { status: 500, body: { errors: [{ code: "X" }] } }]) {
       expect(JSON.stringify(await diagnoseFedEx(ENV, t(rate)))).not.toContain("SECRET-VALUE");
