@@ -64,8 +64,11 @@ export function useTokenizedSubmit(tokenizer: Tokenizer | null) {
     tokenize(tokenizer, fields).then((token) => {
       hidden.value = token;
       for (const id of ["cc-number", "cc-exp", "cc-csc", "cc-name"]) { const el = form.querySelector<HTMLInputElement>(`#${id}`); if (el) el.value = ""; }
-      form.requestSubmit();
-      hidden.value = "";                            // tokens are single use; never leave one behind
+      // Defer: a requestSubmit() made while the browser is still dispatching the original submit event is ignored.
+      setTimeout(() => {
+        form.requestSubmit();                       // React reads the form data synchronously during this call
+        hidden.value = "";                          // tokens are single use; never leave one behind
+      }, 0);
     }, (err: unknown) => setError(err instanceof Error ? err.message : "Check your card details."));
   };
   return { onSubmit, error };
