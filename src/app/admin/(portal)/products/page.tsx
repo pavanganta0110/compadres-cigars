@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ImagePicker } from "@/components/ImagePicker";
 import { stockState } from "@/lib/domain/inventory";
 import { can } from "@/lib/domain/permissions";
 import { serviceClient } from "@/lib/server/db";
@@ -13,7 +14,7 @@ const ERRORS: Record<string, string> = {
   invalid: "That change was not valid.", weight: "Enter the box weight (oz) before publishing: FedEx cannot quote shipping without it.", price: "A published product needs a price above $0.00.",
 };
 
-export default async function Products({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; filter?: string }> }) {
+export default async function Products({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; filter?: string; n?: string }> }) {
   const staff = await requireStaff();
   const sp = await searchParams;
   const { data } = await serviceClient().from("products").select("id, sku, name, price_cents, stock, active, weight_oz, low_stock_threshold, placeholder_price, brands(name), product_images(id, path, position)").order("name");
@@ -28,7 +29,7 @@ export default async function Products({ searchParams }: { searchParams: Promise
         {edit && <Link className="adm-btn" href="/admin/products/new">Add product</Link>}
       </div>
       {sp.saved && <p className="adm-note" role="status">Saved.</p>}
-      {sp.error && <p className="adm-alert" role="alert">{ERRORS[sp.error] ?? ERRORS.invalid}</p>}
+      {sp.error && <p className="adm-alert" role="alert">{sp.error === "weight" && sp.n ? `${sp.n.slice(0, 80)} was not published. ` : ""}{ERRORS[sp.error] ?? ERRORS.invalid}</p>}
       <p className="adm-tabs">
         <Link href="/admin/products" aria-current={sp.filter === "low" ? undefined : "page"}>All ({all.length})</Link>
         <Link href="/admin/products?filter=low" aria-current={sp.filter === "low" ? "page" : undefined}>Needs restocking ({attention.length})</Link>
@@ -54,7 +55,7 @@ export default async function Products({ searchParams }: { searchParams: Promise
                   {edit && (
                     <form action={addProductImageAction} className="adm-inline adm-photo-form">
                       <input type="hidden" name="productId" value={p.id} />
-                      <label>Add photo<input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+                      <ImagePicker name="imageFile" label="Add photo" required />
                       <button className="adm-btn" type="submit" aria-label={`Upload photo for ${p.name}`}>Upload</button>
                     </form>
                   )}</td>
