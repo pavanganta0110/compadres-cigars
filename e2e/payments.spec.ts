@@ -219,6 +219,6 @@ test("axe: checkout payment fields, pending order pay form, admin payments page"
   await check();
   await login(page, staff.owner);
   await page.goto("/admin/payments");
-  await expect(page.getByRole("heading", { name: "Payments" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Payments", exact: true })).toBeVisible();
   await check();
 });

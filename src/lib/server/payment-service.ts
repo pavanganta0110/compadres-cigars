@@ -3,7 +3,7 @@ import { evaluateCheckout, type CartLine, type CheckoutFailure } from "@/lib/dom
 import { redact } from "@/lib/domain/audit";
 import type { AgeVerificationProvider, VerificationResult } from "@/lib/domain/age";
 import { isAcceptableToken } from "@/lib/payments/token";
-import { loadRestrictions } from "./checkout-service";
+import { loadRestrictions, loadTaxRates } from "./checkout-service";
 import { serviceClient } from "./db";
 import { paymentSetup, shippingProvider } from "./providers";
 
@@ -48,7 +48,7 @@ async function recheckCompliance(o: OrderForPayment): Promise<PayResult> {
   }
   const r = await evaluateCheckout({
     lines, destination: { country: "US", state: o.shipping_address?.state ?? "", postalCode: o.shipping_address?.postal_code ?? "" },
-    restrictions: await loadRestrictions(), attested: true, chosenService: o.shipping_service ?? "",
+    restrictions: await loadRestrictions(), taxRates: await loadTaxRates(), attested: true, chosenService: o.shipping_service ?? "",
     ageProvider: new StoredAgeProvider(o.age_verifications[0]), shippingProvider: shippingProvider().provider, now: new Date(),
   });
   if (!r.ok) return { ok: false, code: (r as CheckoutFailure).code, step: (r as CheckoutFailure).step };
