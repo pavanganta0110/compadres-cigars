@@ -3,6 +3,8 @@
  * everywhere "processing" counts as a finalized sale. Keep ONE definition of "paid" and reuse it everywhere.
  */
 export const PAID_STATUSES = ["processing", "packed", "completed", "refunded"] as const;
+/** Where a successfully captured payment puts a pending order (the SQL complete_payment() does the same; a db test pins them together). */
+export const STATUS_AFTER_PAYMENT = "processing" as const;
 export type OrderStatus = "pending" | (typeof PAID_STATUSES)[number] | "cancelled";
 export const isPaid = (s: string): boolean => (PAID_STATUSES as readonly string[]).includes(s);
 

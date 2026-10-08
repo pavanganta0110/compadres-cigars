@@ -2,11 +2,13 @@
 import { startTransition, useActionState, useState } from "react";
 import { formatUsd } from "@/lib/domain/money";
 import { placeOrderAction, quoteAction, type QuoteState } from "./actions";
+import { PaymentFields, useTokenizedSubmit, type Tokenizer } from "./PaymentFields";
 
 const STATES = "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 const initial: QuoteState = { rates: [], quotedFor: "" };
 
-export function CheckoutForm({ error }: { error?: string }) {
+export function CheckoutForm({ error, tokenizer }: { error?: string; tokenizer: Tokenizer | null }) {
+  const pay = useTokenizedSubmit(tokenizer);
   const [quote, quoteForm, quoting] = useActionState(quoteAction, initial);
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
@@ -21,7 +23,7 @@ export function CheckoutForm({ error }: { error?: string }) {
   const ready = quote.rates.length > 0 && !stale;
 
   return (
-    <form action={placeOrderAction} className="form-grid">
+    <form action={placeOrderAction} onSubmit={pay.onSubmit} className="form-grid">
       {error && <p className="notice notice-error wide" role="alert">{error}</p>}
       <label className="wide">Email<input name="email" type="email" autoComplete="email" required /></label>
       <label className="wide">Full name<input name="fullName" autoComplete="name" required /></label>
@@ -58,7 +60,10 @@ export function CheckoutForm({ error }: { error?: string }) {
         <input type="checkbox" name="ageAttest" value="yes" required />
         <span>I confirm I am 21 years of age or older</span>
       </label>
-      <div className="wide"><button className="btn" type="submit" disabled={!ready}>Place order (sandbox)</button></div>
+      {tokenizer
+        ? <PaymentFields tokenizer={tokenizer} error={pay.error} />
+        : <p className="notice notice-error wide" role="alert">Payments are not available right now, so orders cannot be placed. Please try again later.</p>}
+      <div className="wide"><button className="btn" type="submit" disabled={!ready || !tokenizer}>Place order and pay</button></div>
     </form>
   );
 }

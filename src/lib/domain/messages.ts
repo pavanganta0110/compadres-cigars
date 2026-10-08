@@ -12,6 +12,13 @@ export const CHECKOUT_MESSAGES: Record<string, string> = {
   price_changed: "Pricing changed while you were checking out. Please review and try again.",
   duplicate_order: "This order has already been placed. Check your email for confirmation before submitting again.",
   locked: "Your order is already being processed. Please wait a moment before trying again.",
+  payment_declined: "Your card was declined. You have not been charged. Please try a different card.",
+  payment_error: "We could not complete your payment. Please try again, and contact us if the problem continues.",
+  payment_unavailable: "Payments are not available right now. Your order is saved but has not been paid.",
+  invalid_payment_token: "Please re-enter your card details and try again.",
+  payment_in_progress: "A payment for this order is already being processed. Please wait a moment.",
+  already_paid: "This order has already been paid.",
+  order_not_found: "We could not find that order.",
   invalid_form: "Please check the highlighted details and try again.",
   unexpected: "We could not place your order. Please try again.",
 };
