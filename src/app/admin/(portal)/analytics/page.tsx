@@ -1,25 +1,19 @@
-import { formatUsd } from "@/lib/domain/money";
-import { isPaid } from "@/lib/domain/operations";
-import { loadOrders } from "@/lib/server/admin-data";
+import { loadOrders, loadSalesLines, loadStockAlerts } from "@/lib/server/admin-data";
 import { requireStaff } from "@/lib/server/staff";
+import { SalesPanel } from "../SalesPanel";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics" };
 
 export default async function Analytics() {
   await requireStaff("view_reports");
-  const orders = (await loadOrders({ sinceDays: 30 })).filter((o) => isPaid(o.status));
-  const byDay = new Map<string, { n: number; cents: number }>();
-  for (const o of orders) { const d = o.created_at.slice(0, 10); const x = byDay.get(d) ?? { n: 0, cents: 0 }; x.n++; x.cents += o.total_cents; byDay.set(d, x); }
-  const days = [...byDay.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
+  const now = new Date();
+  const [orders, lines, alerts] = await Promise.all([loadOrders({ sinceDays: 30 }), loadSalesLines(30), loadStockAlerts()]);
   return (
     <>
       <h1>Analytics</h1>
-      <p className="adm-note">Paid orders in the last 30 days (processing, packed, completed, refunded).</p>
-      <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>Day</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>
-        {days.map(([d, x]) => <tr key={d}><td>{d}</td><td>{x.n}</td><td>{formatUsd(x.cents)}</td></tr>)}
-        {days.length === 0 && <tr><td colSpan={3}>No paid orders yet.</td></tr>}
-      </tbody></table></div>
+      <p className="adm-note">Gross sales from paid orders (processing, packed, completed, refunded). Pending and cancelled orders are not counted, and refunds are not subtracted here; see Sales &amp; Tax for refunds.</p>
+      <SalesPanel orders={orders} lines={lines} alerts={alerts} now={now} days={30} />
     </>
   );
 }

@@ -6,6 +6,7 @@ import { cartFingerprint } from "@/lib/domain/fingerprint";
 import { buildComplianceSnapshot, COMPLIANCE_SNAPSHOT_VERSION } from "@/lib/domain/snapshot";
 import { redact } from "@/lib/domain/audit";
 import type { RestrictionStatus } from "@/lib/domain/restrictions";
+import type { TaxRateRow } from "@/lib/domain/tax";
 import { readCart, resolveLines } from "./cart-store";
 import { serviceClient } from "./db";
 import { payOrder, type PayResult } from "./payment-service";
@@ -32,6 +33,13 @@ export async function loadRestrictions(): Promise<Map<string, RestrictionStatus>
   return new Map((data ?? []).map((r) => [String(r.state).trim(), r.status as RestrictionStatus]));
 }
 
+/** The live, admin-editable tax table. Postgres re-computes tax from the same table inside the order transaction. */
+export async function loadTaxRates(): Promise<Map<string, TaxRateRow>> {
+  const { data, error } = await serviceClient().from("tax_rates").select("state, rate_bps, matrix_sha256, effective_date");
+  if (error) throw error;
+  return new Map((data ?? []).map((r) => [String(r.state).trim(), { rate_bps: r.rate_bps as number, source_sha256: r.matrix_sha256 as string, effective_date: r.effective_date as string }]));
+}
+
 async function audit(action: string, detail: Record<string, unknown>) {
   await serviceClient().from("audit_log").insert({ actor: "system", action, entity: "checkout", detail: redact(detail) as object });
 }
@@ -48,7 +56,7 @@ export async function placeOrder(input: z.infer<typeof CheckoutForm>, attested: 
   const lines = await resolveLines(await readCart());
   const destination = { country: "US", state: input.state, postalCode: input.postalCode };
   const result = await evaluateCheckout({
-    lines, destination, restrictions: await loadRestrictions(), attested, chosenService: input.shippingService,
+    lines, destination, restrictions: await loadRestrictions(), taxRates: await loadTaxRates(), attested, chosenService: input.shippingService,
     ageProvider: ageProvider().provider, shippingProvider: shippingProvider().provider, now,
   });
   if (!result.ok) {

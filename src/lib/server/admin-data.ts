@@ -19,3 +19,23 @@ export async function loadOrders(opts: { sinceDays?: number; limit?: number } = 
   if (error) throw error;
   return (data as unknown as Raw[]).map(shape);
 }
+
+import type { SalesLine } from "@/lib/domain/sales";
+import { stockAlerts, type StockRow } from "@/lib/domain/inventory";
+
+/** Line items of the last N days with their order's status/time, for the best-seller ranking. */
+export async function loadSalesLines(sinceDays = 30): Promise<SalesLine[]> {
+  const { data, error } = await serviceClient()
+    .from("order_items").select("name, sku, quantity, unit_price_cents, orders!inner(status, created_at, paid_at)")
+    .gte("orders.created_at", new Date(Date.now() - sinceDays * 86400_000).toISOString()).limit(5000);
+  if (error) throw error;
+  return (data as unknown as (Omit<SalesLine, "order"> & { orders: SalesLine["order"] })[]).map(({ orders, ...l }) => ({ ...l, order: orders }));
+}
+
+export async function loadStockRows(): Promise<StockRow[]> {
+  const { data, error } = await serviceClient().from("products").select("id, name, sku, stock, low_stock_threshold, active").order("name");
+  if (error) throw error;
+  return data as StockRow[];
+}
+
+export async function loadStockAlerts() { return stockAlerts(await loadStockRows()); }

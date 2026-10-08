@@ -54,7 +54,7 @@ test("owner sees the branded dashboard with the full sidebar and no vendor chrom
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   const text = await page.locator("body").innerText();
   expect(text).toContain("Compadres Cigars Admin Portal");
-  for (const item of ["Dashboard", "Store", "Products", "Payments", "Operations", "Analytics", "Sales & Tax", "Audit Log", "Restrictions", "Users", "Settings"]) {
+  for (const item of ["Dashboard", "Store", "Products", "Payments", "Operations", "Analytics", "Sales & Tax", "Tax Rates", "Audit Log", "Restrictions", "Users", "Settings"]) {
     await expect(page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: item, exact: true })).toBeVisible();
   }
   for (const vendor of ["WooCommerce", "WordPress", "Automattic", "Jetpack"]) expect(text).not.toContain(vendor);
@@ -127,7 +127,7 @@ test("fulfillment role cannot reach restrictions, users, reports or the export",
   await login(page, users.fulfillment);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Admin" });
-  for (const hidden of ["Restrictions", "Users", "Sales & Tax", "Audit Log"]) await expect(nav.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
+  for (const hidden of ["Restrictions", "Users", "Sales & Tax", "Tax Rates", "Audit Log"]) await expect(nav.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
   for (const path of ["/admin/restrictions", "/admin/users", "/admin/sales-tax", "/admin/audit"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/admin\?denied=1/);
