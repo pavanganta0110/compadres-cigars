@@ -101,3 +101,9 @@
 .adm-inline .adm-btn, .adm-form .adm-btn { white-space: nowrap; }
 .adm a:focus-visible, .adm button:focus-visible, .adm input:focus-visible, .adm select:focus-visible, .adm textarea:focus-visible, .adm summary:focus-visible { outline: 3px solid var(--a-brass); outline-offset: 2px; }
 @media (max-width: 960px) { .adm-split { grid-template-columns: 1fr; } .adm-alerts li { grid-template-columns: 1fr; } }
+.adm-thumbs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.adm-thumb { display: grid; gap: 2px; justify-items: center; }
+.adm-thumb img { object-fit: cover; border: 1px solid var(--a-esp); border-radius: 4px; background: var(--a-ink); }
+.adm-thumb .adm-link { min-height: 0; padding: 0; font-size: .8rem; }
+.adm-photo-form { margin-top: 10px; } .adm-photo-form input[type=file] { max-width: 220px; font-size: .8rem; }
+.adm-stack { display: grid; gap: 14px; } .adm-plain { border: 0 !important; margin: 0 0 4px !important; padding: 0 !important; font-size: 1.3rem !important; }

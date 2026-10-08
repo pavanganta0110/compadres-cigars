@@ -46,3 +46,22 @@ describe("low stock threshold", () => {
     await expect(db.exec("update products set low_stock_threshold = -1")).rejects.toThrow();
   });
 });
+
+describe("media storage", () => {
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+  it("stores an image and returns it byte for byte; anon cannot touch it", async () => {
+    const id = (await db.query<{ id: string }>("select store_media('image/png', $1, null) as id", [png.toString("base64")])).rows[0].id;
+    const got = (await db.query<{ m: { content_type: string; b64: string } }>("select get_media($1) as m", [id])).rows[0].m;
+    expect(got.content_type).toBe("image/png");
+    expect(Buffer.from(got.b64, "base64").equals(png)).toBe(true);
+    expect((await db.query("select get_media('00000000-0000-4000-8000-000000000000') as m")).rows[0]).toEqual({ m: null });
+    await db.exec("set role anon");
+    await expect(db.query("select * from media")).rejects.toThrow();
+    await expect(db.query("select get_media($1)", [id])).rejects.toThrow();
+    await db.exec("reset role");
+  });
+  it("rejects other content types and oversize files", async () => {
+    await expect(db.query("select store_media('image/svg+xml', 'AAAA', null)")).rejects.toThrow();
+    await expect(db.query("select store_media('image/png', $1, null)", [Buffer.alloc(5 * 1024 * 1024 + 1).toString("base64")])).rejects.toThrow();
+  });
+});

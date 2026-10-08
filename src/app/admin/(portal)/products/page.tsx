@@ -3,19 +3,20 @@ import { stockState } from "@/lib/domain/inventory";
 import { can } from "@/lib/domain/permissions";
 import { serviceClient } from "@/lib/server/db";
 import { requireStaff } from "@/lib/server/staff";
-import { updateProductAction } from "./actions";
+import { addProductImageAction, removeProductImageAction, updateProductAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Products" };
 
 const ERRORS: Record<string, string> = {
+  image_too_large: "That image is larger than 4 MB.", image_bad_type: "Only JPEG, PNG or WebP images are accepted.", image_error: "The image could not be saved. Please try again.",
   invalid: "That change was not valid.", weight: "Enter the box weight (oz) before publishing: FedEx cannot quote shipping without it.", price: "A published product needs a price above $0.00.",
 };
 
 export default async function Products({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; filter?: string }> }) {
   const staff = await requireStaff();
   const sp = await searchParams;
-  const { data } = await serviceClient().from("products").select("id, sku, name, price_cents, stock, active, weight_oz, low_stock_threshold, placeholder_price, brands(name)").order("name");
+  const { data } = await serviceClient().from("products").select("id, sku, name, price_cents, stock, active, weight_oz, low_stock_threshold, placeholder_price, brands(name), product_images(id, path, position)").order("name");
   const edit = can(staff.role, "manage_products");
   const all = data ?? [];
   const attention = all.filter((p) => p.active && stockState(p.stock, p.low_stock_threshold) !== "ok");
@@ -40,7 +41,23 @@ export default async function Products({ searchParams }: { searchParams: Promise
             const st = stockState(p.stock, p.low_stock_threshold);
             return (
               <tr key={p.id}>
-                <td><strong>{p.name}</strong><br /><small className="adm-muted">{p.sku} · {(p.brands as unknown as { name: string } | null)?.name}</small>{p.placeholder_price && <><br /><span className="adm-pill warn">placeholder price</span></>}</td>
+                <td><strong>{p.name}</strong><br /><small className="adm-muted">{p.sku} · {(p.brands as unknown as { name: string } | null)?.name}</small>{p.placeholder_price && <><br /><span className="adm-pill warn">placeholder price</span></>}
+                  <div className="adm-thumbs">
+                    {[...(p.product_images as { id: string; path: string; position: number }[])].sort((a, b) => a.position - b.position).map((im) => (
+                      <div key={im.id} className="adm-thumb">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={im.path} alt={`${p.name} photo ${im.position + 1}`} width={64} height={64} loading="lazy" />
+                        {edit && <form action={removeProductImageAction}><input type="hidden" name="imageId" value={im.id} /><button className="adm-link" type="submit" aria-label={`Remove photo ${im.position + 1} of ${p.name}`}>Remove</button></form>}
+                      </div>
+                    ))}
+                  </div>
+                  {edit && (
+                    <form action={addProductImageAction} className="adm-inline adm-photo-form">
+                      <input type="hidden" name="productId" value={p.id} />
+                      <label>Add photo<input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp" required /></label>
+                      <button className="adm-btn" type="submit" aria-label={`Upload photo for ${p.name}`}>Upload</button>
+                    </form>
+                  )}</td>
                 <td>
                   <span className={`adm-pill ${p.active ? "" : "amber"}`}>{p.active ? "Published" : "Draft"}</span>{" "}
                   {st !== "ok" && <span className={`adm-pill ${st === "out" ? "warn" : "amber"}`}>{st === "out" ? "Out of stock" : "Low stock"}</span>}

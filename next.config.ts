@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Admin image uploads (max 4 MB each) arrive as server-action requests.
+  experimental: { serverActions: { bodySizeLimit: "5mb" } },
   images: { formats: ["image/avif", "image/webp"] },
   async headers() {
     return [

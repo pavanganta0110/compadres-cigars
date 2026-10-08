@@ -12,6 +12,7 @@ const NAV: { href: string; label: string; perm: Permission }[] = [
   { href: "/admin", label: "Dashboard", perm: "view" },
   { href: "/admin/orders", label: "Store", perm: "view" },
   { href: "/admin/products", label: "Products", perm: "view" },
+  { href: "/admin/brands", label: "Brands", perm: "view" },
   { href: "/admin/payments", label: "Payments", perm: "view" },
   { href: "/admin/operations", label: "Operations", perm: "view" },
   { href: "/admin/analytics", label: "Analytics", perm: "view_reports" },

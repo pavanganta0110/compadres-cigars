@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { slugify } from "@/lib/domain/inventory";
 import { serviceClient } from "@/lib/server/db";
+import { deleteImage, saveImage } from "@/lib/server/media";
 import { auditAdmin, requireStaff } from "@/lib/server/staff";
 
 const Weight = z.string().trim().regex(/^(\d{1,4}(\.\d{1,2})?)?$/);
@@ -55,14 +56,13 @@ const NewProduct = z.object({
   weightOz: Weight,
   shortDescription: z.string().trim().max(300).optional().default(""),
   description: z.string().trim().max(4000).optional().default(""),
-  image: z.string().trim().regex(/^(\/images\/[A-Za-z0-9._/-]{1,120})?$/).optional().default(""),
   publish: z.string().optional(),
 });
 
 /** Launch a new product. It is created as a DRAFT unless "Publish now" is ticked; drafts never appear in the store. */
 export async function createProductAction(formData: FormData) {
   const staff = await requireStaff("manage_products");
-  const p = NewProduct.safeParse(Object.fromEntries(formData));
+  const p = NewProduct.safeParse(Object.fromEntries([...formData].filter(([, v]) => typeof v === "string")));
   if (!p.success) redirect("/admin/products/new?error=invalid");
   const publish = p.data.publish === "on";
   const price_cents = Math.round(Number(p.data.price) * 100);
@@ -77,9 +77,42 @@ export async function createProductAction(formData: FormData) {
     weight_oz: p.data.weightOz === "" ? null : Number(p.data.weightOz), placeholder_price: false, active: publish,
   }).select("id").maybeSingle();
   if (error || !data) redirect(`/admin/products/new?error=${error?.code === "23505" ? "duplicate" : "invalid"}`);
-  if (p.data.image) await db.from("product_images").insert({ product_id: data.id, path: p.data.image, alt: p.data.name, position: 0 });
+  const img = await saveImage(formData.get("imageFile"), staff.id);
+  if (img.ok) await db.from("product_images").insert({ product_id: data.id, path: img.path, alt: p.data.name, position: 0 });
+  else if (img.code !== "no_file") redirect(`/admin/products?saved=1&error=image_${img.code}`);   // product exists as a draft; the photo can be added from the list
   await auditAdmin(staff.id, "product.created", "products", data.id, { sku: p.data.sku, name: p.data.name, published: publish, price_cents, stock: p.data.stock });
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   redirect(`/admin/products?saved=1`);
+}
+
+/** Adds a photo to an existing product (the first photo is the main one). */
+export async function addProductImageAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("productId"));
+  if (!id.success) redirect("/admin/products?error=invalid");
+  const db = serviceClient();
+  const { data: product } = await db.from("products").select("name, product_images(position)").eq("id", id.data).maybeSingle();
+  if (!product) redirect("/admin/products?error=invalid");
+  const img = await saveImage(formData.get("imageFile"), staff.id);
+  if (!img.ok) redirect(`/admin/products?error=image_${img.code}`);
+  const next = Math.max(-1, ...(product.product_images as { position: number }[]).map((i) => i.position)) + 1;
+  await db.from("product_images").insert({ product_id: id.data, path: img.path, alt: product.name, position: next });
+  await auditAdmin(staff.id, "product.image_added", "products", id.data, { path: img.path });
+  revalidatePath("/admin/products"); revalidatePath("/shop");
+  redirect("/admin/products?saved=1");
+}
+
+export async function removeProductImageAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("imageId"));
+  if (!id.success) redirect("/admin/products?error=invalid");
+  const db = serviceClient();
+  const { data: row } = await db.from("product_images").select("id, path, product_id").eq("id", id.data).maybeSingle();
+  if (!row) redirect("/admin/products?error=invalid");
+  await db.from("product_images").delete().eq("id", id.data);
+  await deleteImage(row.path);
+  await auditAdmin(staff.id, "product.image_removed", "products", row.product_id, { path: row.path });
+  revalidatePath("/admin/products"); revalidatePath("/shop");
+  redirect("/admin/products?saved=1");
 }
