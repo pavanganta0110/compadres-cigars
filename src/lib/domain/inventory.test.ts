@@ -72,3 +72,12 @@ describe("editable tax rates", () => {
     expect(calculateTax("MO", 100, new Map([["MO", { rate_bps: -1, source_sha256: "x", effective_date: "d" }]])).ok).toBe(false);
   });
 });
+
+import { describeInvalid } from "./form-errors";
+describe("form error messages", () => {
+  it("names the offending fields without echoing values", () => {
+    expect(describeInvalid([{ path: ["sku"] }, { path: ["price"] }, { path: ["price"] }])).toContain("SKU must be");
+    expect(describeInvalid([{ path: ["price"] }])).toContain("Price");
+    expect(describeInvalid([])).toBe("");
+  });
+});

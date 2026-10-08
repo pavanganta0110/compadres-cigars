@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { describeInvalid } from "@/lib/domain/form-errors";
 import { slugify } from "@/lib/domain/inventory";
 import { serviceClient } from "@/lib/server/db";
 import { deleteImage, saveImage } from "@/lib/server/media";
@@ -23,7 +24,7 @@ const strings = (fd: FormData) => Object.fromEntries([...fd].filter(([, v]) => t
 export async function createBrandAction(formData: FormData) {
   const staff = await requireStaff("manage_products");
   const p = NewBrand.safeParse(strings(formData));
-  if (!p.success) redirect("/admin/brands/new?error=invalid");
+  if (!p.success) redirect(`/admin/brands/new?error=invalid&detail=${encodeURIComponent(describeInvalid(p.error.issues))}`);
   const slug = slugify(p.data.name);
   if (!slug) redirect("/admin/brands/new?error=invalid");
   const db = serviceClient();
@@ -39,7 +40,7 @@ export async function createBrandAction(formData: FormData) {
   if (error || !data) {
     if (logo.ok) await deleteImage(logo.path);
     if (hero.ok) await deleteImage(hero.path);
-    redirect(`/admin/brands/new?error=${error?.code === "23505" ? "duplicate" : "invalid"}`);
+    redirect(`/admin/brands/new?error=${error?.code === "23505" ? "duplicate" : "database"}&detail=${encodeURIComponent((error?.message ?? "no row returned").slice(0, 160))}`);
   }
   await auditAdmin(staff.id, "brand.created", "brands", data.id, { name: p.data.name, slug, published: p.data.publish === "on" });
   bust();

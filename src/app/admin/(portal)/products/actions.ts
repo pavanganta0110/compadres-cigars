@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { describeInvalid } from "@/lib/domain/form-errors";
 import { slugify } from "@/lib/domain/inventory";
 import { serviceClient } from "@/lib/server/db";
 import { deleteImage, saveImage } from "@/lib/server/media";
@@ -66,7 +67,7 @@ const NewProduct = z.object({
 export async function createProductAction(formData: FormData) {
   const staff = await requireStaff("manage_products");
   const p = NewProduct.safeParse(Object.fromEntries([...formData].filter(([, v]) => typeof v === "string")));
-  if (!p.success) redirect("/admin/products/new?error=invalid");
+  if (!p.success) redirect(`/admin/products/new?error=invalid&detail=${encodeURIComponent(describeInvalid(p.error.issues))}`);
   const publish = p.data.publish === "on";
   const price_cents = Math.round(Number(p.data.price) * 100);
   if (price_cents <= 0) redirect("/admin/products/new?error=price");
@@ -79,7 +80,7 @@ export async function createProductAction(formData: FormData) {
     price_cents, stock: p.data.stock, low_stock_threshold: p.data.lowStock, box_quantity: p.data.boxQuantity,
     weight_oz: p.data.weightOz === "" ? null : Number(p.data.weightOz), placeholder_price: false, active: publish,
   }).select("id").maybeSingle();
-  if (error || !data) redirect(`/admin/products/new?error=${error?.code === "23505" ? "duplicate" : "invalid"}`);
+  if (error || !data) redirect(`/admin/products/new?error=${error?.code === "23505" ? "duplicate" : "database"}&detail=${encodeURIComponent((error?.message ?? "no row returned").slice(0, 160))}`);
   const img = await saveImage(formData.get("imageFile"), staff.id);
   if (img.ok) await db.from("product_images").insert({ product_id: data.id, path: img.path, alt: p.data.name, position: 0 });
   else if (img.code !== "no_file") redirect(`/admin/products?saved=1&error=image_${img.code}`);   // product exists as a draft; the photo can be added from the list
