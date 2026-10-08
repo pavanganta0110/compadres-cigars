@@ -30,7 +30,11 @@ jobs:
             echo "SUPABASE_SERVICE_ROLE_KEY=$(npx supabase status -o env | grep ^SERVICE_ROLE_KEY | cut -d= -f2- | tr -d '\"')"
             echo "AGE_GATE_SECRET=$(openssl rand -hex 32)"
             echo "APP_ENV=local"
+            echo "COMPADRES_PAYMENT_WEBHOOK_SECRET=$(openssl rand -hex 16)"
           } > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: e2e-results, path: test-results, retention-days: 3 }
       - run: npm run build
