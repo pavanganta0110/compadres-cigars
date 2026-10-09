@@ -11,12 +11,13 @@ const ERRORS: Record<string, string> = {
   invalid: "Please check the fields and try again.", price: "Enter a price above $0.00.",
   weight: "Enter the box weight in ounces before publishing: FedEx cannot quote shipping without it. You can also save it as a draft.",
   image_too_large: "That image is larger than 4 MB.", image_bad_type: "Only JPEG, PNG or WebP images are accepted.",
+  database: "The product could not be saved.",
   duplicate: "A product with that SKU or name already exists.",
 };
 
-export default async function NewProduct({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function NewProduct({ searchParams }: { searchParams: Promise<{ error?: string; detail?: string }> }) {
   await requireStaff("manage_products");
-  const { error } = await searchParams;
+  const { error, detail } = await searchParams;
   const { data: brands } = await serviceClient().from("brands").select("id, name").order("display_order");
   const noBrands = (brands ?? []).length === 0;
   return (
@@ -24,7 +25,7 @@ export default async function NewProduct({ searchParams }: { searchParams: Promi
       <p><Link href="/admin/products">&larr; Products</Link></p>
       <h1>Add a product</h1>
       <p className="adm-note">New products are saved as drafts and stay hidden from the store until you publish them. Cigars are sold by the box.</p>
-      {error && <p className="adm-alert" role="alert">{ERRORS[error] ?? ERRORS.invalid}</p>}
+      {error && <p className="adm-alert" role="alert">{ERRORS[error] ?? ERRORS.invalid}{detail ? ` ${error === "database" ? "Database said" : "Check"}: ${detail.slice(0, 200)}` : ""}</p>}
       <form action={createProductAction} className="adm-form adm-form-wide">
         {noBrands && <p className="adm-alert" role="alert">Add a brand first: <Link href="/admin/brands/new">Add brand</Link>.</p>}
         <label>Brand<select name="brandId" required>{(brands ?? []).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}</select></label>

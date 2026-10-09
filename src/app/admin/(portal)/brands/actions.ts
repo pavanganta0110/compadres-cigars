@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { describeInvalid } from "@/lib/domain/form-errors";
 import { slugify } from "@/lib/domain/inventory";
 import { serviceClient } from "@/lib/server/db";
 import { deleteImage, saveImage } from "@/lib/server/media";
@@ -23,7 +24,7 @@ const strings = (fd: FormData) => Object.fromEntries([...fd].filter(([, v]) => t
 export async function createBrandAction(formData: FormData) {
   const staff = await requireStaff("manage_products");
   const p = NewBrand.safeParse(strings(formData));
-  if (!p.success) redirect("/admin/brands/new?error=invalid");
+  if (!p.success) redirect(`/admin/brands/new?error=invalid&detail=${encodeURIComponent(describeInvalid(p.error.issues))}`);
   const slug = slugify(p.data.name);
   if (!slug) redirect("/admin/brands/new?error=invalid");
   const db = serviceClient();
@@ -39,7 +40,7 @@ export async function createBrandAction(formData: FormData) {
   if (error || !data) {
     if (logo.ok) await deleteImage(logo.path);
     if (hero.ok) await deleteImage(hero.path);
-    redirect(`/admin/brands/new?error=${error?.code === "23505" ? "duplicate" : "invalid"}`);
+    redirect(`/admin/brands/new?error=${error?.code === "23505" ? "duplicate" : "database"}&detail=${encodeURIComponent((error?.message ?? "no row returned").slice(0, 160))}`);
   }
   await auditAdmin(staff.id, "brand.created", "brands", data.id, { name: p.data.name, slug, published: p.data.publish === "on" });
   bust();
@@ -66,4 +67,22 @@ export async function updateBrandAction(formData: FormData) {
   await auditAdmin(staff.id, before.active !== active ? (active ? "brand.published" : "brand.unpublished") : "brand.updated", "brands", p.data.brandId, { published: active });
   bust();
   redirect("/admin/brands?saved=1");
+}
+
+/** Removes a brand only when it has no products (products must be removed or moved first). Requires the confirmation box. */
+export async function removeBrandAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("brandId"));
+  if (!id.success) redirect("/admin/brands?error=invalid");
+  if (formData.get("confirm") !== "on") redirect("/admin/brands?error=confirm");
+  const db = serviceClient();
+  const { data: brand } = await db.from("brands").select("name, logo_path, hero_path, products(id)").eq("id", id.data).maybeSingle();
+  if (!brand) redirect("/admin/brands?error=invalid");
+  if ((brand.products as unknown[]).length > 0) redirect(`/admin/brands?error=has_products&n=${encodeURIComponent(brand.name.slice(0, 60))}`);
+  const { error } = await db.from("brands").delete().eq("id", id.data);
+  if (error) redirect("/admin/brands?error=invalid");
+  await deleteImage(brand.logo_path); await deleteImage(brand.hero_path);
+  await auditAdmin(staff.id, "brand.removed", "brands", id.data, { name: brand.name });
+  bust();
+  redirect("/admin/brands?removed=1");
 }

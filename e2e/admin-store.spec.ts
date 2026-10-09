@@ -216,6 +216,49 @@ test("brands: add as a draft, publish to show it in the store, unpublish to hide
   expect((await shop.goto(`/brands/${slug}`))!.status()).toBe(404);
 });
 
+test("remove: needs the confirmation; a brand that still has products is refused", async ({ page }) => {
+  const brand = `E2E Brand Rm ${run}`;
+  const prod = `E2E Remove Cigar ${run}`;
+  await login(page, users.owner);
+  await page.goto("/admin/brands/new");
+  await page.getByLabel("Brand name").fill(brand);
+  await page.getByRole("button", { name: "Create brand" }).click();
+  await expect(page.getByText("Saved.")).toBeVisible();
+
+  await page.goto("/admin/products/new");
+  await page.getByLabel("Brand", { exact: true }).selectOption({ label: brand });
+  await page.getByLabel("Product name").fill(prod);
+  await page.getByLabel("SKU").fill(`E2E-RM-${run}`);
+  await page.getByLabel("Price (USD)").fill("20");
+  await page.getByRole("button", { name: "Create product" }).click();
+  await expect(page.getByText("Saved.")).toBeVisible();
+
+  // the brand still has a product: refused
+  await page.goto("/admin/brands");
+  const section = () => page.locator("section", { has: page.getByRole("heading", { name: brand }) });
+  await section().getByText("Remove this brand").click();
+  await section().getByLabel(/Yes, remove/).check();
+  await section().getByRole("button", { name: `Remove ${brand}` }).click();
+  await expect(page.locator(".adm-alert")).toContainText("still has products");
+
+  // remove the product (confirmation is required by the form), then the brand
+  await page.goto("/admin/products");
+  await productRow(page, prod).getByText("Remove this product").click();
+  await productRow(page, prod).getByRole("button", { name: `Remove ${prod}` }).click();   // blocked by the required checkbox
+  expect((await db().from("products").select("id").eq("sku", `E2E-RM-${run}`)).data).toHaveLength(1);
+  await productRow(page, prod).getByLabel(/Yes, remove/).check();
+  await productRow(page, prod).getByRole("button", { name: `Remove ${prod}` }).click();
+  await expect(page.getByText("Product removed.")).toBeVisible();
+  expect((await db().from("products").select("id").eq("sku", `E2E-RM-${run}`)).data).toHaveLength(0);
+
+  await page.goto("/admin/brands");
+  await section().getByText("Remove this brand").click();
+  await section().getByLabel(/Yes, remove/).check();
+  await section().getByRole("button", { name: `Remove ${brand}` }).click();
+  await expect(page.getByText("Brand removed.")).toBeVisible();
+  expect((await db().from("brands").select("id").eq("name", brand)).data).toHaveLength(0);
+});
+
 test("the dashboard shows the sales snapshot", async ({ page }) => {
   await login(page, users.owner);
   for (const t of ["Sales today", "Last 7 days", "Last 30 days", "Average order"]) await expect(page.getByText(t, { exact: true })).toBeVisible();

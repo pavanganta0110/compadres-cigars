@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { describeInvalid } from "@/lib/domain/form-errors";
 import { slugify } from "@/lib/domain/inventory";
 import { serviceClient } from "@/lib/server/db";
 import { deleteImage, saveImage } from "@/lib/server/media";
@@ -66,7 +67,7 @@ const NewProduct = z.object({
 export async function createProductAction(formData: FormData) {
   const staff = await requireStaff("manage_products");
   const p = NewProduct.safeParse(Object.fromEntries([...formData].filter(([, v]) => typeof v === "string")));
-  if (!p.success) redirect("/admin/products/new?error=invalid");
+  if (!p.success) redirect(`/admin/products/new?error=invalid&detail=${encodeURIComponent(describeInvalid(p.error.issues))}`);
   const publish = p.data.publish === "on";
   const price_cents = Math.round(Number(p.data.price) * 100);
   if (price_cents <= 0) redirect("/admin/products/new?error=price");
@@ -79,7 +80,7 @@ export async function createProductAction(formData: FormData) {
     price_cents, stock: p.data.stock, low_stock_threshold: p.data.lowStock, box_quantity: p.data.boxQuantity,
     weight_oz: p.data.weightOz === "" ? null : Number(p.data.weightOz), placeholder_price: false, active: publish,
   }).select("id").maybeSingle();
-  if (error || !data) redirect(`/admin/products/new?error=${error?.code === "23505" ? "duplicate" : "invalid"}`);
+  if (error || !data) redirect(`/admin/products/new?error=${error?.code === "23505" ? "duplicate" : "database"}&detail=${encodeURIComponent((error?.message ?? "no row returned").slice(0, 160))}`);
   const img = await saveImage(formData.get("imageFile"), staff.id);
   if (img.ok) await db.from("product_images").insert({ product_id: data.id, path: img.path, alt: p.data.name, position: 0 });
   else if (img.code !== "no_file") redirect(`/admin/products?saved=1&error=image_${img.code}`);   // product exists as a draft; the photo can be added from the list
@@ -118,4 +119,31 @@ export async function removeProductImageAction(formData: FormData) {
   await auditAdmin(staff.id, "product.image_removed", "products", row.product_id, { path: row.path });
   revalidatePath("/admin/products"); revalidatePath("/shop");
   redirect("/admin/products?saved=1");
+}
+
+/**
+ * Permanently removes a product that was never ordered. A product that appears on any order is kept (order records
+ * point at it) and is unpublished instead. Requires the confirmation box.
+ */
+export async function removeProductAction(formData: FormData) {
+  const staff = await requireStaff("manage_products");
+  const id = z.string().uuid().safeParse(formData.get("productId"));
+  if (!id.success) redirect("/admin/products?error=invalid");
+  if (formData.get("confirm") !== "on") redirect("/admin/products?error=confirm");
+  const db = serviceClient();
+  const { data: product } = await db.from("products").select("name, sku, product_images(path)").eq("id", id.data).maybeSingle();
+  if (!product) redirect("/admin/products?error=invalid");
+  const { count } = await db.from("order_items").select("id", { count: "exact", head: true }).eq("product_id", id.data);
+  if ((count ?? 0) > 0) {
+    await db.from("products").update({ active: false }).eq("id", id.data);
+    await auditAdmin(staff.id, "product.unpublished", "products", id.data, { reason: "has orders; kept for order records", removeRequested: true });
+    revalidatePath("/admin/products"); revalidatePath("/shop");
+    redirect(`/admin/products?error=has_orders&n=${encodeURIComponent(product.name.slice(0, 80))}`);
+  }
+  const { error } = await db.from("products").delete().eq("id", id.data);
+  if (error) redirect("/admin/products?error=invalid");
+  for (const im of product.product_images as { path: string }[]) await deleteImage(im.path);
+  await auditAdmin(staff.id, "product.removed", "products", id.data, { sku: product.sku, name: product.name });
+  revalidatePath("/admin/products"); revalidatePath("/shop"); revalidatePath("/admin");
+  redirect("/admin/products?removed=1");
 }

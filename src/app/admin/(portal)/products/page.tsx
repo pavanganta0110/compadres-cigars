@@ -4,17 +4,19 @@ import { stockState } from "@/lib/domain/inventory";
 import { can } from "@/lib/domain/permissions";
 import { serviceClient } from "@/lib/server/db";
 import { requireStaff } from "@/lib/server/staff";
-import { addProductImageAction, removeProductImageAction, updateProductAction } from "./actions";
+import { addProductImageAction, removeProductAction, removeProductImageAction, updateProductAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Products" };
 
 const ERRORS: Record<string, string> = {
   image_too_large: "That image is larger than 4 MB.", image_bad_type: "Only JPEG, PNG or WebP images are accepted.", image_error: "The image could not be saved. Please try again.",
+  confirm: "Tick the confirmation box to remove a product.",
+  has_orders: "has been ordered before, so it cannot be deleted (order records need it). It was unpublished instead and is hidden from the store.",
   invalid: "That change was not valid.", weight: "Enter the box weight (oz) before publishing: FedEx cannot quote shipping without it.", price: "A published product needs a price above $0.00.",
 };
 
-export default async function Products({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; filter?: string; n?: string }> }) {
+export default async function Products({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; removed?: string; filter?: string; n?: string }> }) {
   const staff = await requireStaff();
   const sp = await searchParams;
   const { data } = await serviceClient().from("products").select("id, sku, name, price_cents, stock, active, weight_oz, low_stock_threshold, placeholder_price, brands(name), product_images(id, path, position)").order("name");
@@ -29,7 +31,8 @@ export default async function Products({ searchParams }: { searchParams: Promise
         {edit && <Link className="adm-btn" href="/admin/products/new">Add product</Link>}
       </div>
       {sp.saved && <p className="adm-note" role="status">Saved.</p>}
-      {sp.error && <p className="adm-alert" role="alert">{sp.error === "weight" && sp.n ? `${sp.n.slice(0, 80)} was not published. ` : ""}{ERRORS[sp.error] ?? ERRORS.invalid}</p>}
+      {sp.removed && <p className="adm-note" role="status">Product removed.</p>}
+      {sp.error && <p className="adm-alert" role="alert">{(sp.error === "weight" || sp.error === "has_orders") && sp.n ? `${sp.n.slice(0, 80)}${sp.error === "weight" ? " was not published. " : " "}` : ""}{ERRORS[sp.error] ?? ERRORS.invalid}</p>}
       <p className="adm-tabs">
         <Link href="/admin/products" aria-current={sp.filter === "low" ? undefined : "page"}>All ({all.length})</Link>
         <Link href="/admin/products?filter=low" aria-current={sp.filter === "low" ? "page" : undefined}>Needs restocking ({attention.length})</Link>
@@ -74,6 +77,14 @@ export default async function Products({ searchParams }: { searchParams: Promise
                       <label className="adm-check"><input type="checkbox" name="active" defaultChecked={p.active} />Published</label>
                       <button className="adm-btn" type="submit">Save</button>
                     </form>
+                    <details className="adm-details">
+                      <summary>Remove this product</summary>
+                      <form action={removeProductAction} className="adm-inline">
+                        <input type="hidden" name="productId" value={p.id} />
+                        <label className="adm-check"><input type="checkbox" name="confirm" required />Yes, remove {p.name}. This cannot be undone.</label>
+                        <button className="adm-btn adm-danger" type="submit" aria-label={`Remove ${p.name}`}>Remove</button>
+                      </form>
+                    </details>
                   </td>
                 ) : (<><td>{(p.price_cents / 100).toFixed(2)}</td><td>{p.stock}</td></>)}
               </tr>
