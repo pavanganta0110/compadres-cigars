@@ -14,6 +14,7 @@ npm test && npm run test:e2e
 ## Status
 - **Phase 1 (this PR):** schema + RLS on every table, seed (2 products, **placeholder prices**), 21+ signed-cookie gate, storefront, brand pages, placeholder legal pages.
 - **Phase 3:** payments sandbox + refunds (mock and QuickBooks Payments providers, webhook, admin refunds). See [docs/payments.md](docs/payments.md).
+- **Email:** order confirmation, shipping/tracking, refund and staff alerts, plus customer emails stored for marketing (with consent). See [docs/email.md](docs/email.md).
 - Phases 2, 4, 5: checkout compliance, admin portal, FedEx. Remaining: email, hardening.
 
 ## Warnings

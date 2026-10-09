@@ -5,6 +5,7 @@ import type { AgeVerificationProvider, VerificationResult } from "@/lib/domain/a
 import { isAcceptableToken } from "@/lib/payments/token";
 import { loadRestrictions, loadTaxRates } from "./checkout-service";
 import { serviceClient } from "./db";
+import { notifyNeedsReview, notifyOrderPaid } from "./email-service";
 import { paymentSetup, shippingProvider } from "./providers";
 
 export type PayResult = { ok: true } | { ok: false; code: string; step?: string };
@@ -114,8 +115,10 @@ export async function payOrder(orderId: string, token: unknown): Promise<PayResu
   if (done.error || !(done.data as { ok?: boolean } | null)?.ok) {
     // Money was captured but the order did not move. The payment row stays 'authorized' so nobody can be charged twice.
     await auditPayment("payment.reconcile_needed", orderId, { ...meta, ref: cap.reference });
+    await notifyNeedsReview("A captured payment could not be recorded on the order", orderId, `payment:${paymentId}`);
     return { ok: false, code: "payment_error" };
   }
   await auditPayment("payment.capture_recorded", orderId, { ...meta, ref: cap.reference });
+  await notifyOrderPaid(orderId);
   return { ok: true };
 }
