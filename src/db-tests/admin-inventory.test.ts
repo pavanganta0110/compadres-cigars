@@ -65,3 +65,25 @@ describe("media storage", () => {
     await expect(db.query("select store_media('image/png', $1, null)", [Buffer.alloc(5 * 1024 * 1024 + 1).toString("base64")])).rejects.toThrow();
   });
 });
+
+describe("Ronald Isley photography migration", () => {
+  it("puts the new photos first, keeps the old ones, and is safe to run again", async () => {
+    const { readFileSync } = await import("node:fs");
+    const sql = readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8");
+    const paths = async () => (await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position, path")).rows.map((r) => r.path);
+    const before = await paths();
+    expect(before[0]).toBe("/images/isley-open-box.jpg");
+    await db.exec(sql);
+    expect(await paths()).toEqual(before);
+    expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-lounge.jpg");
+  });
+  it("on a database still holding the old gallery it prepends the new photos and keeps the old ones", async () => {
+    const { readFileSync } = await import("node:fs");
+    await db.exec("delete from product_images where path in ('/images/isley-open-box.jpg','/images/isley-box-and-cigar.jpg','/images/isley-cigar-standing.jpg','/images/isley-box-closed-gold.jpg'); update product_images set position = position - 10 where path like '/images/isley-%' and position >= 10; update brands set hero_path = '/images/isley-box-open.jpg' where slug = 'ronald-isley'");
+    await db.exec(readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8"));
+    const { rows } = await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position");
+    expect(rows.slice(0, 4).map((r) => r.path)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
+    expect(rows.map((r) => r.path)).toEqual(expect.arrayContaining(["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"]));
+    expect(rows).toHaveLength(7);
+  });
+});

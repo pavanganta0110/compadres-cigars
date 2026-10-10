@@ -4,7 +4,7 @@ insert into brands (slug, name, tagline, short_description, story, logo_path, he
 ('ronald-isley', 'Ronald Isley', 'The Gold Standard',
  'Legendary music. Timeless taste. A premium Dominican cigar by Ronald Isley.',
  E'For more than six decades, Ronald Isley has defined excellence in music, style, and culture. His unmistakable voice, timeless hits, and influence on generations have made him a true icon.\n\nThe Plug cigar is an extension of that legacy. A smooth, refined smoke for those who appreciate the finer things in life and move with purpose.',
- '/images/crest.png', '/images/isley-box-open.jpg', '#d6ad68', 'isley', 10),
+ '/images/crest.png', '/images/isley-lounge.jpg', '#d6ad68', 'isley', 10),
 ('sugarhill', 'Sugarhill', 'Rapper''s Delight',
  'Handcrafted Dominican cigars with hip-hop roots, sold by the box.',
  E'Draft copy, pending client approval.\n\nSugarhill is where the records meet the rolling room: bold, loud, and made to be shared. Rapper''s Delight is the first release.',
@@ -24,8 +24,12 @@ insert into products (brand_id, slug, sku, name, short_description, description,
  12900, 25, 10, null, null, null, 'Dominican Republic', null);
 
 insert into product_images (product_id, path, alt, position) values
-((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-open.jpg', 'Open box of ten Ronald Isley The Plug cigars', 0),
-((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-cigar.jpg', 'A single Ronald Isley The Plug belicoso cigar', 1),
-((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-spine.jpg', 'Box spine reading 10 Cigars, The Plug, 60 x 6.75', 2),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-open-box.jpg', 'Open box of ten Ronald Isley The Plug cigars with the gold Gold Standard seal', 0),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-and-cigar.jpg', 'Ronald Isley The Plug open box with a single cigar and the closed black box', 1),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-cigar-standing.jpg', 'A single Ronald Isley The Plug belicoso cigar with its gold and black bands', 2),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-closed-gold.jpg', 'The closed black lacquer Ronald Isley box with a gold seal', 3),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-open.jpg', 'Open box of ten Ronald Isley The Plug cigars', 10),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-cigar.jpg', 'A single Ronald Isley The Plug belicoso cigar', 11),
+((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-spine.jpg', 'Box spine reading 10 Cigars, The Plug, 60 x 6.75', 12),
 ((select id from products where sku='SUGARHILL-RD-10'), '/images/sugarhill-box-closed.jpg', 'Closed black and gold Rapper''s Delight cigar box', 0),
 ((select id from products where sku='SUGARHILL-RD-10'), '/images/sugarhill-box-open.jpg', 'Open Rapper''s Delight box showing ten cigars', 1);
