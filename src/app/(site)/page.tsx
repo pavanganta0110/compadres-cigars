@@ -5,7 +5,6 @@ import { ProductCard } from "@/components/ProductCard";
 
 /** Lifestyle photography. `pos` keeps faces in frame when a portrait photo is cropped into a wider tile. */
 const MOSAIC = [
-  { src: "/images/life-lounge-smoke.jpg", alt: "A man in a blue patterned shirt lounging in a leather chair, wreathed in cigar smoke", pos: "50% 38%", cls: "tall" },
   { src: "/images/life-couch.jpg", alt: "A woman in a black blazer exhaling cigar smoke on a tan leather sofa while friends look on", pos: "70% 45%" },
   { src: "/images/life-pool-shot.jpg", alt: "A bearded man lining up a pool shot with a cigar in his mouth", pos: "50% 22%" },
   { src: "/images/life-smoke-closeup.jpg", alt: "A woman in red glasses leaning back with a cigar, smoke swirling around her", pos: "55% 40%" },
@@ -16,8 +15,8 @@ export default async function Home() {
   const [brands, products] = await Promise.all([getBrands(), getProducts()]);
   return (
     <main id="main">
-      <section className="hero hero-photo">
-        <Image src="/images/life-smoke-profile.jpg" alt="" fill priority sizes="100vw" className="hero-bg hero-bg-right" />
+      <section className="hero hero-photo" aria-label="Welcome">
+        <Image src="/images/life-lounge-smoke.jpg" alt="" fill priority sizes="100vw" className="hero-bg hero-bg-blue" />
         <div className="hero-copy">
           <p className="eyebrow">Kansas City · Dominican handcrafted</p>
           <h1>Premium cigars, by the box.</h1>
