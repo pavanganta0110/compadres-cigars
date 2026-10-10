@@ -25,6 +25,8 @@ export const CheckoutForm = z.object({
   shippingService: z.string().trim().min(1).max(60),
   /** Opaque, single-use processor token produced in the browser. Never a card number (payOrder refuses PAN-shaped values). */
   paymentToken: z.string().trim().max(300).optional().default(""),
+  /** Optional marketing consent: only the literal checkbox value counts, and it is never pre-ticked. */
+  marketingOptIn: z.string().optional(),
 });
 
 export async function loadRestrictions(): Promise<Map<string, RestrictionStatus>> {
@@ -88,6 +90,10 @@ export async function placeOrder(input: z.infer<typeof CheckoutForm>, attested: 
   if (!r.ok) {
     await audit("checkout.blocked", { step: "order_creation", code: r.code, state: input.state });
     return { ok: false, code: r.code ?? "unexpected", step: "order_creation" };
+  }
+  if (input.marketingOptIn === "yes") {
+    // Consent is recorded when the customer ticks the box; ticking never needs a successful payment. We never un-subscribe here.
+    await serviceClient().from("customers").update({ marketing_opt_in: true, marketing_opt_in_at: new Date().toISOString(), marketing_opt_in_source: "checkout", marketing_opt_out_at: null }).eq("email", input.email).eq("marketing_opt_in", false);
   }
   // The order exists (pending) and every check passed. payOrder re-runs the checks, then charges. A failed payment
   // leaves the order pending so the customer can retry on the order page.

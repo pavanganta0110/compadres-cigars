@@ -1,4 +1,5 @@
 import "server-only";
+import { notifyNeedsReview, notifyRefund } from "./email-service";
 import { auditPayment } from "./payment-service";
 import { serviceClient } from "./db";
 import { paymentSetup } from "./providers";
@@ -39,8 +40,10 @@ export async function refundOrder(opts: { orderId: string; amountCents: number; 
   if (fin.error || !f?.ok) {
     // The processor refunded but we could not record it. The row stays 'pending' (the amount stays reserved) for staff to reconcile.
     await auditPayment("refund.reconcile_needed", opts.orderId, { refundId, ref: r.reference }, opts.staffId);
+    await notifyNeedsReview("A refund was issued at the processor but could not be recorded", opts.orderId, `refund:${refundId}`);
     return { ok: false, code: "refund_error" };
   }
   await auditPayment("refund.completed", opts.orderId, { refundId, amountCents: opts.amountCents, ref: r.reference, fullyRefunded: !!f.fully_refunded }, opts.staffId);
+  await notifyRefund(opts.orderId, refundId, opts.amountCents, !!f.fully_refunded);
   return { ok: true, fullyRefunded: !!f.fully_refunded };
 }

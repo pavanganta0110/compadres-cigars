@@ -6,6 +6,7 @@ import { isTrackingNumber } from "@/lib/domain/operations";
 import { parseDollarsToCents } from "@/lib/payments/refund";
 import { serviceClient } from "@/lib/server/db";
 import { auditAdmin, requireStaff } from "@/lib/server/staff";
+import { notifyShipped } from "@/lib/server/email-service";
 import { refundOrder } from "@/lib/server/refund-service";
 import { refreshTracking } from "@/lib/server/tracking-sync";
 
@@ -35,6 +36,7 @@ export async function saveTrackingAction(formData: FormData) {
   if (!data) redirect(`/admin/orders/${id.data}?error=status`);
   await auditAdmin(staff.id, "order.tracking_recorded", "orders", id.data, { tracking_length: tracking.length });
   await refreshTracking({ orderId: id.data }).catch(() => undefined);   // best effort; never blocks saving
+  await notifyShipped(id.data, tracking);                              // customer "your order shipped" email
   revalidatePath(`/admin/orders/${id.data}`);
   redirect(`/admin/orders/${id.data}?saved=1`);
 }

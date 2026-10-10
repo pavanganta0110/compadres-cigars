@@ -31,6 +31,7 @@ jobs:
             echo "AGE_GATE_SECRET=$(openssl rand -hex 32)"
             echo "APP_ENV=local"
             echo "COMPADRES_PAYMENT_WEBHOOK_SECRET=$(openssl rand -hex 16)"
+            echo "COMPADRES_ADMIN_ALERT_EMAILS=alerts@example.com"
           } > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

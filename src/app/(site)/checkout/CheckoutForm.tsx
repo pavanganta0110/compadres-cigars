@@ -60,6 +60,10 @@ export function CheckoutForm({ error, tokenizer }: { error?: string; tokenizer: 
         <input type="checkbox" name="ageAttest" value="yes" required />
         <span>I confirm I am 21 years of age or older</span>
       </label>
+      <label className="wide radio">
+        <input type="checkbox" name="marketingOptIn" value="yes" />
+        <span>Email me news and offers from Compadres Cigars (optional). You can unsubscribe at any time.</span>
+      </label>
       {tokenizer
         ? <PaymentFields tokenizer={tokenizer} error={pay.error} />
         : <p className="notice notice-error wide" role="alert">Payments are not available right now, so orders cannot be placed. Please try again later.</p>}
