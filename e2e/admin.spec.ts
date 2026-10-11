@@ -148,6 +148,32 @@ test("the last owner cannot be demoted", async ({ page }) => {
   await expect(page.locator(".adm-alert")).toContainText("at least one owner");
 });
 
+test("dashboard shows sales and estimated tax by state, and tax payments can be recorded and voided (owner only)", async ({ page }) => {
+  await makeOrder("completed", 2, "NE");
+  await login(page, users.owner);
+  await expect(page.getByRole("heading", { name: "Sales and estimated tax by state" })).toBeVisible();
+  await expect(page.getByText(/does not send money/).first()).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: /^NE/ }).first()).toBeVisible();
+  await page.goto("/admin/sales-tax/payments");
+  await page.getByLabel("State").selectOption("NE");
+  await page.getByLabel("Covers sales from").fill("2026-10-01");
+  await page.getByLabel("Covers sales through").fill("2026-10-31");
+  await page.getByLabel("Amount paid (USD)").fill("1.00");
+  await page.getByLabel("Confirmation number").fill(`CONF-${run}`);
+  await page.getByRole("button", { name: "Record payment" }).click();
+  await expect(page.getByRole("row").filter({ hasText: `CONF-${run}` })).toContainText("$1.00");
+  const { data: audit } = await db().from("audit_log").select("id").eq("action", "tax.remittance_recorded").limit(1);
+  expect(audit!.length).toBe(1);
+  await page.getByRole("row").filter({ hasText: `CONF-${run}` }).getByRole("button", { name: "Void" }).click();
+  await expect(page.getByRole("row").filter({ hasText: `CONF-${run}` })).toContainText("voided");
+});
+
+test("a fulfillment user cannot see or record tax payments", async ({ page }) => {
+  await login(page, users.fulfillment);
+  await page.goto("/admin/sales-tax/payments");
+  await expect(page).toHaveURL(/\/admin\?denied=1/);
+});
+
 for (const path of ["/admin/login", "/admin"]) {
   test(`axe: ${path}`, async ({ page }) => {
     if (path === "/admin") await login(page, users.owner);
