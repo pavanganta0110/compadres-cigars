@@ -119,3 +119,30 @@ describe("immutability + audit", () => {
     expect((await db.query("select 1 from audit_log where action='restriction.changed' and entity_id='TX'")).rows.length).toBeGreaterThan(0);
   });
 });
+
+describe("tax remittance ledger", () => {
+  const insert = () => db.exec(`insert into tax_remittances(state, period_from, period_to, amount_cents, paid_on, method) values ('MO','2026-10-01','2026-10-31',1234,'2026-11-10','state_portal')`);
+  it("records a payment with an audit entry and refuses unknown states", async () => {
+    await insert();
+    expect((await db.query("select 1 from audit_log where action='tax.remittance_recorded'")).rows).toHaveLength(1);
+    await expect(db.exec(`insert into tax_remittances(state, period_from, period_to, amount_cents, paid_on) values ('DC','2026-10-01','2026-10-31',100,'2026-11-10')`)).rejects.toThrow();
+    await expect(db.exec(`insert into tax_remittances(state, period_from, period_to, amount_cents, paid_on) values ('MO','2026-10-31','2026-10-01',100,'2026-11-10')`)).rejects.toThrow();
+    await expect(db.exec(`insert into tax_remittances(state, period_from, period_to, amount_cents, paid_on) values ('MO','2026-10-01','2026-10-31',0,'2026-11-10')`)).rejects.toThrow();
+  });
+  it("is append-only: amounts cannot change and rows cannot be deleted, but a mistake can be voided once", async () => {
+    await insert();
+    await expect(db.exec("update tax_remittances set amount_cents = 1")).rejects.toThrow(/append-only/);
+    await expect(db.exec("delete from tax_remittances")).rejects.toThrow(/append-only/);
+    await db.exec("update tax_remittances set voided_at = now()");
+    expect((await db.query("select 1 from audit_log where action='tax.remittance_voided'")).rows).toHaveLength(1);
+    await expect(db.exec("update tax_remittances set voided_at = null")).rejects.toThrow();
+  });
+  it("browsers cannot read it; the server can", async () => {
+    await insert();
+    await db.exec("set role anon");
+    await expect(db.query("select * from tax_remittances")).rejects.toThrow();
+    await db.exec("reset role"); await db.exec("set role service_role");
+    expect((await db.query("select * from tax_remittances")).rows).toHaveLength(1);
+    await db.exec("reset role");
+  });
+});
