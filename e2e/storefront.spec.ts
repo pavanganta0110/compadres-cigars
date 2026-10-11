@@ -44,7 +44,7 @@ test("browse: home, shop (no filter bar), brands, product", async ({ page }) => 
   await expect(page.getByRole("button", { name: "Add to Cart" })).toBeEnabled();
 });
 
-for (const path of ["/", "/shop", "/brands/ronald-isley", "/brands/sugarhill", "/products/rappers-delight-box-of-10", "/legal/privacy"]) {
+for (const path of ["/", "/shop", "/brands/ronald-isley", "/brands/sugarhill", "/products/rappers-delight-box-of-10", "/legal/privacy", "/legal/terms", "/legal/age-policy", "/legal/shipping", "/legal/returns", "/legal/restrictions"]) {
   test(`axe: ${path}`, async ({ page }) => {
     await enter(page, path);
     const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
@@ -55,4 +55,25 @@ test("axe: age gate", async ({ page }) => {
   await page.goto("/age-gate");
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(r.violations.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
+});
+
+test.describe("legal pages", () => {
+  const pages: [string, string][] = [["privacy", "Privacy Policy"], ["terms", "Terms of Sale"], ["age-policy", "Age Policy"], ["shipping", "Shipping Policy"], ["returns", "Returns Policy"], ["restrictions", "Shipping Restrictions"]];
+  for (const [slug, title] of pages) {
+    test(`/legal/${slug} is a full page, still marked for legal review`, async ({ page }) => {
+      await enter(page, `/legal/${slug}`);
+      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+      await expect(page.getByText("Legal review required.")).toBeVisible();
+      expect(await page.locator("main h2").count()).toBeGreaterThanOrEqual(4);
+      expect((await page.locator("main").innerText()).length).toBeGreaterThan(1200);
+    });
+  }
+  test("shipping restrictions lists where we can and cannot ship, and the footer links every policy", async ({ page }) => {
+    await enter(page, "/legal/restrictions");
+    await expect(page.getByRole("heading", { name: "Where we can ship right now" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Where we cannot ship right now" })).toBeVisible();
+    for (const title of ["Privacy Policy", "Terms of Sale", "Age Policy", "Shipping Policy", "Returns Policy", "Shipping Restrictions"]) {
+      await expect(page.getByRole("navigation", { name: "Legal" }).getByRole("link", { name: title })).toBeVisible();
+    }
+  });
 });
