@@ -3,6 +3,9 @@ import { formatUsd } from "@/lib/domain/money";
 import { formatWaiting, packQueue, summarizeOps } from "@/lib/domain/operations";
 import { can } from "@/lib/domain/permissions";
 import { loadOrders, loadSalesLines, loadStockAlerts } from "@/lib/server/admin-data";
+import { parsePeriod } from "@/lib/server/report-data";
+import { loadRoyalties } from "@/lib/server/royalty-data";
+import { RoyaltyPanel } from "./RoyaltyPanel";
 import { SalesPanel, StockAlerts } from "./SalesPanel";
 import { serviceClient } from "@/lib/server/db";
 import { paymentSetup, shippingProvider } from "@/lib/server/providers";
@@ -29,12 +32,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const now = new Date();
   const db = serviceClient();
   const canReports = can(staff.role, "view_reports");
-  const [orders, blocked, refunds, lines, alerts] = await Promise.all([
+  const canRoyalties = can(staff.role, "view_royalties");
+  const month = parsePeriod(undefined, undefined);
+  const [orders, blocked, refunds, lines, alerts, royalties] = await Promise.all([
     loadOrders({ sinceDays: 120 }),
     db.from("audit_log").select("id, at, detail").eq("action", "checkout.blocked").in("detail->>code", ["age_not_verified", "shipping_ineligible"]).gte("at", new Date(now.getTime() - 7 * 86400_000).toISOString()).order("at", { ascending: false }).limit(10),
     db.from("refunds").select("id, amount_cents, created_at, order_id").eq("status", "completed").order("created_at", { ascending: false }).limit(5),
     canReports ? loadSalesLines(30) : Promise.resolve([]),
     loadStockAlerts(),
+    canRoyalties ? loadRoyalties(month.from, month.to).then((r) => r.rows, () => null) : Promise.resolve(undefined),
   ]);
   const s = summarizeOps(orders, now);
   const queue = packQueue(orders, now);
@@ -49,6 +55,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       {canReports
         ? <><h2>Sales</h2><SalesPanel orders={orders} lines={lines} alerts={alerts} now={now} /></>
         : alerts.length > 0 && <><h2>Inventory alerts</h2><StockAlerts alerts={alerts} /></>}
+
+      {canRoyalties && <><h2>Royalties</h2><RoyaltyPanel rows={royalties ?? null} /></>}
 
       <h2>Integration health</h2>
       <ul className="adm-health">

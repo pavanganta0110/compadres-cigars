@@ -1,9 +1,9 @@
 export type Role = "owner" | "manager" | "fulfillment" | "viewer";
-export type Permission = "view" | "fulfill" | "manage_products" | "view_reports" | "view_audit" | "manage_restrictions" | "manage_users" | "refund" | "manage_payments" | "manage_tax" | "manage_email" | "export_customers";
+export type Permission = "view" | "fulfill" | "manage_products" | "view_reports" | "view_audit" | "manage_restrictions" | "manage_users" | "refund" | "manage_payments" | "manage_tax" | "manage_email" | "export_customers" | "view_royalties" | "manage_royalties";
 
 const MATRIX: Record<Role, readonly Permission[]> = {
-  owner: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "manage_restrictions", "manage_users", "refund", "manage_payments", "manage_tax", "manage_email", "export_customers"],
-  manager: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "refund", "manage_email", "export_customers"],
+  owner: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "manage_restrictions", "manage_users", "refund", "manage_payments", "manage_tax", "manage_email", "export_customers", "view_royalties", "manage_royalties"],
+  manager: ["view", "fulfill", "manage_products", "view_reports", "view_audit", "refund", "manage_email", "export_customers", "view_royalties"],
   fulfillment: ["view", "fulfill"],
   viewer: ["view"],
 };
