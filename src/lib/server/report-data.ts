@@ -13,12 +13,12 @@ export function parsePeriod(from?: string, to?: string) {
 export async function taxReportFor(from: Date, to: Date) {
   const db = serviceClient();
   const [o, r] = await Promise.all([
-    db.from("orders").select("status, created_at, tax_cents, subtotal_cents, shipping_cents, total_cents, shipping_address").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
+    db.from("orders").select("status, created_at, tax_cents, subtotal_cents, shipping_cents, total_cents, shipping_address, order_items(quantity)").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
     db.from("refunds").select("amount_cents, created_at, orders(shipping_address)").eq("status", "completed").gte("created_at", from.toISOString()).lt("created_at", to.toISOString()).limit(5000),
   ]);
   if (o.error) throw o.error;
   if (r.error) throw r.error;
-  const orders: ReportOrder[] = (o.data ?? []).map((x) => ({ ...x, state: (x.shipping_address as { state?: string } | null)?.state ?? null }));
+  const orders: ReportOrder[] = (o.data ?? []).map((x) => ({ ...x, state: (x.shipping_address as { state?: string } | null)?.state ?? null, units: ((x.order_items as { quantity: number }[] | null) ?? []).reduce((n, i) => n + i.quantity, 0) }));
   const refunds: ReportRefund[] = (r.data ?? []).map((x) => ({ amount_cents: x.amount_cents, created_at: x.created_at, state: ((x.orders as unknown as { shipping_address: { state?: string } | null } | null)?.shipping_address?.state) ?? null }));
   return buildTaxReport(orders, refunds, from, to);
 }

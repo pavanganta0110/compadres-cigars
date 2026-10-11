@@ -73,6 +73,11 @@ describe("tax report", () => {
     expect(r.totals).toMatchObject({ orders: 4, tax_estimated_cents: 3328, taxable_cents: 40000 });
     expect(r.rows.map((x) => [x.state, x.orders])).toEqual([["MO", 2], ["TX", 2]]);
   });
+  it("counts boxes sold per state, paid statuses only", () => {
+    const r = buildTaxReport([{ ...ord("packed", "MO", 844), units: 2 }, { ...ord("completed", "MO", 844), units: 3 }, { ...ord("completed", "TX", 820), units: 1 }, { ...ord("pending", "MO", 844), units: 9 }], [], from, to);
+    expect(r.rows.map((x) => [x.state, x.orders, x.units])).toEqual([["MO", 2, 5], ["TX", 1, 1]]);
+    expect(r.totals.units).toBe(6);
+  });
   it("attributes refunds to the period they were created, even for older orders", () => {
     const refunds = [{ amount_cents: 5000, created_at: "2026-10-10T00:00:00Z", state: "MO" }, { amount_cents: 999, created_at: "2026-09-10T00:00:00Z", state: "MO" }];
     expect(buildTaxReport([], refunds, from, to).totals.refunds_cents).toBe(5000);
@@ -95,5 +100,23 @@ describe("permissions", () => {
   });
   it("unknown roles and prototype keys get nothing", () => {
     for (const r of [undefined, null, "", "admin", "__proto__", "constructor"]) expect(can(r as never, "view")).toBe(false);
+  });
+});
+
+import { outstandingByState, parseDollarsToCents } from "./taxRemittance";
+describe("tax remittance tracking", () => {
+  const row = (state: string, tax: number) => ({ state, orders: 1, units: 1, taxable_cents: 10000, tax_estimated_cents: tax, refunds_cents: 0 });
+  it("outstanding = collected minus recorded payments, ignoring voided ones", () => {
+    const out = outstandingByState([row("MO", 844), row("TX", 820)], [{ state: "MO", amount_cents: 400 }, { state: "MO", amount_cents: 100, voided_at: "2026-10-01" }]);
+    expect(out).toEqual([{ state: "MO", collected_cents: 844, paid_cents: 400, outstanding_cents: 444 }, { state: "TX", collected_cents: 820, paid_cents: 0, outstanding_cents: 820 }]);
+  });
+  it("shows a state that was paid but has no collected tax as negative (overpaid)", () => {
+    expect(outstandingByState([], [{ state: "KS", amount_cents: 500 }])).toEqual([{ state: "KS", collected_cents: 0, paid_cents: 500, outstanding_cents: -500 }]);
+  });
+  it("parses dollars strictly", () => {
+    expect(parseDollarsToCents("12.34")).toBe(1234);
+    expect(parseDollarsToCents("5")).toBe(500);
+    expect(parseDollarsToCents("5.5")).toBe(550);
+    for (const bad of ["0", "-1", "1.234", "abc", "", "1e3", "$5"]) expect(parseDollarsToCents(bad)).toBeNull();
   });
 });
