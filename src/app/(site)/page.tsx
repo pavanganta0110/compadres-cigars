@@ -51,9 +51,9 @@ export default async function Home() {
           <Image src="/images/life-pool-group.jpg" alt="Four friends in black and white evening wear with cigars around a pool table under industrial lamps" fill sizes="(max-width: 900px) 100vw, 520px" />
         </div>
         <div className="feature-copy">
-          <p className="eyebrow">The Compadres life</p>
+          <p className="eyebrow">The Lion Cigars life</p>
           <h2 id="life-title">Good cigars. Better company.</h2>
-          <p>Slow evenings, a friendly game, and a box worth sharing. Every Compadres cigar is rolled by hand in the Dominican Republic and made for the moments you want to last a little longer.</p>
+          <p>Slow evenings, a friendly game, and a box worth sharing. Every Lion Cigars cigar is rolled by hand in the Dominican Republic and made for the moments you want to last a little longer.</p>
           <Link className="btn" href="/shop">Find your box</Link>
         </div>
       </section>

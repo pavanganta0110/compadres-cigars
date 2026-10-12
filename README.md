@@ -1,4 +1,4 @@
-# Compadres Cigars
+# Lion Cigars
 
 Regulated tobacco e-commerce on Next.js (App Router) + Supabase. Port of the verified WordPress/WooCommerce build.
 

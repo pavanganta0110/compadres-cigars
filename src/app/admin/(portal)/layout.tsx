@@ -6,7 +6,7 @@ import { logoutAction } from "../login/actions";
 import { AdminNav } from "./AdminNav";
 import "../admin.css";
 
-export const metadata = { title: { default: "Compadres Cigars Admin Portal", template: "%s | Compadres Cigars Admin Portal" }, robots: { index: false, follow: false } };
+export const metadata = { title: { default: "Lion Cigars Admin Portal", template: "%s | Lion Cigars Admin Portal" }, robots: { index: false, follow: false } };
 
 const NAV: { href: string; label: string; perm: Permission }[] = [
   { href: "/admin", label: "Dashboard", perm: "view" },
@@ -35,7 +35,7 @@ export default async function PortalLayout({ children }: { children: React.React
       <aside className="adm-side">
         <div className="adm-logo">
           <Image src="/images/crest.png" alt="" width={56} height={56} />
-          <p className="adm-brand">Compadres Cigars Admin Portal</p>
+          <p className="adm-brand">Lion Cigars Admin Portal</p>
         </div>
         <AdminNav items={NAV.filter((n) => can(staff.role, n.perm)).map(({ href, label }) => ({ href, label, badge: href === "/admin/products" ? lowStock : 0 }))} />
         <form action={logoutAction} className="adm-user">

@@ -53,7 +53,7 @@ test("owner sees the branded dashboard with the full sidebar and no vendor chrom
   await login(page, users.owner);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   const text = await page.locator("body").innerText();
-  expect(text).toContain("Compadres Cigars Admin Portal");
+  expect(text).toContain("Lion Cigars Admin Portal");
   for (const item of ["Dashboard", "Store", "Products", "Payments", "Operations", "Analytics", "Sales & Tax", "Tax Rates", "Audit Log", "Restrictions", "Users", "Settings"]) {
     await expect(page.getByRole("navigation", { name: "Admin" }).getByRole("link", { name: item, exact: true })).toBeVisible();
   }

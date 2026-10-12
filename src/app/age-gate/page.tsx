@@ -8,7 +8,7 @@ export default async function AgeGate({ searchParams }: { searchParams: Promise<
   const sp = await searchParams;
   return (
     <main className="gate" id="main">
-      <Image src="/images/crest.png" alt="Compadres Premium Cigars" width={280} height={280} priority />
+      <Image src="/images/crest.png" alt="Lion Premium Cigars" width={280} height={280} priority />
       <h1>You must be 21 or older to enter</h1>
       <p>This site sells tobacco products and is intended for adults only. This notice is not identity verification; age is verified again at checkout.</p>
       <form action={enterSite}>

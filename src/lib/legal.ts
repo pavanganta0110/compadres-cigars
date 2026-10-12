@@ -1,7 +1,7 @@
 /** Titles and summaries for the legal pages (full text in legal-content.ts). They stay visibly marked until a lawyer approves final text. */
 export const LEGAL_PAGES: Record<string, { title: string; summary: string }> = {
   privacy: { title: "Privacy Policy", summary: "How we collect, use, retain and delete personal information." },
-  terms: { title: "Terms of Sale", summary: "The terms that apply to purchases from Compadres Cigars." },
+  terms: { title: "Terms of Sale", summary: "The terms that apply to purchases from Lion Cigars." },
   "age-policy": { title: "Age Policy", summary: "Our 21+ requirement and how age is verified at checkout." },
   shipping: { title: "Shipping Policy", summary: "Adult signature delivery, carriers and where we can ship." },
   returns: { title: "Returns Policy", summary: "Return and refund rules for tobacco products." },

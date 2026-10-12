@@ -20,7 +20,7 @@ export type ReviewPayload = { what: string; number?: number; orderId?: string; s
 export type TestPayload = { sentBy: string };
 
 export type Rendered = { subject: string; text: string; html: string };
-const shell = (title: string, body: string) => `<!doctype html><html><body style="margin:0;background:#f4f0e9;font-family:Arial,Helvetica,sans-serif;color:#1f1612"><div style="max-width:600px;margin:0 auto;padding:24px"><div style="background:#1f1612;color:#d6ad68;padding:18px 24px;font-size:20px;letter-spacing:.04em">Compadres Cigars</div><div style="background:#ffffff;padding:24px;border:1px solid #e3dccf"><h1 style="font-size:20px;margin:0 0 16px">${esc(title)}</h1>${body}</div><p style="font-size:12px;color:#5f554b;margin:16px 0 0">Compadres Cigars. For adults 21 and older.</p></div></body></html>`;
+const shell = (title: string, body: string) => `<!doctype html><html><body style="margin:0;background:#f4f0e9;font-family:Arial,Helvetica,sans-serif;color:#1f1612"><div style="max-width:600px;margin:0 auto;padding:24px"><div style="background:#1f1612;color:#d6ad68;padding:18px 24px;font-size:20px;letter-spacing:.04em">Lion Cigars</div><div style="background:#ffffff;padding:24px;border:1px solid #e3dccf"><h1 style="font-size:20px;margin:0 0 16px">${esc(title)}</h1>${body}</div><p style="font-size:12px;color:#5f554b;margin:16px 0 0">Lion Cigars. For adults 21 and older.</p></div></body></html>`;
 const linesHtml = (items: OrderLine[]) => `<table style="width:100%;border-collapse:collapse;font-size:14px">${items.map((i) => `<tr><td style="padding:6px 0;border-bottom:1px solid #eee">${esc(i.name)} &times; ${i.quantity}</td><td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right">${formatUsd(i.unit_price_cents * i.quantity)}</td></tr>`).join("")}</table>`;
 const linesText = (items: OrderLine[]) => items.map((i) => `  ${i.name} x ${i.quantity}: ${formatUsd(i.unit_price_cents * i.quantity)}`).join("\n");
 const addrLines = (a: Address) => [a.recipient, [a.line1, a.line2].filter(Boolean).join(" "), [a.city, a.state].filter(Boolean).join(", ") + (a.postal_code ? ` ${a.postal_code}` : "")].filter((s) => s && s.trim());
@@ -36,7 +36,7 @@ export function renderEmail(kind: EmailKind, payload: unknown): Rendered {
       const p = payload as OrderPayload;
       const url = at(p.siteUrl, `/order/${p.orderId}`);
       return {
-        subject: `Your Compadres Cigars order #${p.number} is confirmed`,
+        subject: `Your Lion Cigars order #${p.number} is confirmed`,
         text: `Thank you${p.name ? `, ${p.name}` : ""}! We received your payment for order #${p.number}.\n\n${linesText(p.items)}\n\n${totalsText(p)}\n\nShip to:\n${addrLines(p.address).map((l) => `  ${l}`).join("\n")}\n\n${SIGNATURE}\nWe will email you again with a FedEx tracking number when your order ships.${url ? `\n\nView your order: ${url}` : ""}\n`,
         html: shell(`Thank you${p.name ? `, ${p.name}` : ""}! Order #${p.number} is confirmed`, `<p>We received your payment.</p>${linesHtml(p.items)}${totalsHtml(p)}<p style="font-size:14px"><strong>Ship to</strong><br>${addrLines(p.address).map(esc).join("<br>")}</p><p style="font-size:14px">${esc(SIGNATURE)}</p><p style="font-size:14px">We will email you again with a FedEx tracking number when your order ships.</p>${link(url, "View your order")}`),
       };
@@ -45,7 +45,7 @@ export function renderEmail(kind: EmailKind, payload: unknown): Rendered {
       const p = payload as ShippedPayload;
       const track = fedexTrackUrl(p.tracking);
       return {
-        subject: `Your Compadres Cigars order #${p.number} has shipped`,
+        subject: `Your Lion Cigars order #${p.number} has shipped`,
         text: `Good news${p.name ? `, ${p.name}` : ""}: order #${p.number} is on its way by FedEx${p.service ? ` (${p.service})` : ""}.\n\nTracking number: ${p.tracking}\nTrack it: ${track}\n\nShipping to:\n${addrLines(p.address).map((l) => `  ${l}`).join("\n")}\n\n${SIGNATURE}\n`,
         html: shell(`Order #${p.number} has shipped`, `<p>Your order is on its way by FedEx${p.service ? ` (${esc(p.service)})` : ""}.</p><p style="font-size:16px"><strong>Tracking number: ${esc(p.tracking)}</strong></p>${link(track, "Track your package")}<p style="font-size:14px"><strong>Shipping to</strong><br>${addrLines(p.address).map(esc).join("<br>")}</p><p style="font-size:14px">${esc(SIGNATURE)}</p>`),
       };
@@ -88,7 +88,7 @@ export function renderEmail(kind: EmailKind, payload: unknown): Rendered {
     }
     case "admin_test": {
       const p = payload as TestPayload;
-      return { subject: "Compadres Cigars test email", text: `This is a test email requested by ${p.sentBy}. If you can read it, email is working.\n`, html: shell("Test email", `<p>This is a test email requested by ${esc(p.sentBy)}. If you can read it, email is working.</p>`) };
+      return { subject: "Lion Cigars test email", text: `This is a test email requested by ${p.sentBy}. If you can read it, email is working.\n`, html: shell("Test email", `<p>This is a test email requested by ${esc(p.sentBy)}. If you can read it, email is working.</p>`) };
     }
   }
 }

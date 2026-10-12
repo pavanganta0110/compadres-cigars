@@ -62,7 +62,7 @@ export function CheckoutForm({ error, tokenizer }: { error?: string; tokenizer: 
       </label>
       <label className="wide radio">
         <input type="checkbox" name="marketingOptIn" value="yes" />
-        <span>Email me news and offers from Compadres Cigars (optional). You can unsubscribe at any time.</span>
+        <span>Email me news and offers from Lion Cigars (optional). You can unsubscribe at any time.</span>
       </label>
       {tokenizer
         ? <PaymentFields tokenizer={tokenizer} error={pay.error} />

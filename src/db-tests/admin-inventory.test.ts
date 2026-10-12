@@ -87,3 +87,15 @@ describe("Ronald Isley photography migration", () => {
     expect(rows).toHaveLength(7);
   });
 });
+
+describe("Lion Cigars rename migration", () => {
+  it("rewrites the old name in stored copy and is safe to run twice", async () => {
+    const { readFileSync } = await import("node:fs");
+    await db.exec("update products set description = 'Handcrafted by Compadres Cigars in the Dominican Republic.' where sku = 'ISLEY-PLUG-60X675-10'");
+    const sql = readFileSync("supabase/migrations/20261012000010_rename_lion_cigars.sql", "utf8");
+    await db.exec(sql); await db.exec(sql);
+    const { rows } = await db.query<{ description: string }>("select description from products where sku = 'ISLEY-PLUG-60X675-10'");
+    expect(rows[0].description).toBe("Handcrafted by Lion Cigars in the Dominican Republic.");
+    expect((await db.query("select 1 from products where description like '%Compadres%' or name like '%Compadres%'")).rows).toHaveLength(0);
+  });
+});
