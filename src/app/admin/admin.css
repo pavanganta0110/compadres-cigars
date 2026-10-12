@@ -146,3 +146,5 @@ table.adm-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .adm a.adm-btn.adm-danger { color: var(--danger); }
 .adm a.adm-btn.adm-danger:hover { color: #fff; }
 .adm .adm-table-wrap:focus-visible { outline: 3px solid var(--brass-text); outline-offset: 2px; }
+
+.adm-login-mark { justify-self: center; } .adm-logo svg { flex: none; }

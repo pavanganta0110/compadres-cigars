@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LionMark } from "@/components/LionMark";
 import Link from "next/link";
 import { getBrands } from "@/lib/catalog";
 import { LEGAL_PAGES } from "@/lib/legal";
@@ -10,7 +10,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 <a className="skip" href="#main">Skip to content</a>
         <header className="site-header">
           <Link href="/" className="brandmark" aria-label="Lion Premium Cigars, home">
-            <Image src="/images/crest.png" alt="" width={64} height={64} priority />
+            <LionMark size={56} />
             <span>Lion Cigars</span>
           </Link>
           <nav aria-label="Primary">
@@ -23,7 +23,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <footer className="site-footer">
           <div className="footer-grid">
             <div>
-              <Image src="/images/crest.png" alt="Lion Premium Cigars" width={96} height={96} />
+              <LionMark size={88} />
               <p>1111 E. 73rd St, Kansas City, MO 64131</p>
             </div>
             <nav aria-label="Legal">

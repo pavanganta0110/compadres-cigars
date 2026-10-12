@@ -123,3 +123,18 @@ test.describe("product photo gallery", () => {
     expect(hidden).toBe(true);
   });
 });
+
+test.describe("business name", () => {
+  test("the age gate and the storefront say Lion Cigars and never the old name", async ({ page }) => {
+    await page.goto("/age-gate");
+    await expect(page.getByText("Lion Cigars", { exact: true }).first()).toBeVisible();
+    expect(await page.title()).toContain("Lion Cigars");
+    expect((await page.locator("body").innerText()).toLowerCase()).not.toContain("compadres");
+    for (const path of ["/", "/shop", "/legal/privacy", "/legal/terms"]) {
+      await enter(page, path);
+      const text = (await page.locator("body").innerText()).toLowerCase();
+      expect(text, `${path} still mentions the old name`).not.toContain("compadres");
+      expect(await page.title()).toContain("Lion Cigars");
+    }
+  });
+});
