@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LionMark } from "@/components/LionMark";
 import { can, type Permission } from "@/lib/domain/permissions";
 import { loadStockAlerts } from "@/lib/server/admin-data";
 import { requireStaff } from "@/lib/server/staff";
@@ -34,7 +34,7 @@ export default async function PortalLayout({ children }: { children: React.React
       <a className="skip" href="#main">Skip to content</a>
       <aside className="adm-side">
         <div className="adm-logo">
-          <Image src="/images/crest.png" alt="" width={56} height={56} />
+          <LionMark size={48} />
           <p className="adm-brand">Lion Cigars Admin Portal</p>
         </div>
         <AdminNav items={NAV.filter((n) => can(staff.role, n.perm)).map(({ href, label }) => ({ href, label, badge: href === "/admin/products" ? lowStock : 0 }))} />

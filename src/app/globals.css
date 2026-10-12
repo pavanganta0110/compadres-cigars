@@ -159,6 +159,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .state-list li { break-inside: avoid; padding: 2px 0; }
 .legal-related ul { list-style: none; padding-left: 0; display: flex; gap: 8px 22px; flex-wrap: wrap; }
 
+<<<<<<< HEAD
 /* ---- product gallery ---- */
 .gallery-main { overflow: hidden; }
 .gallery-empty { display: grid; place-items: center; color: #cbbfae; }
@@ -179,3 +180,9 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .gallery-main img.gallery-off { opacity: 0; pointer-events: none; } .gallery-main img.gallery-on { opacity: 1; }
 .gallery-main img { transition: opacity .35s ease; }
 @media (prefers-reduced-motion: reduce) { .gallery-main img { transition: none; } }
+=======
+/* ---- Lion Cigars seal and age gate ---- */
+.gate-mark { filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .6)); }
+.gate-name { font-family: var(--font-l); font-weight: 600; font-size: 1.5rem; letter-spacing: .32em; text-transform: uppercase; color: var(--brass); margin: 4px 0 8px; }
+.brandmark svg, .footer-grid svg { flex: none; }
+>>>>>>> b8775b8 (Lion Cigars seal drawn in code replaces the old logo picture (age gate, header, footer, admin); guard test for the name)

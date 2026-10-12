@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LionMark } from "@/components/LionMark";
 import { loginAction } from "./actions";
 import "../admin.css";
 
@@ -9,7 +9,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   return (
     <main id="main" className="adm-login">
       <form action={loginAction} className="adm-login-card">
-        <Image src="/images/crest.png" alt="" width={96} height={96} style={{ justifySelf: "center" }} />
+        <LionMark size={110} className="adm-login-mark" />
         <p className="adm-brand" style={{ textAlign: "center" }}>Lion Cigars Admin Portal</p>
         <h1>Sign in</h1>
         {error && <p className="adm-alert" role="alert">Those details did not work. Check your email and password.</p>}

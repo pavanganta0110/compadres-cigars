@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LionMark } from "@/components/LionMark";
 import { enterSite } from "./actions";
 import { safeNextPath } from "@/lib/domain/age-gate";
 
@@ -8,7 +8,8 @@ export default async function AgeGate({ searchParams }: { searchParams: Promise<
   const sp = await searchParams;
   return (
     <main className="gate" id="main">
-      <Image src="/images/crest.png" alt="Lion Premium Cigars" width={280} height={280} priority />
+      <LionMark size={220} className="gate-mark" />
+      <p className="gate-name">Lion Cigars</p>
       <h1>You must be 21 or older to enter</h1>
       <p>This site sells tobacco products and is intended for adults only. This notice is not identity verification; age is verified again at checkout.</p>
       <form action={enterSite}>
