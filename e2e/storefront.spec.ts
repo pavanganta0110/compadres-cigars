@@ -77,3 +77,49 @@ test.describe("legal pages", () => {
     }
   });
 });
+
+test.describe("product photo gallery", () => {
+  test("thumbnails, arrows, keyboard and enlarge all switch between the photos", async ({ page }) => {
+    await enter(page, "/products/the-plug-box-of-10");
+    const thumbs = page.getByRole("group", { name: "Product photos" }).getByRole("button");
+    const total = await thumbs.count();
+    expect(total).toBeGreaterThanOrEqual(2);
+    const count = page.getByText(/^Photo \d+ of \d+$/);
+    const mainAlt = () => page.locator(".gallery-main img.gallery-on").getAttribute("alt");
+
+    await expect(count).toHaveText(`Photo 1 of ${total}`);
+    const first = await mainAlt();
+    await thumbs.nth(1).click();
+    await expect(count).toHaveText(`Photo 2 of ${total}`);
+    await expect(thumbs.nth(1)).toHaveAttribute("aria-current", "true");
+    expect(await mainAlt()).not.toBe(first);
+
+    await page.getByRole("button", { name: "Previous photo" }).first().click();
+    await expect(count).toHaveText(`Photo 1 of ${total}`);
+    await page.getByRole("button", { name: "Previous photo" }).first().click();
+    await expect(count).toHaveText(`Photo ${total} of ${total}`);          // wraps to the last photo
+    await page.getByRole("button", { name: "Next photo" }).first().click();
+    await expect(count).toHaveText(`Photo 1 of ${total}`);                 // and back to the first
+
+    await thumbs.nth(0).focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(count).toHaveText(`Photo 2 of ${total}`);
+    await page.keyboard.press("ArrowLeft");
+    await expect(count).toHaveText(`Photo 1 of ${total}`);
+
+    await page.getByRole("button", { name: /Enlarge photo 1 of/ }).click();
+    const dialog = page.getByRole("dialog", { name: "Enlarged product photo" });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Next photo" }).click();
+    await expect(dialog.getByRole("img")).toHaveAttribute("alt", /.+/);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+  });
+
+  test("only the current photo is exposed to assistive technology", async ({ page }) => {
+    await enter(page, "/products/the-plug-box-of-10");
+    await expect(page.locator(".gallery-main img.gallery-on")).toHaveCount(1);
+    const hidden = await page.locator(".gallery-main img.gallery-off").evaluateAll((els) => els.every((e) => e.getAttribute("aria-hidden") === "true" && e.getAttribute("alt") === ""));
+    expect(hidden).toBe(true);
+  });
+});
