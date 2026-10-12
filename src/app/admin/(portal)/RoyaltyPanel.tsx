@@ -15,7 +15,7 @@ export function RoyaltyPanel({ rows }: { rows: BrandRoyaltyRow[] | null }) {
         <Link href="/admin/royalties">Open royalties</Link>
       </div>
       <p className="adm-muted">This month so far: <strong>{formatUsd(month)}</strong> earned · <strong>{formatUsd(owed)}</strong> owed to brands now</p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Brand</th><th>Rate</th><th>Net sales this month</th><th>Royalty this month</th><th>Owed now</th></tr></thead>
         <tbody>
           {rows.map((r) => <tr key={r.brandId}><th scope="row">{r.name}</th><td>{formatBps(r.rateBps)}%</td><td>{formatUsd(r.period.netCents)}</td><td><strong>{formatUsd(r.period.royaltyCents)}</strong></td><td>{formatUsd(r.owed)}</td></tr>)}

@@ -47,7 +47,7 @@ export default async function Royalties({ searchParams }: { searchParams: Promis
       </div>
 
       <h2>By brand</h2>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Brand</th><th>Rate</th><th>Units sold</th><th>Net sales</th><th>Royalty earned</th><th>Paid out (all time)</th><th>Owed now</th></tr></thead>
         <tbody>
           {rows.map((r) => (
@@ -95,7 +95,7 @@ export default async function Royalties({ searchParams }: { searchParams: Promis
 
       <h2>Payout history</h2>
       {payouts.length === 0 ? <p>No payouts recorded yet.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table">
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
           <thead><tr><th>Date paid</th><th>Brand</th><th>Amount</th><th>Reference</th></tr></thead>
           <tbody>{payouts.map((p) => <tr key={p.id}><td>{p.paid_on}</td><td>{names.get(p.brand_id) ?? "Brand"}</td><td>{formatUsd(p.amount_cents)}</td><td>{p.reference}</td></tr>)}</tbody>
         </table></div>

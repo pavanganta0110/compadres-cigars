@@ -37,7 +37,7 @@ export default async function Products({ searchParams }: { searchParams: Promise
         <Link href="/admin/products" aria-current={sp.filter === "low" ? undefined : "page"}>All ({all.length})</Link>
         <Link href="/admin/products?filter=low" aria-current={sp.filter === "low" ? "page" : undefined}>Needs restocking ({attention.length})</Link>
       </p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Product</th><th>Status</th>{edit ? <th>Edit</th> : <><th>Price</th><th>Stock</th></>}</tr></thead>
         <tbody>
           {rows.length === 0 && <tr><td colSpan={3}>Nothing needs restocking.</td></tr>}

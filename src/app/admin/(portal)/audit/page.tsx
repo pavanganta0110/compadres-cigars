@@ -11,7 +11,7 @@ export default async function Audit() {
     <>
       <h1>Audit Log</h1>
       <p className="adm-note">Append-only. Card data, tokens, keys and dates of birth are never recorded. Showing the latest 200 events.</p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Detail</th></tr></thead>
         <tbody>
           {(data ?? []).map((e) => (

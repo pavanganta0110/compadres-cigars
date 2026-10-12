@@ -87,7 +87,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <h2>Orders to pack and ship</h2>
       {queue.length === 0 ? <p>Nothing waiting to be packed.</p> : (
         <form action={markPackedAction}>
-          <div className="adm-table-wrap"><table className="adm-table">
+          <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
             <thead><tr>{canFulfill && <th><span className="sr-only">Select</span></th>}<th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Waiting</th></tr></thead>
             <tbody>
               {queue.map((o) => (
@@ -109,7 +109,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
       <h2>Orders needing attention</h2>
       {(blocked.data ?? []).length === 0 ? <p>No failed age checks or blocked shipping in the last 7 days.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>When</th><th>Problem</th><th>State</th></tr></thead><tbody>
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>When</th><th>Problem</th><th>State</th></tr></thead><tbody>
           {(blocked.data ?? []).map((b) => { const d = b.detail as { code?: string; state?: string }; return (
             <tr key={b.id}><td>{new Date(b.at).toLocaleString()}</td><td>{d.code === "age_not_verified" ? "Age check not completed" : "Shipping service not eligible"}</td><td>{d.state}</td></tr>
           ); })}
@@ -118,14 +118,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
       <h2>Recent shipments</h2>
       {shipped.length === 0 ? <p>No tracking numbers recorded yet.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>Order</th><th>Tracking</th><th>Carrier status</th></tr></thead><tbody>
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>Order</th><th>Tracking</th><th>Carrier status</th></tr></thead><tbody>
           {shipped.map((o) => <tr key={o.id}><td><Link href={`/admin/orders/${o.id}`}>#{o.number}</Link></td><td>{o.tracking_number}</td><td>{o.carrier_status_code ?? "Not checked yet"}</td></tr>)}
         </tbody></table></div>
       )}
 
       <h2>Recent refunds</h2>
       {(refunds.data ?? []).length === 0 ? <p>No refunds.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>When</th><th>Amount</th></tr></thead><tbody>
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>When</th><th>Amount</th></tr></thead><tbody>
           {(refunds.data ?? []).map((r) => <tr key={r.id}><td>{new Date(r.created_at).toLocaleString()}</td><td>{formatUsd(r.amount_cents)}</td></tr>)}
         </tbody></table></div>
       )}

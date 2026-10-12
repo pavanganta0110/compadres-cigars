@@ -40,7 +40,7 @@ export default async function Customers({ searchParams }: { searchParams: Promis
         <label>Search by email or name<input name="q" defaultValue={q} maxLength={80} /></label>
         <button className="adm-btn" type="submit">Search</button>
       </form>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Email</th><th>Name</th><th>Orders</th><th>Marketing</th><th>Joined</th></tr></thead>
         <tbody>
           {(data ?? []).map((c) => (

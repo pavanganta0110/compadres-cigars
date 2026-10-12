@@ -140,3 +140,9 @@ table.adm-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 
 @media (max-width: 960px) { .adm-split { grid-template-columns: 1fr; } .adm-alerts li { grid-template-columns: 1fr; } }
 @media (max-width: 860px) { .adm { grid-template-columns: 1fr; } .adm-side { position: static; height: auto; } .adm-side nav { flex-direction: row; flex-wrap: wrap; } .adm-user { margin-top: 0; } }
+
+/* Link-style buttons: the generic ".adm a" colour must not override the button text colour (contrast) */
+.adm a.adm-btn { color: #fbf7f0; }
+.adm a.adm-btn.adm-danger { color: var(--danger); }
+.adm a.adm-btn.adm-danger:hover { color: #fff; }
+.adm .adm-table-wrap:focus-visible { outline: 3px solid var(--brass-text); outline-offset: 2px; }

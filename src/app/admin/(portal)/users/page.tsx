@@ -18,7 +18,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<{ 
       <p className="adm-note">New staff are added from a terminal so no password is ever typed into a web form or shared in chat: <code>npm run admin:add-user -- name@example.com manager</code>. Roles: owner (everything), manager (no restrictions or users), fulfillment (orders only), viewer (read only).</p>
       {sp.saved && <p className="adm-note" role="status">Saved.</p>}
       {sp.error && <p className="adm-alert" role="alert">{ERRORS[sp.error] ?? "That change was not valid."}</p>}
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Email</th><th>Role</th><th>Change</th></tr></thead>
         <tbody>
           {users.map((u) => (

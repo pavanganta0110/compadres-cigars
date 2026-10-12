@@ -24,7 +24,7 @@ export default async function TaxPayments({ searchParams }: { searchParams: Prom
       {sp.error && <p className="adm-alert" role="alert">That entry was not valid. Check the amount, dates and state.</p>}
 
       <h2>Estimated tax still owed, by state</h2>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>State</th><th>Estimated tax collected (all time)</th><th>Recorded as paid</th><th>Still owed (estimate)</th></tr></thead>
         <tbody>
           {owed.map((o) => <tr key={o.state}><td>{o.state}</td><td>{formatUsd(o.collected_cents)}</td><td>{formatUsd(o.paid_cents)}</td><td>{o.outstanding_cents < 0 ? `${formatUsd(-o.outstanding_cents)} overpaid` : formatUsd(o.outstanding_cents)}</td></tr>)}
@@ -53,7 +53,7 @@ export default async function TaxPayments({ searchParams }: { searchParams: Prom
       )}
 
       <h2>Recorded payments</h2>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Paid on</th><th>State</th><th>Period</th><th>Amount</th><th>Method</th><th>Confirmation</th><th /></tr></thead>
         <tbody>
           {rows.map((r) => (

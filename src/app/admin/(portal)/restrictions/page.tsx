@@ -16,7 +16,7 @@ export default async function Restrictions({ searchParams }: { searchParams: Pro
       {sp.saved && <p className="adm-note" role="status">Saved {sp.saved}.</p>}
       {sp.error === "confirm" && <p className="adm-alert" role="alert">Tick the confirmation box to allow a state.</p>}
       {sp.error === "invalid" && <p className="adm-alert" role="alert">That change was not valid.</p>}
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>State</th><th>Status</th><th>Note</th><th>Change</th></tr></thead>
         <tbody>
           {(data ?? []).map((r) => {

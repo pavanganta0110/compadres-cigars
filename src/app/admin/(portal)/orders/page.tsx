@@ -13,7 +13,7 @@ export default async function Orders() {
     <>
       <h1>Orders</h1>
       <p className="adm-note">Store → Orders. Customers are listed under <Link href="/admin/customers">Customers</Link>.</p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>State</th><th>Status</th><th>Total</th><th>Tracking</th></tr></thead>
         <tbody>
           {orders.map((o) => (
