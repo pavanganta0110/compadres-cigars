@@ -13,6 +13,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <h1>Settings</h1>
       <h2>Environment</h2>
       <p>APP_ENV: <strong>{env}</strong>. Payment, shipping and age providers run live only when APP_ENV is production AND the matching approval flag is true. Nothing is approved today.</p>
+      {!process.env.COMPADRES_CONTACT_EMAIL?.trim() && <p className="adm-alert" role="alert">The legal pages have no contact email yet. Set <code>COMPADRES_CONTACT_EMAIL</code> in Vercel so customers can reach you (privacy requests, returns, delivery problems).</p>}
       <h2>Shipping (FedEx)</h2>
       <p>Runs one real authorization and one small rate quote against FedEx and reports which step fails. No secrets are shown.</p>
       <form action={testFedExAction}><button className="adm-btn" type="submit">Test FedEx connection</button></form>
