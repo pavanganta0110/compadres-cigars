@@ -19,7 +19,7 @@ export default async function TaxRates({ searchParams }: { searchParams: Promise
       {sp.saved && <p className="adm-note" role="status">Saved the rate for {sp.saved.slice(0, 2)}.</p>}
       {sp.error && <p className="adm-alert" role="alert">Enter a percentage from 0 to 30 with up to two decimals, for example 8.44.</p>}
       <p className="adm-muted">{changed === 0 ? "All 50 states use the business-approved matrix." : `${changed} state${changed === 1 ? "" : "s"} changed from the approved matrix.`}</p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>State</th><th>Approved matrix</th><th>Current rate (%)</th><th>Source</th><th>Effective</th><th /></tr></thead>
         <tbody>
           {rows.map((r) => {

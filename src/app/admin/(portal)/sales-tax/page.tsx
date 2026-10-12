@@ -25,7 +25,7 @@ export default async function SalesTax({ searchParams }: { searchParams: Promise
       </form>
       <p><Link href="/admin/sales-tax/payments">Record tax payments and see what is still owed</Link>. Payments are made in each state&apos;s own tax portal; this system tracks them and does not send money.</p>
       <p>Finalized sales include processing, packed, completed and refunded orders. Refunds count in the period they were issued.</p>
-      <div className="adm-table-wrap"><table className="adm-table">
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
         <thead><tr><th>State</th><th>Orders</th><th>Boxes sold</th><th>Taxable sales</th><th>Estimated tax collected</th><th>Refunds</th></tr></thead>
         <tbody>
           {report.rows.map((r) => <tr key={r.state}><td>{r.state}</td><td>{r.orders}</td><td>{r.units}</td><td>{formatUsd(r.taxable_cents)}</td><td>{formatUsd(r.tax_estimated_cents)}</td><td>{formatUsd(r.refunds_cents)}</td></tr>)}

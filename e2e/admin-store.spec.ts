@@ -18,7 +18,7 @@ async function makeStaff(email: string, role: string) {
 }
 async function login(page: Page, email: string) {
   await page.goto("/admin/login");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
@@ -131,7 +131,7 @@ test.describe("products and inventory", () => {
     await productRow(page, name).getByRole("button", { name: "Save" }).click();
     await expect(productRow(page, name).locator(".adm-pill", { hasText: "Out of stock" })).toBeVisible();
     await page.goto("/admin/products?filter=low");
-    await expect(page.getByText(name)).toBeVisible();
+    await expect(productRow(page, name)).toBeVisible();
 
     // plenty of stock clears the alert
     await productRow(page, name).getByLabel("Stock", { exact: true }).fill("50");
@@ -226,7 +226,7 @@ test("remove: needs the confirmation; a brand that still has products is refused
   await expect(page.getByText("Saved.")).toBeVisible();
 
   await page.goto("/admin/products/new");
-  await page.getByLabel("Brand", { exact: true }).selectOption({ label: brand });
+  await page.locator('select[name="brandId"]').selectOption({ label: brand });
   await page.getByLabel("Product name").fill(prod);
   await page.getByLabel("SKU").fill(`E2E-RM-${run}`);
   await page.getByLabel("Price (USD)").fill("20");

@@ -18,11 +18,12 @@ async function makeStaff(email: string, role: string) {
 }
 async function login(page: Page, email: string) {
   await page.goto("/admin/login");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
+const YESTERDAY = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
 const rateForm = (page: Page) => page.locator("form", { has: page.getByLabel(`${BRAND}: royalty rate (%)`) });
 const payoutForm = (page: Page) => page.locator("form", { has: page.getByLabel(new RegExp(`${BRAND}: amount paid`)) });
 const brandRow = (page: Page) => page.getByRole("row").filter({ has: page.getByRole("rowheader", { name: BRAND }) }).first();
@@ -71,6 +72,7 @@ test("the owner sets a rate; royalty = rate x net product sales (no tax or shipp
   await expect(page.locator(".adm-alert")).toContainText("0 to 100");
 
   await page.getByLabel(`${BRAND}: royalty rate (%)`).fill("10");
+  await rateForm(page).getByLabel("Effective from (optional)").fill(YESTERDAY);   // before the test orders were paid
   await page.getByRole("button", { name: `Save royalty rate for ${BRAND}` }).click();
   await expect(page.getByText("Rate saved.")).toBeVisible();
   await expect(brandRow(page)).toContainText("10.00%");
@@ -84,6 +86,7 @@ test("payouts lower what is owed, cannot exceed it, and are listed; a future rat
   await login(page, users.owner);
   await page.goto("/admin/royalties");
   await page.getByLabel(`${BRAND}: royalty rate (%)`).fill("10");
+  await rateForm(page).getByLabel("Effective from (optional)").fill(YESTERDAY);
   await page.getByRole("button", { name: `Save royalty rate for ${BRAND}` }).click();
   await expect(page.getByText("Rate saved.")).toBeVisible();
 

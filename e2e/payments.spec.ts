@@ -19,7 +19,7 @@ async function makeStaff(email: string, role: string) {
 }
 async function login(page: Page, email: string) {
   await page.goto("/admin/login");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
@@ -45,7 +45,7 @@ async function fillCheckout(page: Page, email: string) {
   await page.goto("/products/the-plug-box-of-10");
   await page.getByRole("button", { name: "Add to Cart" }).click();
   await page.getByRole("link", { name: "Proceed to checkout" }).click();
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Full name").fill("Test Buyer");
   await page.getByLabel("Address", { exact: true }).fill("1111 E 73rd St");
   await page.getByLabel("City").fill("Kansas City");

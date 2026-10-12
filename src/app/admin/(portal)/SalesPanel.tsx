@@ -32,7 +32,7 @@ export function SalesPanel({ orders, lines, alerts, now, days = 14 }: { orders: 
             ))}
           </div>
           <details className="adm-details"><summary>Show as a table</summary>
-            <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>Day</th><th>Orders</th><th>Sales</th></tr></thead><tbody>
+            <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>Day</th><th>Orders</th><th>Sales</th></tr></thead><tbody>
               {[...series].reverse().map((d) => <tr key={d.day}><td>{shortDay(d.day)}</td><td>{d.orders}</td><td>{formatUsd(d.cents)}</td></tr>)}
             </tbody></table></div>
           </details>

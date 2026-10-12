@@ -14,7 +14,7 @@ export function StateTaxPanel({ report, label, outstanding }: { report: Report; 
     <>
       <p className="adm-note" role="note"><strong>Estimates only.</strong> {report.disclaimer} Refunds are shown separately and not netted out of the tax. Payments are made in each state&apos;s own tax portal and recorded here; this system does not send money. {label}</p>
       {rows.length === 0 ? <p>No paid orders yet this month.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table">
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
           <caption className="sr-only">Boxes sold and estimated sales tax by state</caption>
           <thead><tr><th>State</th><th>Boxes sold</th><th>Orders</th><th>Taxable sales</th><th>Estimated tax this month</th><th>Refunds</th><th>Still owed, all time (est.)</th></tr></thead>
           <tbody>

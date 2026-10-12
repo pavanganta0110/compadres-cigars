@@ -28,7 +28,7 @@ async function fillCheckout(page: Page, email: string, state: string) {
   await page.getByRole("button", { name: "Add to Cart" }).click();
   await expect(page).toHaveURL(/\/cart/);
   await page.getByRole("link", { name: "Proceed to checkout" }).click();
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Full name").fill("Test Buyer");
   await page.getByLabel("Address", { exact: true }).fill("1111 E 73rd St");
   await page.getByLabel("City").fill("Kansas City");

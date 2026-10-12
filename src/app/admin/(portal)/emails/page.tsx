@@ -33,7 +33,7 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
       <h2>Recent emails</h2>
       <p className="adm-muted">{Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(" · ") || "Nothing yet."}</p>
       {(data ?? []).length > 0 && (
-        <div className="adm-table-wrap"><table className="adm-table">
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
           <thead><tr><th>When</th><th>Type</th><th>To</th><th>Subject</th><th>Status</th><th /></tr></thead>
           <tbody>{(data ?? []).map((e) => (
             <tr key={e.id}>

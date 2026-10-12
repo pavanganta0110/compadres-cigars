@@ -64,7 +64,7 @@ export default async function Payments({ searchParams }: { searchParams: Promise
 
       <h2>Recent payments</h2>
       {(recent.data ?? []).length === 0 ? <p>No payment attempts yet.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table">
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table">
           <thead><tr><th>When</th><th>Order</th><th>Processor</th><th>Status</th><th>Amount</th><th>Refunded</th></tr></thead>
           <tbody>{(recent.data ?? []).map((p) => (
             <tr key={p.id}><td>{new Date(p.created_at).toLocaleString()}</td><td><Link href={`/admin/orders/${p.order_id}`}>#{num(p)}</Link></td><td>{p.provider} ({p.mode})</td><td>{p.status}</td><td>{formatUsd(p.amount_cents)}</td><td>{formatUsd(p.refunded_cents)}</td></tr>

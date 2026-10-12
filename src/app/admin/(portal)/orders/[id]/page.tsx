@@ -37,7 +37,7 @@ export default async function OrderDetail({ params, searchParams }: { params: Pr
       <h1>Order #{o.number}</h1>
       <p><span className="adm-pill">{o.status}</span> · {o.email}</p>
       <h2>Items</h2>
-      <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>SKU</th><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>
+      <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>SKU</th><th>Item</th><th>Qty</th><th>Price</th></tr></thead><tbody>
         {(o.order_items as { id: string; sku: string; name: string; quantity: number; unit_price_cents: number }[]).map((i) => <tr key={i.id}><td>{i.sku}</td><td>{i.name}</td><td>{i.quantity}</td><td>{formatUsd(i.unit_price_cents)}</td></tr>)}
       </tbody></table></div>
       <p>Subtotal {formatUsd(o.subtotal_cents)} · Shipping {formatUsd(o.shipping_cents)} · Estimated tax {formatUsd(o.tax_cents)} · <strong>Total {formatUsd(o.total_cents)}</strong></p>
@@ -48,14 +48,14 @@ export default async function OrderDetail({ params, searchParams }: { params: Pr
       <details><summary>Immutable compliance snapshot (v{o.compliance_snapshot_version})</summary><pre style={{ overflow: "auto" }}>{JSON.stringify(o.compliance_snapshot, null, 2)}</pre></details>
       <h2>Payment</h2>
       {(payments ?? []).length === 0 ? <p>No payment attempts. The order is {o.status}.</p> : (
-        <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>When</th><th>Processor</th><th>Status</th><th>Amount</th><th>Refunded</th><th>Note</th></tr></thead><tbody>
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>When</th><th>Processor</th><th>Status</th><th>Amount</th><th>Refunded</th><th>Note</th></tr></thead><tbody>
           {(payments ?? []).map((p) => <tr key={p.id}><td>{new Date(p.created_at).toLocaleString()}</td><td>{p.provider} ({p.mode})</td><td>{p.status}</td><td>{formatUsd(p.amount_cents)}</td><td>{formatUsd(p.refunded_cents)}</td><td>{p.decline_code ?? ""}</td></tr>)}
         </tbody></table></div>
       )}
       {sp.refund === "ok" && <p className="adm-note" role="status">Refund issued.</p>}
       {sp.refund && sp.refund !== "ok" && <p className="adm-alert" role="alert">Refund not issued: {REFUND_MESSAGES[sp.refund] ?? "it could not be completed. Nothing was recorded as refunded; check the audit log."}</p>}
       {(refunds ?? []).length > 0 && (
-        <div className="adm-table-wrap"><table className="adm-table"><thead><tr><th>When</th><th>Refund</th><th>Status</th><th>Reason</th></tr></thead><tbody>
+        <div className="adm-table-wrap" tabIndex={0}><table className="adm-table"><thead><tr><th>When</th><th>Refund</th><th>Status</th><th>Reason</th></tr></thead><tbody>
           {(refunds ?? []).map((r) => <tr key={r.id}><td>{new Date(r.created_at).toLocaleString()}</td><td>{formatUsd(r.amount_cents)}</td><td>{r.status}</td><td>{r.reason}</td></tr>)}
         </tbody></table></div>
       )}

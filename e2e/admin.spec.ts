@@ -16,7 +16,7 @@ async function makeStaff(email: string, role: string) {
 }
 async function login(page: Page, email: string, password = PASSWORD, expectSuccess = true) {
   await page.goto("/admin/login");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   if (expectSuccess) await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
@@ -155,7 +155,7 @@ test("dashboard shows sales and estimated tax by state, and tax payments can be 
   await expect(page.getByText(/does not send money/).first()).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: /^NE/ }).first()).toBeVisible();
   await page.goto("/admin/sales-tax/payments");
-  await page.getByLabel("State").selectOption("NE");
+  await page.locator('select[name="state"]').selectOption("NE");
   await page.getByLabel("Covers sales from").fill("2026-10-01");
   await page.getByLabel("Covers sales through").fill("2026-10-31");
   await page.getByLabel("Amount paid (USD)").fill("1.00");
