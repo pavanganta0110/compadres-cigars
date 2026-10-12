@@ -10,7 +10,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
     <main id="main" className="adm-login">
       <form action={loginAction} className="adm-login-card">
         <Image src="/images/crest.png" alt="" width={96} height={96} style={{ justifySelf: "center" }} />
-        <p className="adm-brand" style={{ textAlign: "center" }}>Compadres Cigars Admin Portal</p>
+        <p className="adm-brand" style={{ textAlign: "center" }}>Lion Cigars Admin Portal</p>
         <h1>Sign in</h1>
         {error && <p className="adm-alert" role="alert">Those details did not work. Check your email and password.</p>}
         <label>Email<input name="email" type="email" autoComplete="username" required /></label>

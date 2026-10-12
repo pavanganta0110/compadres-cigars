@@ -92,7 +92,7 @@ export async function payOrder(orderId: string, token: unknown): Promise<PayResu
   const setState = (patch: Record<string, unknown>) => db.from("payments").update(patch).eq("id", paymentId).then((r) => r, (e) => ({ error: e }));
   const meta = { paymentId, attempt: b.attempt, provider: setup.name, mode: setup.paymentMode, amountCents: o.total_cents };
 
-  const auth = await setup.provider.authorize({ amountCents: o.total_cents, token, idempotencyKey: paymentId, description: "Compadres Cigars order" });
+  const auth = await setup.provider.authorize({ amountCents: o.total_cents, token, idempotencyKey: paymentId, description: "Lion Cigars order" });
   if (!auth.ok) {
     await setState({ status: auth.code === "declined" ? "declined" : "failed", decline_code: (auth.providerCode ?? auth.code).slice(0, 80) });
     await auditPayment(auth.code === "declined" ? "payment.declined" : "payment.authorize_failed", orderId, { ...meta, code: auth.code, providerCode: auth.providerCode });

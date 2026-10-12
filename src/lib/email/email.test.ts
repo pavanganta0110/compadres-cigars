@@ -33,7 +33,7 @@ describe("email gating", () => {
 
 const email = { to: "buyer@example.com", subject: "Hi", html: "<p>x</p>", text: "x", idempotencyKey: "order_confirmation:abc" };
 function resend(status: number, body: unknown, calls: HttpRequest[] = []) {
-  return new ResendEmailProvider("re_test_key_value", "Compadres Cigars <orders@example.com>", async (r): Promise<HttpResponse> => { calls.push(r); return { status, text: typeof body === "string" ? body : JSON.stringify(body) }; });
+  return new ResendEmailProvider("re_test_key_value", "Lion Cigars <orders@example.com>", async (r): Promise<HttpResponse> => { calls.push(r); return { status, text: typeof body === "string" ? body : JSON.stringify(body) }; });
 }
 describe("ResendEmailProvider", () => {
   it("posts one email with the key in the Authorization header and an idempotency key", async () => {
@@ -42,7 +42,7 @@ describe("ResendEmailProvider", () => {
     expect(calls[0].url).toBe(RESEND_URL);
     expect(calls[0].headers.Authorization).toBe("Bearer re_test_key_value");
     expect(calls[0].headers["Idempotency-Key"]).toBe("order_confirmation:abc");
-    expect(JSON.parse(calls[0].body)).toMatchObject({ from: "Compadres Cigars <orders@example.com>", to: ["buyer@example.com"], subject: "Hi" });
+    expect(JSON.parse(calls[0].body)).toMatchObject({ from: "Lion Cigars <orders@example.com>", to: ["buyer@example.com"], subject: "Hi" });
     expect(calls[0].body).not.toContain("re_test_key_value");
   });
   it("classifies failures: validation/auth are permanent; 429/5xx/network are retryable; text is never echoed", async () => {
@@ -56,7 +56,7 @@ describe("ResendEmailProvider", () => {
     expect(await resend(200, { nope: 1 }).send(email)).toMatchObject({ ok: false });
   });
   it("validates the From address", () => {
-    expect(fromAddressOk("Compadres Cigars <orders@example.com>")).toBe(true);
+    expect(fromAddressOk("Lion Cigars <orders@example.com>")).toBe(true);
     expect(fromAddressOk("orders@example.com")).toBe(true);
     for (const v of ["", "orders", "a@b", "x <y@z.co>\r\nBcc: evil@e.com"]) expect(fromAddressOk(v)).toBe(false);
   });
@@ -74,7 +74,7 @@ const order: OrderPayload = {
 describe("templates", () => {
   it("order confirmation: totals, adult-signature notice, link, and escaped HTML", () => {
     const r = renderEmail("order_confirmation", order);
-    expect(r.subject).toBe("Your Compadres Cigars order #1042 is confirmed");
+    expect(r.subject).toBe("Your Lion Cigars order #1042 is confirmed");
     for (const s of ["$298.00", "$14.50", "$25.15", "$337.65", "21 or older", "https://shop.example.com/order/11111111-1111-4111-8111-111111111111", "Kansas City, MO 64131"]) expect(r.text).toContain(s);
     expect(r.html).not.toContain("<script>");
     expect(r.html).not.toContain("<b>Lee</b>");

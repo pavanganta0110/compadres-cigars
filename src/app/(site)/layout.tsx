@@ -9,9 +9,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <>
 <a className="skip" href="#main">Skip to content</a>
         <header className="site-header">
-          <Link href="/" className="brandmark" aria-label="Compadres Premium Cigars, home">
+          <Link href="/" className="brandmark" aria-label="Lion Premium Cigars, home">
             <Image src="/images/crest.png" alt="" width={64} height={64} priority />
-            <span>Compadres</span>
+            <span>Lion Cigars</span>
           </Link>
           <nav aria-label="Primary">
             <Link href="/shop">Shop</Link>
@@ -23,7 +23,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <footer className="site-footer">
           <div className="footer-grid">
             <div>
-              <Image src="/images/crest.png" alt="Compadres Premium Cigars" width={96} height={96} />
+              <Image src="/images/crest.png" alt="Lion Premium Cigars" width={96} height={96} />
               <p>1111 E. 73rd St, Kansas City, MO 64131</p>
             </div>
             <nav aria-label="Legal">

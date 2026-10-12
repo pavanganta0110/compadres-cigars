@@ -13,7 +13,7 @@ function ask(q, hidden = false) {
   });
 }
 const key = await ask("Resend API key (hidden): ", true);
-const from = await ask("From address, e.g. Compadres Cigars <orders@yourdomain.com>: ");
+const from = await ask("From address, e.g. Lion Cigars <orders@yourdomain.com>: ");
 const admins = await ask("Staff alert emails (comma-separated): ");
 const site = await ask("Site URL for links, e.g. https://your-site.vercel.app (Enter to skip): ");
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

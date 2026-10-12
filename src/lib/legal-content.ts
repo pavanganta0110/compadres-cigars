@@ -8,7 +8,7 @@ export const LEGAL_UPDATED = "October 11, 2026";
 export type Contact = { name: string; address: string; email: string | null; phone: string | null };
 export function contactFromEnv(env: Record<string, string | undefined> = process.env): Contact {
   const t = (v: string | undefined) => (v ?? "").trim() || null;
-  return { name: t(env.COMPADRES_BUSINESS_NAME) ?? "Compadres Cigars", address: t(env.COMPADRES_BUSINESS_ADDRESS) ?? "1111 E. 73rd St, Kansas City, MO 64131", email: t(env.COMPADRES_CONTACT_EMAIL), phone: t(env.COMPADRES_CONTACT_PHONE) };
+  return { name: t(env.COMPADRES_BUSINESS_NAME) ?? "Lion Cigars", address: t(env.COMPADRES_BUSINESS_ADDRESS) ?? "1111 E. 73rd St, Kansas City, MO 64131", email: t(env.COMPADRES_CONTACT_EMAIL), phone: t(env.COMPADRES_CONTACT_PHONE) };
 }
 /** Business choices stated in the policies. Change them here (and have counsel confirm) rather than in the prose. */
 export const LEGAL_FACTS = { reportWindowDays: 7, shipTargetBusinessDays: 1, governingState: "Missouri" } as const;
@@ -22,7 +22,7 @@ const WARNINGS = ["SURGEON GENERAL WARNING: Cigars Are Not A Safe Alternative To
 
 export const LEGAL_DOCS: Record<string, LegalDoc> = {
   privacy: {
-    intro: "This policy explains what personal information Compadres Cigars collects when you use this website or buy from us, why we collect it, who we share it with, and the choices you have.",
+    intro: "This policy explains what personal information Lion Cigars collects when you use this website or buy from us, why we collect it, who we share it with, and the choices you have.",
     blocks: (c) => [
       { h: "Who we are", p: [`${c.name} (“we”, “us”) operates this website and sells premium cigars by the box to adults aged 21 and over. Our address is ${c.address}.`] },
       { h: "What we collect", ul: [
@@ -64,7 +64,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
   },
 
   terms: {
-    intro: "These terms apply when you buy from Compadres Cigars through this website. By placing an order you agree to them.",
+    intro: "These terms apply when you buy from Lion Cigars through this website. By placing an order you agree to them.",
     blocks: (c) => [
       { h: "Who can buy", ul: ["You must be at least 21 years old.", "It must be legal for you to buy and receive tobacco products at your delivery address.", "Orders are for your own personal use. You may not buy to resell, and you may not provide tobacco products to anyone under 21.", "The information you give us must be accurate and complete."] },
       { h: "Products and prices", p: ["Cigars are sold by the box only. Descriptions and photographs are provided in good faith, and natural tobacco varies in color and appearance. Prices are in US dollars and may change at any time before you place an order. If a price or description is wrong, we may correct it and give you the choice to proceed or cancel. We may limit quantities."] },
@@ -75,7 +75,7 @@ export const LEGAL_DOCS: Record<string, LegalDoc> = {
       { h: "Shipping and delivery", p: ["We ship by FedEx and every package requires an adult signature. See our Shipping Policy and Age Policy for how delivery works. Risk of loss passes to you when the package is delivered and signed for."] },
       { h: "Returns and refunds", p: ["Because cigars are perishable tobacco products, returns are limited. See our Returns Policy."] },
       { h: "Health notice", p: ["Tobacco use is dangerous to your health.", ...WARNINGS] },
-      { h: "Our content", p: ["The brand names, logos, photographs and text on this site belong to Compadres Cigars or its licensors. You may not copy or use them without our written permission."] },
+      { h: "Our content", p: ["The brand names, logos, photographs and text on this site belong to Lion Cigars or its licensors. You may not copy or use them without our written permission."] },
       { h: "Our responsibility", p: ["To the fullest extent the law allows, our liability for any claim about an order is limited to the amount you paid for that order, and we are not liable for indirect or consequential losses. Nothing in these terms limits any right you have under law that cannot be limited."] },
       { h: "Governing law", p: [`These terms are governed by the laws of the State of ${LEGAL_FACTS.governingState}, without regard to its conflict-of-laws rules, and the courts located in ${LEGAL_FACTS.governingState} will handle disputes, except where the law of your state requires otherwise.`] },
       { h: "Changes", p: [`We may update these terms. The version that applies to your order is the one shown when you placed it. Last updated ${LEGAL_UPDATED}.`] },

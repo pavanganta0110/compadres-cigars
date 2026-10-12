@@ -11,7 +11,7 @@ const admin = Inter({ subsets: ["latin"], variable: "--font-admin", display: "sw
 const marker = Permanent_Marker({ subsets: ["latin"], weight: "400", variable: "--font-marker", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Compadres Cigars | Premium Dominican Cigars by the Box", template: "%s | Compadres Cigars" },
+  title: { default: "Lion Cigars | Premium Dominican Cigars by the Box", template: "%s | Lion Cigars" },
   description: "Premium handcrafted Dominican cigars, sold by the box. Kansas City, MO. Adults 21+ only.",
 };
 
