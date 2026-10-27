@@ -41,3 +41,12 @@ Audit actions: `payment.authorized`, `payment.declined`, `payment.authorize_fail
 - No expiry/restock job for abandoned `pending` orders (stock stays reserved).
 - A payment stuck in `authorizing`/`authorized` keeps blocking a second charge on that order by design; the Payments page lists them under "Needs review".
 - Rejected webhooks are logged to the server console, not the database (to avoid unauthenticated writes).
+
+## Authorize.net
+Select with `COMPADRES_PAYMENT_PROVIDER=authorizenet` and set `AUTHNET_API_LOGIN_ID`, `AUTHNET_TRANSACTION_KEY`, `AUTHNET_SIGNATURE_KEY` and `AUTHNET_CLIENT_KEY` (see `.env.example`). Missing credentials make payments unavailable (never mocked). The same live gate applies: live only when `APP_ENV=production` AND `COMPADRES_PAYMENT_PRODUCTION_APPROVED=true`, otherwise Authorize.net's sandbox (`jstest.authorize.net` / `apitest.authorize.net`).
+
+- **Card entry:** Accept.js (loaded from Authorize.net) turns the card into a single-use token in the browser. Only that token reaches this site.
+- **Flow:** authorize only, then capture; if capture fails the authorization is voided (same as the other providers).
+- **Refunds:** Authorize.net refunds only SETTLED charges (usually the next day). A full refund of an unsettled charge is voided instead; a partial refund of an unsettled charge is refused until it settles.
+- **Webhook:** add `https://YOUR-SITE/api/webhooks/payments` under Account > Webhooks, signed with the Signature Key. Void/capture events are logged; refund events made in the Authorize.net dashboard are logged but not auto-matched (the payload carries no original charge id).
+- **Not yet exercised against Authorize.net's sandbox from this codebase** (covered by fake-transport tests). Run a sandbox test order before going live, and confirm in writing that Authorize.net has approved tobacco sales.

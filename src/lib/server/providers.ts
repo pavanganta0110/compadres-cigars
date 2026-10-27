@@ -10,6 +10,8 @@ import { fetchTransport } from "@/lib/payments/quickbooks/transport";
 import { quickbooksConfigFromEnv, quickbooksConfigured, quickbooksTokenizeUrl } from "@/lib/payments/quickbooks/config";
 import { QuickBooksOAuth } from "@/lib/payments/quickbooks/oauth";
 import { QuickBooksPaymentsProvider } from "@/lib/payments/quickbooks/provider";
+import { authorizenetAcceptJsUrl, authorizenetConfigFromEnv, authorizenetConfigured } from "@/lib/payments/authorizenet/config";
+import { AuthorizeNetProvider } from "@/lib/payments/authorizenet/provider";
 import { UnavailablePaymentProvider, type PaymentMode, type PaymentProvider } from "@/lib/payments/types";
 import { DbTokenStore } from "./payment-credentials";
 
@@ -36,7 +38,7 @@ export function shippingProvider(): { provider: ShippingProvider; mode: Provider
 
 // ---------------------------------------------------------------- payments
 /** What the browser needs to turn a card into a token. Public values only. */
-export type Tokenizer = { kind: "mock" } | { kind: "quickbooks"; url: string };
+export type Tokenizer = { kind: "mock" } | { kind: "quickbooks"; url: string } | { kind: "authorizenet"; scriptUrl: string; apiLoginId: string; clientKey: string };
 
 export type PaymentSetup = {
   provider: PaymentProvider;
@@ -54,13 +56,14 @@ export type PaymentSetup = {
 };
 
 /**
- * COMPADRES_PAYMENT_PROVIDER=quickbooks selects Intuit; not configured => UNAVAILABLE, never silently mocked.
+ * COMPADRES_PAYMENT_PROVIDER=quickbooks selects Intuit, =authorizenet selects Authorize.net; not configured => UNAVAILABLE, never silently mocked.
  * Live only if APP_ENV=production AND COMPADRES_PAYMENT_PRODUCTION_APPROVED=true. Unset/mock => mock, refused in production.
  */
 export async function paymentSetup(): Promise<PaymentSetup> {
   const env = process.env;
   const qb = quickbooksConfigFromEnv(env);
-  const sel = selectPayment({ appEnv: env.APP_ENV, provider: env.COMPADRES_PAYMENT_PROVIDER, approved: env.COMPADRES_PAYMENT_PRODUCTION_APPROVED, quickbooksConfigured: quickbooksConfigured(qb) });
+  const an = authorizenetConfigFromEnv(env);
+  const sel = selectPayment({ appEnv: env.APP_ENV, provider: env.COMPADRES_PAYMENT_PROVIDER, approved: env.COMPADRES_PAYMENT_PRODUCTION_APPROVED, quickbooksConfigured: quickbooksConfigured(qb), authorizenetConfigured: authorizenetConfigured(an) });
   if (sel.kind === "unavailable") {
     return { provider: new UnavailablePaymentProvider(), mode: "disabled", paymentMode: "disabled", name: "none", connected: null, productionReady: false, detail: `Unavailable: ${sel.reason} Checkout cannot take payments.`, tokenizer: null };
   }
@@ -68,6 +71,14 @@ export async function paymentSetup(): Promise<PaymentSetup> {
     return {
       provider: new MockPaymentProvider(env.COMPADRES_PAYMENT_WEBHOOK_SECRET ?? ""), mode: "sandbox", paymentMode: "mock", name: "mock", connected: null,
       productionReady: false, detail: "Mock processor (local/staging only). No card is ever charged.", tokenizer: { kind: "mock" },
+    };
+  }
+  if (sel.kind === "authorizenet") {
+    return {
+      provider: new AuthorizeNetProvider(sel.mode, an, fetchTransport), mode: sel.mode, paymentMode: sel.mode, name: "authorizenet", connected: true,
+      productionReady: sel.mode === "live",
+      detail: sel.mode === "live" ? "Authorize.net, LIVE gates satisfied." : "Authorize.net sandbox (no real money).",
+      tokenizer: { kind: "authorizenet", scriptUrl: authorizenetAcceptJsUrl(sel.mode), apiLoginId: an.apiLoginId, clientKey: an.clientKey },
     };
   }
   const store = new DbTokenStore(qb.encryptionKey);
