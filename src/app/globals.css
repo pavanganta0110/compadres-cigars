@@ -184,3 +184,6 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .gate-mark { filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .6)); }
 .gate-name { font-family: var(--font-l); font-weight: 600; font-size: 1.5rem; letter-spacing: .32em; text-transform: uppercase; color: var(--brass); margin: 4px 0 8px; }
 .brandmark svg, .footer-grid svg { flex: none; }
+
+.flavor-select { display: grid; gap: 6px; font-size: .9rem; color: var(--brass); max-width: 320px; margin: 0 0 16px; }
+.flavor-select select { background: var(--coal); color: var(--cream); border: 1px solid var(--espresso); padding: 12px; font: inherit; min-height: 44px; width: 100%; }
