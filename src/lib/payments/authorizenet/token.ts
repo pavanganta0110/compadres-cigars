@@ -32,7 +32,7 @@ export function acceptJsMessage(code: unknown): string {
     case "E_WC_07": return "That expiration year is not valid.";
     case "E_WC_08": return "That card has expired.";
     case "E_WC_15": return "That security code is not valid.";
-    case "E_WC_10": case "E_WC_11": case "E_WC_12": case "E_WC_13": case "E_WC_14":
+    case "E_WC_10": case "E_WC_11": case "E_WC_12": case "E_WC_13": case "E_WC_14": case "E_WC_21":
       return `Card payments are not set up correctly (Authorize.net rejected this site's keys, code ${c}). Please contact us.`;
     default: return `We could not read those card details${c ? ` (code ${c})` : ""}. Please check them and try again.`;
   }
