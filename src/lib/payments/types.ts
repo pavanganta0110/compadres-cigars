@@ -29,7 +29,7 @@ export type PaymentEvent = {
 export type WebhookVerification = { ok: true; events: PaymentEvent[] } | { ok: false; reason: "bad_signature" | "bad_payload" | "not_configured" };
 
 export interface PaymentProvider {
-  readonly name: "mock" | "quickbooks" | "none";
+  readonly name: "mock" | "quickbooks" | "authorizenet" | "none";
   readonly mode: PaymentMode;
   authorize(req: AuthorizeRequest): Promise<AuthorizeResult>;
   capture(req: CaptureRequest): Promise<CaptureResult>;

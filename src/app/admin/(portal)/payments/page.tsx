@@ -42,7 +42,7 @@ export default async function Payments({ searchParams }: { searchParams: Promise
       </p>
       <p className="adm-note">{setup.detail}</p>
       {msg && <p className={msg[0] ? "adm-note" : "adm-alert"} role={msg[0] ? "status" : "alert"}>{msg[1]}</p>}
-      <p className="adm-note">Live payments run only when APP_ENV is production AND COMPADRES_PAYMENT_PRODUCTION_APPROVED is true. Neither is a statement that the processor has approved tobacco sales: that approval must be confirmed with the processor in writing before going live. Card data never reaches this site; only processor tokens do.</p>
+      <p className="adm-note">Live payments run only when APP_ENV is production AND COMPADRES_PAYMENT_PRODUCTION_APPROVED is true. Neither is a statement that the processor has approved tobacco sales: that approval must be confirmed with the processor in writing before going live. Card data never reaches this site; only processor tokens do. Authorize.net and QuickBooks are both supported (COMPADRES_PAYMENT_PROVIDER).</p>
 
       {setup.name === "quickbooks" && can(staff.role, "manage_payments") && (
         <>

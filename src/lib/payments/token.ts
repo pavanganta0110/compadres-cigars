@@ -1,5 +1,5 @@
 /** Opaque processor tokens only. Anything that could be a card number is refused before it is used or logged. */
-const TOKEN_SHAPE = /^[A-Za-z0-9_.:-]{8,300}$/;
+const TOKEN_SHAPE = /^[A-Za-z0-9_.:-]{8,400}$/;
 const DIGITS_ONLY_LONG = /^\d[\d ]{11,22}\d$/;
 
 export function isAcceptableToken(v: unknown): v is string {

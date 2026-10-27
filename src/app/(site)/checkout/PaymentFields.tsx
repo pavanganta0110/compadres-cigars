@@ -1,8 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { mockTokenForCard } from "@/lib/payments/token";
+import { encodeAnetToken } from "@/lib/payments/authorizenet/token";
 
-export type Tokenizer = { kind: "mock" } | { kind: "quickbooks"; url: string };
+export type Tokenizer = { kind: "mock" } | { kind: "quickbooks"; url: string } | { kind: "authorizenet"; scriptUrl: string; apiLoginId: string; clientKey: string };
 
 const digits = (v: string) => v.replace(/\D/g, "");
 
@@ -16,7 +17,9 @@ export function PaymentFields({ tokenizer, error }: { tokenizer: Tokenizer; erro
       <legend style={{ color: "var(--brass)" }}>Payment</legend>
       {tokenizer.kind === "mock"
         ? <p className="notice" role="note">Sandbox payment: no real card is charged. Test card 4242 4242 4242 4242 approves; 4000 0000 0000 0002 declines. Use any future expiry and any 3-digit code.</p>
-        : <p className="notice" role="note">Sandbox payment through Intuit: no real card is charged. Use Intuit&apos;s sandbox test cards.</p>}
+        : tokenizer.kind === "authorizenet"
+          ? <p className="notice" role="note">Your card is sent securely to Authorize.net. Our site never sees the card number.</p>
+          : <p className="notice" role="note">Sandbox payment through Intuit: no real card is charged. Use Intuit&apos;s sandbox test cards.</p>}
       {error && <p className="notice notice-error" role="alert">{error}</p>}
       <div className="form-grid">
         <label className="wide">Name on card<input id="cc-name" autoComplete="cc-name" /></label>
@@ -31,11 +34,36 @@ export function PaymentFields({ tokenizer, error }: { tokenizer: Tokenizer; erro
 
 type Fields = { number: string; name: string; month: string; year: string; cvc: string; zip: string };
 
+type AcceptResponse = { messages?: { resultCode?: string }; opaqueData?: { dataValue?: string } };
+type AcceptGlobal = { dispatchData(data: unknown, cb: (r: AcceptResponse) => void): void };
+
+/** Loads Authorize.net's Accept.js once (it must come from Authorize.net's own host so the card goes straight to them). */
+function loadAcceptJs(url: string): Promise<AcceptGlobal> {
+  const w = window as unknown as { Accept?: AcceptGlobal };
+  if (w.Accept) return Promise.resolve(w.Accept);
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = url; s.async = true;
+    s.onload = () => (w.Accept ? resolve(w.Accept) : reject(new Error("load")));
+    s.onerror = () => reject(new Error("load"));
+    document.head.appendChild(s);
+  });
+}
+
 async function tokenize(t: Tokenizer, f: Fields): Promise<string> {
   if (!/^\d{13,19}$/.test(f.number)) throw new Error("Enter a valid card number.");
   if (!/^(0[1-9]|1[0-2])$/.test(f.month) || !/^\d{4}$/.test(f.year)) throw new Error("Enter the expiry as MM/YY.");
   if (!/^\d{3,4}$/.test(f.cvc)) throw new Error("Enter the security code.");
   if (t.kind === "mock") return mockTokenForCard(f.number);
+  if (t.kind === "authorizenet") {
+    const accept = await loadAcceptJs(t.scriptUrl).catch(() => { throw new Error("We could not reach the payment processor. Please try again."); });
+    return new Promise<string>((resolve, reject) => {
+      accept.dispatchData(
+        { authData: { clientKey: t.clientKey, apiLoginID: t.apiLoginId }, cardData: { cardNumber: f.number, month: f.month, year: f.year, cardCode: f.cvc, zip: f.zip || undefined, fullName: f.name || undefined } },
+        (r) => (r.messages?.resultCode === "Ok" && typeof r.opaqueData?.dataValue === "string" ? resolve(encodeAnetToken(r.opaqueData.dataValue)) : reject(new Error("We could not read those card details. Please check them and try again."))),
+      );
+    });
+  }
   const res = await fetch(t.url, {
     method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "Request-Id": crypto.randomUUID() },
     body: JSON.stringify({ card: { number: f.number, expMonth: f.month, expYear: f.year, cvc: f.cvc, name: f.name || undefined, address: { postalCode: f.zip || undefined } } }),
