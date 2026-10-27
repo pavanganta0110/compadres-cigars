@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getBrand, getProducts } from "@/lib/catalog";
+import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -12,7 +12,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const brand = await getBrand(slug);
   if (!brand) notFound();
-  const products = await getProducts(slug);
+  const products = await getListing(slug);
   const story = (brand.story ?? "").split("\n\n").filter(Boolean);
   const accent = brand.accent_color ?? "#d6ad68";
   return (
