@@ -1,7 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { mockTokenForCard } from "@/lib/payments/token";
-import { encodeAnetToken } from "@/lib/payments/authorizenet/token";
+import { acceptJsMessage, encodeAnetToken } from "@/lib/payments/authorizenet/token";
 
 export type Tokenizer = { kind: "mock" } | { kind: "quickbooks"; url: string } | { kind: "authorizenet"; scriptUrl: string; apiLoginId: string; clientKey: string };
 
@@ -34,7 +34,7 @@ export function PaymentFields({ tokenizer, error }: { tokenizer: Tokenizer; erro
 
 type Fields = { number: string; name: string; month: string; year: string; cvc: string; zip: string };
 
-type AcceptResponse = { messages?: { resultCode?: string }; opaqueData?: { dataValue?: string } };
+type AcceptResponse = { messages?: { resultCode?: string; message?: { code?: string }[] }; opaqueData?: { dataValue?: string } };
 type AcceptGlobal = { dispatchData(data: unknown, cb: (r: AcceptResponse) => void): void };
 
 /** Loads Authorize.net's Accept.js once (it must come from Authorize.net's own host so the card goes straight to them). */
@@ -60,7 +60,7 @@ async function tokenize(t: Tokenizer, f: Fields): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       accept.dispatchData(
         { authData: { clientKey: t.clientKey, apiLoginID: t.apiLoginId }, cardData: { cardNumber: f.number, month: f.month, year: f.year, cardCode: f.cvc, zip: f.zip || undefined, fullName: f.name || undefined } },
-        (r) => (r.messages?.resultCode === "Ok" && typeof r.opaqueData?.dataValue === "string" ? resolve(encodeAnetToken(r.opaqueData.dataValue)) : reject(new Error("We could not read those card details. Please check them and try again."))),
+        (r) => (r.messages?.resultCode === "Ok" && typeof r.opaqueData?.dataValue === "string" ? resolve(encodeAnetToken(r.opaqueData.dataValue)) : reject(new Error(acceptJsMessage(r.messages?.message?.[0]?.code)))),
       );
     });
   }

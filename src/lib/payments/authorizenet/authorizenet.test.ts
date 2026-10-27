@@ -4,7 +4,7 @@ import { isAcceptableToken } from "../token";
 import type { HttpRequest } from "../quickbooks/transport";
 import { authorizenetConfigFromEnv, authorizenetConfigured } from "./config";
 import { AuthorizeNetProvider, signAuthorizeNetWebhook } from "./provider";
-import { decodeAnetToken, encodeAnetToken } from "./token";
+import { acceptJsMessage, decodeAnetToken, encodeAnetToken } from "./token";
 
 const cfg = { apiLoginId: "login1234", transactionKey: "txkey12345", signatureKey: "abcdef0123456789abcdef0123456789", clientKey: "client1234" };
 const TOKEN = encodeAnetToken("eyJjb2RlIjoiNTBfMl8wNjAwMDUyN0Q0NTU4M0Q3MDVCRDAzMjRENUY5NEYyRjA2NTQ2NDJGNDQ5MDlBRjJDMDQ0M0Y4MUI4MDM2RjgwNTM1MDQ4MUQyNDUxMTg0RjQ0IiwidG9rZW4iOiI5NzY5MDg5NDg2OTQzMzczMjA0NjA0IiwidiI6IjEuMSJ9");
@@ -115,5 +115,14 @@ describe("authorizenet webhook", () => {
     const r = JSON.stringify({ notificationId: "n-3", eventType: "net.authorize.payment.refund.created", payload: { id: "2", authAmount: 5 } });
     expect(await p.verifyWebhook(v, headers(signAuthorizeNetWebhook(cfg.signatureKey, v)))).toMatchObject({ ok: true, events: [{ type: "charge.voided" }] });
     expect(await p.verifyWebhook(r, headers(signAuthorizeNetWebhook(cfg.signatureKey, r)))).toMatchObject({ ok: true, events: [{ type: "charge.refunded", refundRef: "2", amountCents: 500 }] });
+  });
+});
+
+describe("acceptJsMessage", () => {
+  it("explains known codes and only echoes a code of the expected shape", () => {
+    expect(acceptJsMessage("E_WC_05")).toContain("card number");
+    expect(acceptJsMessage("E_WC_10")).toContain("E_WC_10");
+    expect(acceptJsMessage("<script>alert(1)</script>")).not.toContain("script");
+    expect(acceptJsMessage(undefined)).toContain("could not read");
   });
 });
