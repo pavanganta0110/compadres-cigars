@@ -1,4 +1,4 @@
-import { getProducts } from "@/lib/catalog";
+import { getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 
 export const metadata = { title: "Shop" };
@@ -7,7 +7,7 @@ export const metadata = { title: "Shop" };
 const SHOW_SHOP_FILTERS = process.env.NEXT_PUBLIC_SHOP_FILTERS === "true";
 
 export default async function Shop() {
-  const products = await getProducts();
+  const products = await getListing();
   return (
     <main id="main" className="section">
       <h1>Shop</h1>

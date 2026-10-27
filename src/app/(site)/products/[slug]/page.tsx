@@ -1,7 +1,8 @@
 import { ProductGallery } from "@/components/ProductGallery";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProduct, specRows } from "@/lib/catalog";
+import { getProduct, getVariants, specRows } from "@/lib/catalog";
+import { FlavorSelect } from "@/components/FlavorSelect";
 import { formatUsd } from "@/lib/domain/money";
 import { addToCartAction } from "@/app/(site)/cart/actions";
 
@@ -13,14 +14,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const product = await getProduct((await params).slug);
   if (!product) notFound();
+  const variants = product.variant_group ? await getVariants(product.variant_group) : [];
+  const images = (product.images.length ? product.images : variants.find((v) => v.images.length)?.images ?? []).map((im) => ({ path: im.path, alt: im.alt }));
   return (
     <main id="main" className="section product">
-      <ProductGallery images={product.images.map((im) => ({ path: im.path, alt: im.alt }))} />
+      <ProductGallery images={images} />
       <div className="product-info">
         <p className="eyebrow"><Link href={`/brands/${product.brand.slug}`}>{product.brand.name}</Link></p>
-        <h1>{product.name}</h1>
+        <h1>{product.variant_group ?? product.name}</h1>
         <p className="price price-lg">{formatUsd(product.price_cents)}</p>
         {product.placeholder_price && <p className="fine" role="note">Placeholder price, pending owner approval.</p>}
+        {variants.length > 1 && (
+          <FlavorSelect current={product.slug} options={variants.map((v) => ({ slug: v.slug, label: v.variant_label ?? v.name, soldOut: v.stock <= 0 }))} />
+        )}
         <p>{product.description}</p>
         {product.stock > 0 ? (
           <form action={addToCartAction}>
