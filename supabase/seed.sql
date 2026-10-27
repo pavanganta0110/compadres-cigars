@@ -14,14 +14,14 @@ insert into products (brand_id, slug, sku, name, short_description, description,
   vitola, length_in, ring_gauge, country_of_origin, weight_oz) values
 ((select id from brands where slug='ronald-isley'), 'the-plug-box-of-10', 'ISLEY-PLUG-60X675-10',
  'Ronald Isley "The Plug" — Box of 10',
- 'Belicoso, 60 x 6.75. Box of 10. Handcrafted in the Dominican Republic.',
+ 'Box Press Torpedo, 60 x 6.75. Box of 10. Handcrafted in the Dominican Republic.',
  'Expertly crafted in the Dominican Republic by Lion Cigars, The Plug delivers a premium smoking experience worthy of the name. Rich flavor, smooth draw, and a bold presence, just like the music. Sold by the box only.',
- 14900, 25, 10, 'Belicoso', 6.75, 60, 'Dominican Republic', null),
+ 42999, 25, 10, 'Box Press Torpedo', 6.75, 60, 'Dominican Republic', null),
 ((select id from brands where slug='sugarhill'), 'rappers-delight-box-of-10', 'SUGARHILL-RD-10',
- 'Sugarhill "Rapper''s Delight" — Box of 10',
- 'Box of 10. Handcrafted in the Dominican Republic.',
+ 'Sugarhill "Rapper''s Delight" — Box of 20',
+ 'Box of 20, 60 x 6, Habano wrapper. Handcrafted in the Dominican Republic.',
  'Rapper''s Delight, the first Sugarhill release, presented in a lacquered black and gold humidor-style box. Sold by the box only.',
- 12900, 25, 10, null, null, null, 'Dominican Republic', null);
+ 34999, 25, 20, null, 6, 60, 'Dominican Republic', null);
 
 insert into product_images (product_id, path, alt, position) values
 ((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-open-box.jpg', 'Open box of ten Ronald Isley The Plug cigars with the gold Gold Standard seal', 0),
@@ -33,3 +33,6 @@ insert into product_images (product_id, path, alt, position) values
 ((select id from products where sku='ISLEY-PLUG-60X675-10'), '/images/isley-box-spine.jpg', 'Box spine reading 10 Cigars, The Plug, 60 x 6.75', 12),
 ((select id from products where sku='SUGARHILL-RD-10'), '/images/sugarhill-box-closed.jpg', 'Closed black and gold Rapper''s Delight cigar box', 0),
 ((select id from products where sku='SUGARHILL-RD-10'), '/images/sugarhill-box-open.jpg', 'Open Rapper''s Delight box showing ten cigars', 1);
+
+-- Prices on the owner's price list are approved (not placeholders).
+update products set placeholder_price = false where sku in ('ISLEY-PLUG-60X675-10','SUGARHILL-RD-10');
