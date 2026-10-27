@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { mockTokenForCard } from "@/lib/payments/token";
 import { acceptJsMessage, encodeAnetToken } from "@/lib/payments/authorizenet/token";
 
@@ -12,6 +12,8 @@ const digits = (v: string) => v.replace(/\D/g, "");
  * the card goes from here straight to the processor's tokenization endpoint, and our server only receives the token.
  */
 export function PaymentFields({ tokenizer, error }: { tokenizer: Tokenizer; error?: string }) {
+  // Accept.js pulls in a second script (AcceptCore.js) after it loads, so start loading as soon as the card form appears.
+  useEffect(() => { if (tokenizer.kind === "authorizenet") loadAcceptJs(tokenizer.scriptUrl).catch(() => undefined); }, [tokenizer]);
   return (
     <fieldset className="wide payment-fields" style={{ border: 0, padding: 0, margin: 0 }}>
       <legend style={{ color: "var(--brass)" }}>Payment</legend>
@@ -57,12 +59,16 @@ async function tokenize(t: Tokenizer, f: Fields): Promise<string> {
   if (t.kind === "mock") return mockTokenForCard(f.number);
   if (t.kind === "authorizenet") {
     const accept = await loadAcceptJs(t.scriptUrl).catch(() => { throw new Error("We could not reach the payment processor. Please try again."); });
-    return new Promise<string>((resolve, reject) => {
-      accept.dispatchData(
-        { authData: { clientKey: t.clientKey, apiLoginID: t.apiLoginId }, cardData: { cardNumber: f.number, month: f.month, year: f.year, cardCode: f.cvc, zip: f.zip || undefined, fullName: f.name || undefined } },
-        (r) => (r.messages?.resultCode === "Ok" && typeof r.opaqueData?.dataValue === "string" ? resolve(encodeAnetToken(r.opaqueData.dataValue)) : reject(new Error(acceptJsMessage(r.messages?.message?.[0]?.code)))),
-      );
-    });
+    const data = { authData: { clientKey: t.clientKey, apiLoginID: t.apiLoginId }, cardData: { cardNumber: f.number, month: f.month, year: f.year, cardCode: f.cvc, zip: f.zip || undefined, fullName: f.name || undefined } };
+    // E_WC_03 ("not loaded correctly") just means AcceptCore.js has not finished loading yet: wait and retry (up to ~6 s).
+    let r: AcceptResponse = {};
+    for (let attempt = 0; attempt < 12; attempt++) {
+      r = await new Promise<AcceptResponse>((resolve) => accept.dispatchData(data, resolve));
+      if (r.messages?.message?.[0]?.code !== "E_WC_03") break;
+      await new Promise((ok) => setTimeout(ok, 500));
+    }
+    if (r.messages?.resultCode === "Ok" && typeof r.opaqueData?.dataValue === "string") return encodeAnetToken(r.opaqueData.dataValue);
+    throw new Error(acceptJsMessage(r.messages?.message?.[0]?.code));
   }
   const res = await fetch(t.url, {
     method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "Request-Id": crypto.randomUUID() },
