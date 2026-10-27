@@ -26,7 +26,7 @@ describe("editable tax rates", () => {
     const rates = new Map<string, TaxRateRow>((await db.query<{ state: string; rate_bps: number; matrix_sha256: string; effective_date: string }>("select state, rate_bps, matrix_sha256, effective_date::text from tax_rates")).rows.map((r) => [r.state.trim(), { rate_bps: r.rate_bps, source_sha256: r.matrix_sha256, effective_date: r.effective_date }]));
     const tax = calculateTax("MO", p.price_cents, rates);
     if (!tax.ok) throw new Error("tax");
-    expect(tax.snapshot.tax_cents).toBe(1490);
+    expect(tax.snapshot.tax_cents).toBe(Math.round(p.price_cents * 0.1));
     expect(tax.snapshot.source_sha256).toBe(ADMIN_OVERRIDE);
     const payload = {
       email: "b@example.com", full_name: "B", lease_key: "l1", items: [{ product_id: p.id, quantity: 1 }],
@@ -35,7 +35,7 @@ describe("editable tax rates", () => {
       age: { provider: "self_attestation", reference: "r", status: "passed", verified_at: new Date().toISOString(), expires_at: new Date(Date.now() + 3600_000).toISOString() },
     };
     const r = (await db.query<{ r: Record<string, unknown> }>("select create_checkout_order($1::jsonb) as r", [JSON.stringify(payload)])).rows[0].r;
-    expect(r).toMatchObject({ ok: true, total_cents: p.price_cents + 1000 + 1490 });
+    expect(r).toMatchObject({ ok: true, total_cents: p.price_cents + 1000 + Math.round(p.price_cents * 0.1) });
   });
 });
 

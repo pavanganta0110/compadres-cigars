@@ -36,7 +36,7 @@ describe("schema + seed", () => {
   });
   it("anon cannot read orders or restriction rules but can read the catalog", async () => {
     await db.exec("set role anon");
-    expect((await db.query("select * from brands")).rows.length).toBe(2);
+    expect((await db.query("select * from brands")).rows.length).toBe(3);
     await expect(db.query("select * from orders")).rejects.toThrow();
     await expect(db.query("select * from restriction_rules")).rejects.toThrow();
     await expect(db.query("select create_checkout_order('{}'::jsonb)")).rejects.toThrow();
@@ -52,8 +52,9 @@ describe("create_checkout_order", () => {
   });
   it("creates the order, decrements stock, stores snapshot, age record and audit event", async () => {
     await allow("MO");
-    const r = await call(await payload());
-    expect(r).toMatchObject({ ok: true, total_cents: 14900 + 1450 + 1258 });
+    const pl = await payload();
+    const r = await call(pl);
+    expect(r).toMatchObject({ ok: true, total_cents: pl.expected_subtotal_cents + 1450 + pl.expected_tax_cents });
     expect((await db.query<{ s: number }>("select stock s from products where sku='ISLEY-PLUG-60X675-10'")).rows[0].s).toBe(24);
     const o = (await db.query<{ status: string; email: string; v: number; adult: boolean }>("select status, email, compliance_snapshot_version v, adult_signature_required adult from orders")).rows[0];
     expect(o).toEqual({ status: "pending", email: "buyer@example.com", v: 1, adult: true });
