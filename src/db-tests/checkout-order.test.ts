@@ -36,7 +36,7 @@ describe("schema + seed", () => {
   });
   it("anon cannot read orders or restriction rules but can read the catalog", async () => {
     await db.exec("set role anon");
-    expect((await db.query("select * from brands")).rows.length).toBe(3);
+    expect((await db.query("select * from brands")).rows.length).toBe(4);
     await expect(db.query("select * from orders")).rejects.toThrow();
     await expect(db.query("select * from restriction_rules")).rejects.toThrow();
     await expect(db.query("select create_checkout_order('{}'::jsonb)")).rejects.toThrow();
