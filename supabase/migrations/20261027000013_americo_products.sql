@@ -1,5 +1,8 @@
 -- Americo Cigars boxes from the owner's price list (green-highlighted rows, pen prices). Idempotent.
 -- Placeholder stock of 25 and no photos yet: set real counts and add photos in the admin portal.
+-- The boxes/cigarillos brand from migration 12 is Compadres Cigars (the storefront company name stays Lion Cigars). Idempotent.
+update brands set slug = 'compadres-cigars', name = 'Compadres Cigars', short_description = 'Premium cigars by Compadres Cigars, sold by the box.'
+where slug = 'lion-cigars' and not exists (select 1 from brands where slug = 'compadres-cigars');
 insert into brands (slug, name, tagline, short_description, logo_path, accent_color, template, display_order)
 select 'americo-cigars', 'Americo Cigars', 'Premium Cigars', 'Premium cigars by Americo Cigars, sold by the box.', '/images/crest.png', '#d6ad68', 'default', 40
 where not exists (select 1 from brands where slug = 'americo-cigars');
