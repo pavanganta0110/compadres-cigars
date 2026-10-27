@@ -19,3 +19,21 @@ export function decodeAnetToken(token: string): string | null {
   const b64 = body.replace(/-/g, "+").replace(/_/g, "/");
   return b64 + "=".repeat((4 - (b64.length % 4)) % 4);
 }
+
+/**
+ * Customer-safe text for an Accept.js error code (returned by the browser script, never by our server). Only a code of the
+ * expected shape is echoed, so nothing else from the response can reach the page.
+ */
+export function acceptJsMessage(code: unknown): string {
+  const c = typeof code === "string" && /^E(_WC)?_?\d{2,5}$/.test(code) ? code : undefined;
+  switch (c) {
+    case "E_WC_05": return "That card number is not valid.";
+    case "E_WC_06": return "That expiration month is not valid.";
+    case "E_WC_07": return "That expiration year is not valid.";
+    case "E_WC_08": return "That card has expired.";
+    case "E_WC_15": return "That security code is not valid.";
+    case "E_WC_10": case "E_WC_11": case "E_WC_12": case "E_WC_13": case "E_WC_14":
+      return `Card payments are not set up correctly (Authorize.net rejected this site's keys, code ${c}). Please contact us.`;
+    default: return `We could not read those card details${c ? ` (code ${c})` : ""}. Please check them and try again.`;
+  }
+}
