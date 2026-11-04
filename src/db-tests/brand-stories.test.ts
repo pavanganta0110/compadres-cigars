@@ -35,4 +35,12 @@ describe("brand stories", () => {
     await db.exec(sql); await db.exec(sql);
     expect(await paths()).toHaveLength(2);
   });
+  it("the Robusto and Maduro Torpedo box photos point at the new files and the migration is safe to run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000028_compadres_box_photos.sql", "utf8");
+    const first = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position limit 1", [sku])).rows[0]?.path;
+    expect(await first("LION-ROBUSTO-50X5-20")).toBe("/images/compadres-robusto-box-20.png");
+    expect(await first("LION-MADTORPEDO-52X6-20")).toBe("/images/compadres-maduro-torpedo-box-20.png");
+    await db.exec(sql); await db.exec(sql);
+    expect(await first("LION-ROBUSTO-50X5-20")).toBe("/images/compadres-robusto-box-20.png");
+  });
 });
