@@ -196,22 +196,6 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .hero-plain .hero-copy { max-width: 760px; }
 .hero-plain .hero-actions { justify-content: center; }
 
-/* Brand-page photo gallery: one large lead photo beside two stacked ones. */
-.gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: repeat(2, 300px); gap: 14px; }
-.gallery-item { position: relative; margin: 0; overflow: hidden; background: #000; border: 1px solid var(--espresso); box-shadow: 0 18px 44px rgba(0, 0, 0, .4); }
-.gallery-item img { object-fit: cover; transition: transform .6s ease; }
-.gallery-item:hover img { transform: scale(1.04); }
-.gallery-lead { grid-row: span 2; }
-@media (max-width: 800px) { .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 380px 260px; } .gallery-lead { grid-column: span 2; grid-row: auto; } }
-@media (max-width: 480px) { .gallery { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: 340px; } .gallery-lead { grid-column: auto; } }
-@media (prefers-reduced-motion: reduce) { .gallery-item img { transition: none; } .gallery-item:hover img { transform: none; } }
-
-/* Galleries with more than three photos: a 4-column grid, the lead photo 2x2, and the last two photos spanning two columns each. */
-.gallery-many { grid-template-columns: repeat(4, 1fr); grid-template-rows: none; grid-auto-rows: 300px; }
-.gallery-many .gallery-lead { grid-column: span 2; }
-.gallery-many .gallery-item:nth-child(n+6) { grid-column: span 2; }
-@media (max-width: 800px) { .gallery-many { grid-template-columns: 1fr 1fr; grid-auto-rows: 280px; } .gallery-many .gallery-lead { grid-column: span 2; grid-row: span 2; } }
-@media (max-width: 480px) { .gallery-many { grid-template-columns: 1fr; grid-auto-rows: 340px; } .gallery-many .gallery-lead, .gallery-many .gallery-item:nth-child(n+6) { grid-column: auto; grid-row: auto; } }
 
 /* Home "Our brands" tiles in each brand's own look: mark on top, caption below. */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -276,3 +260,21 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 /* Brand story: the first paragraph leads. */
 .story-lead { font-family: var(--font-d); font-size: clamp(1.35rem, 2.6vw, 1.7rem) !important; line-height: 1.4; }
 @media (prefers-reduced-motion: reduce) { .card-media img { transition: none; } .card:hover .card-media img { transform: none; } }
+
+/* Brand photography, spread through the page: a photo beside the story, a full-width band, and a short strip after the boxes. */
+.story-grid { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+.story-grid .story-inner { margin: 0; max-width: none; }
+.story-photo { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--espresso); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+.story-photo img { object-fit: cover; }
+.photo-band { position: relative; margin: 0; height: clamp(280px, 42vw, 520px); overflow: hidden; background: #000; border-top: 1px solid var(--espresso); border-bottom: 1px solid var(--espresso); }
+.photo-band img { object-fit: cover; }
+.photo-strip .eyebrow { margin-bottom: 18px; }
+.photo-strip-row { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.photo-strip-row[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.photo-strip-row[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.strip-item { position: relative; margin: 0; height: clamp(260px, 30vw, 400px); overflow: hidden; background: #000; border: 1px solid var(--espresso); }
+.strip-item img { object-fit: cover; transition: transform .6s ease; }
+.strip-item:hover img { transform: scale(1.04); }
+@media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; } .story-photo { aspect-ratio: 4 / 3; } }
+@media (max-width: 700px) { .photo-strip-row, .photo-strip-row[data-count="3"], .photo-strip-row[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); } .strip-item { height: 240px; } }
+@media (prefers-reduced-motion: reduce) { .strip-item img { transition: none; } .strip-item:hover img { transform: none; } }

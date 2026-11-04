@@ -7,7 +7,7 @@ insert into brands (slug, name, tagline, short_description, story, logo_path, he
  '/images/crest.png', '/images/isley-portrait-white-suit.jpg', '#d6ad68', 'isley', 10),
 ('sugarhill', 'Sugarhill', 'Rapper''s Delight',
  'Handcrafted Dominican cigars with hip-hop roots, sold by the box.',
- E'Draft copy, pending client approval.\n\nSugarhill is where the records meet the rolling room: bold, loud, and made to be shared. Rapper''s Delight is the first release.',
+ E'In 1979, in Englewood, New Jersey, a producer put three young MCs in a studio and changed popular music. “Rapper''s Delight” by the Sugarhill Gang became the first rap single to reach the top 40 of the Billboard Hot 100, peaking at number 36 in January 1980, and it is now counted among the most important rap songs ever recorded.\n\nThe group was assembled by Sylvia Robinson, co-founder of Sugar Hill Records, with Henry “Big Bank Hank” Jackson, Michael “Wonder Mike” Wright and Guy “Master Gee” O''Brien. Both the group and the label take their name from the Sugar Hill neighborhood of Harlem. “Apache” and “8th Wonder” followed, the group reformed in 1994, and in 2019 it marked the 40th anniversary of “Rapper''s Delight” with a world tour.\n\nSugarhill cigars bring that story to the humidor: bold, loud, and made to be shared. Rapper''s Delight is the first release.',
  '/images/crest.png', '/images/sugarhill-box-open.jpg', '#e0457b', 'sugarhill', 20);
 
 insert into products (brand_id, slug, sku, name, short_description, description, price_cents, stock, box_quantity,
