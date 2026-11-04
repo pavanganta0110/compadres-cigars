@@ -33,12 +33,5 @@ export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
     hero: { src: "/images/compadres-hero-cigar-whiskey.jpg", alt: "", pos: "50% 50%" },
     side: { src: "/images/compadres-hand-rolling.jpg", alt: "Hands rolling a cigar at the rolling table, tobacco leaf spread out around the roller", pos: "55% 45%" },
     band: { src: "/images/compadres-lounge-red.jpg", alt: "A hand-carved Compadres ashtray with cigars resting on it, an open Compadres box and a Gran Corona box on the table, a woman in a red dress holding a cigar behind them", pos: "50% 62%" },
-    strip: {
-      eyebrow: "From leaf to box",
-      photos: [
-        { src: "/images/compadres-tobacco-leaf.jpg", alt: "A man holding up a single large, dark tobacco leaf", pos: "50% 40%" },
-        { src: "/images/compadres-pressing.jpg", alt: "A wooden cigar press with a stack of molds under a screw press", pos: "50% 45%" },
-      ],
-    },
   },
 };
