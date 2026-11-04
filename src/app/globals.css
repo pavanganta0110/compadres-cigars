@@ -67,6 +67,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .brand-isley { --accent: #d6ad68; }
 .brand-isley .brand-title { font-family: var(--font-d); text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-size: clamp(3rem, 8vw, 6rem); }
 .brand-isley .hero-bg { object-position: 62% 36%; }
+@media (max-width: 800px) { .brand-isley .hero-bg { object-position: 68% 8%; } }
 .brand-isley .story { background: var(--parchment); color: var(--ink); }
 .brand-isley .story h2 { color: var(--ink); text-transform: uppercase; }
 .brand-isley .story-inner::before { content: ""; display: block; width: 80px; height: 3px; background: var(--brass); margin-bottom: 20px; }
