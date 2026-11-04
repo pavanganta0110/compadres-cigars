@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { PhotoBand, PhotoStrip, StoryPhoto, storyPhoto } from "@/components/BrandPhotos";
+import { BRAND_TILES } from "@/lib/brandTiles";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const b = await getBrand((await params).slug);
@@ -17,10 +18,17 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const story = (brand.story ?? "").split("\n\n").filter(Boolean);
   const accent = brand.accent_color ?? "#d6ad68";
   const side = story.length > 0 ? storyPhoto(brand.slug) : undefined;
+  const tile = BRAND_TILES[brand.slug];
+  const heroMark = !brand.hero_path && tile?.heroMark ? tile : undefined;
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
       <section className="brand-hero">
         {brand.hero_path && <Image src={brand.hero_path} alt="" fill priority sizes="100vw" className="hero-bg" />}
+        {heroMark && (
+          <div className="hero-mark">
+            <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 60vw, 560px" />
+          </div>
+        )}
         <div className="hero-copy">
           <p className="eyebrow">{brand.tagline}</p>
           <h1 className="brand-title">{brand.name}</h1>
