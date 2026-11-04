@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
-import { BrandGallery } from "@/components/BrandGallery";
+import { PhotoBand, PhotoStrip, StoryPhoto, storyPhoto } from "@/components/BrandPhotos";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const b = await getBrand((await params).slug);
@@ -16,6 +16,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const products = await getListing(slug);
   const story = (brand.story ?? "").split("\n\n").filter(Boolean);
   const accent = brand.accent_color ?? "#d6ad68";
+  const side = story.length > 0 ? storyPhoto(brand.slug) : undefined;
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
       <section className="brand-hero">
@@ -33,18 +34,22 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         <li>Adult signature on delivery</li>
       </ul>
       {story.length > 0 && (
-        <section className="story">
-          <div className="story-inner">
-            <h2>{brand.template === "isley" ? "The legend" : "The story"}</h2>
-            {story.map((p, i) => <p key={i} className={i === 0 ? "story-lead" : undefined}>{p}</p>)}
+        <section className={`story${side ? " story-has-photo" : ""}`}>
+          <div className={side ? "story-grid" : undefined}>
+            <div className="story-inner">
+              <h2>{brand.template === "isley" ? "The legend" : "The story"}</h2>
+              {story.map((p, i) => <p key={i} className={i === 0 ? "story-lead" : undefined}>{p}</p>)}
+            </div>
+            {side && <StoryPhoto photo={side} />}
           </div>
         </section>
       )}
-      <BrandGallery template={brand.template} />
+      <PhotoBand slug={brand.slug} />
       <section className="section" id="boxes">
         <h2>{brand.template === "isley" ? "The Plug" : "Boxes"}</h2>
         <div className="grid">{products.map((p) => <ProductCard key={p.id} product={p} />)}</div>
       </section>
+      <PhotoStrip slug={brand.slug} />
     </main>
   );
 }
