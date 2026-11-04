@@ -223,9 +223,10 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .tile-caption .eyebrow { display: block; margin: 0; }
 .tile-caption .tile-name { display: block; font-size: 1.7rem; line-height: 1.15; }
 
-.tile-b-isley { background: #000; border-color: var(--brass); }
-.tile-b-isley .tile-mark img { object-fit: contain; padding: 6px; mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 76%); -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 76%); }
-.tile-b-isley .tile-name { font-family: var(--font-d); text-transform: uppercase; letter-spacing: .06em; color: var(--brass); }
+.tile-b-isley { background: radial-gradient(360px 240px at 50% 30%, #2a2113 0%, #000 78%); border-color: var(--brass); text-align: center; }
+.tile-b-isley .tile-mark { flex: 0 0 auto; width: 200px; height: 200px; min-height: 0; margin: 26px auto 6px; border-radius: 50%; overflow: hidden; border: 3px solid var(--brass); box-shadow: 0 0 0 6px #000, 0 0 0 8px rgba(214, 173, 104, .55), 0 14px 40px rgba(0, 0, 0, .6); }
+.tile-b-isley .tile-mark img { object-fit: cover; padding: 0; }
+.tile-b-isley .tile-name { font-family: var(--font-d); text-transform: uppercase; letter-spacing: .08em; color: var(--brass); }
 
 .tile-b-sugarhill { background: #3fc6f3; border-color: #1f8fc0; }
 .tile-b-sugarhill .tile-mark { background: #3fc6f3; }
@@ -241,3 +242,9 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .tile-b-americo .eyebrow { color: #d4b06a; }
 .tile-b-americo .tile-mark img { padding: 30px; }
 @media (prefers-reduced-motion: reduce) { .tile-branded { transition: none; } .tile-branded:hover { transform: none; } }
+
+/* Career milestones: a grid of year + line cards. */
+.milestone-list { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
+.milestone-list li { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; background: var(--coal); border: 1px solid var(--espresso); border-top: 3px solid var(--brass); }
+.milestone-year { font-family: var(--font-d); font-size: 2.1rem; line-height: 1; color: var(--brass); font-variant-numeric: lining-nums; }
+.milestone-text { color: var(--parchment); font-size: 1rem; line-height: 1.45; }

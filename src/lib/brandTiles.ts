@@ -11,7 +11,7 @@ export type BrandTileStyle = {
 };
 
 export const BRAND_TILES: Record<string, BrandTileStyle> = {
-  "ronald-isley": { mark: "/images/isley-seal.jpg", markAlt: "Ronald Isley, The Gold Standard seal", cls: "tile-b-isley" },
+  "ronald-isley": { mark: "/images/isley-portrait-engraving.jpg", markAlt: "Engraved portrait of Ronald Isley in a wide-brim hat and round sunglasses", cls: "tile-b-isley" },
   sugarhill: { mark: "/images/sugarhill-logo.jpg", markAlt: "Sugar Hill logo in striped lettering", cls: "tile-b-sugarhill", nameInMark: true, pos: "50% 52%" },
   "compadres-cigars": { mark: "/images/compadres-crest.png", markAlt: "Compadres Premium Cigars crest with two lions", cls: "tile-b-compadres", nameInMark: true },
   "americo-cigars": { mark: "/images/americo-logo.png", markAlt: "Americo Cigars logo", cls: "tile-b-americo", nameInMark: true },
