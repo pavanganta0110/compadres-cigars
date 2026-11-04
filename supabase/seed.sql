@@ -4,7 +4,7 @@ insert into brands (slug, name, tagline, short_description, story, logo_path, he
 ('ronald-isley', 'Ronald Isley', 'The Gold Standard',
  'Legendary music. Timeless taste. A premium Dominican cigar by Ronald Isley.',
  E'For more than six decades, Ronald Isley has defined excellence in music, style, and culture. His unmistakable voice, timeless hits, and influence on generations have made him a true icon.\n\nThe Plug cigar is an extension of that legacy. A smooth, refined smoke for those who appreciate the finer things in life and move with purpose.',
- '/images/crest.png', '/images/isley-lounge.jpg', '#d6ad68', 'isley', 10),
+ '/images/crest.png', '/images/isley-portrait-white-suit.jpg', '#d6ad68', 'isley', 10),
 ('sugarhill', 'Sugarhill', 'Rapper''s Delight',
  'Handcrafted Dominican cigars with hip-hop roots, sold by the box.',
  E'Draft copy, pending client approval.\n\nSugarhill is where the records meet the rolling room: bold, loud, and made to be shared. Rapper''s Delight is the first release.',
