@@ -23,7 +23,7 @@ export default async function Home() {
           <p>Two brands. Ten cigars to a box. Delivered with an adult signature.</p>
           <div className="hero-actions">
             <Link className="btn" href="/shop">Shop the collection</Link>
-            <Link className="btn btn-ghost" href="#brands">Meet the brands</Link>
+            <Link className="link-quiet" href="#brands">Meet the brands<span aria-hidden="true"> ↓</span></Link>
           </div>
         </div>
       </section>

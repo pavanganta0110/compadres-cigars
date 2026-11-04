@@ -5,6 +5,8 @@ import { getProduct, getVariants, specRows } from "@/lib/catalog";
 import { FlavorSelect } from "@/components/FlavorSelect";
 import { formatUsd } from "@/lib/domain/money";
 import { addToCartAction } from "@/app/(site)/cart/actions";
+import { StrengthMeter } from "@/components/StrengthMeter";
+import { LEGAL_FACTS } from "@/lib/legal-content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const p = await getProduct((await params).slug);
@@ -27,6 +29,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         {variants.length > 1 && (
           <FlavorSelect current={product.slug} options={variants.map((v) => ({ slug: v.slug, label: v.variant_label ?? v.name, soldOut: v.stock <= 0 }))} />
         )}
+        <StrengthMeter strength={product.strength} />
         <p>{product.description}</p>
         {product.stock > 0 ? (
           <form action={addToCartAction}>
@@ -36,7 +39,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ) : (
           <button className="btn" type="button" disabled aria-disabled="true">Sold out</button>
         )}
-        <p className="fine">Sold by the box. Adult signature required on delivery. Must be 21+.</p>
+        <ul className="assure" aria-label="Delivery and returns">
+          <li>Sold by the box. You must be 21 or older.</li>
+          <li>Ships by FedEx with an adult signature (21+, valid photo ID).</li>
+          <li>We aim to ship within {LEGAL_FACTS.shipTargetBusinessDays} business day of an approved order.</li>
+          <li>Something wrong? Report it within {LEGAL_FACTS.reportWindowDays} days. <Link href="/legal/returns">Returns Policy</Link></li>
+        </ul>
         <h2>Specifications</h2>
         <dl className="specs">
           {specRows(product).map(([k, v]) => (<div key={k}><dt>{k}</dt><dd>{v}</dd></div>))}

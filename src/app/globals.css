@@ -242,3 +242,37 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .tile-b-americo .eyebrow { color: #d4b06a; }
 .tile-b-americo .tile-mark img { padding: 30px; }
 @media (prefers-reduced-motion: reduce) { .tile-branded { transition: none; } .tile-branded:hover { transform: none; } }
+
+/* Product cards: size and box count, strength meter, price and a clear "View box" link. */
+.card { display: flex; flex-direction: column; }
+.card-body { flex: 1; display: flex; flex-direction: column; }
+.card-media { overflow: hidden; }
+.card-media img { transition: transform .5s ease; }
+.card:hover .card-media img { transform: scale(1.04); }
+.card-badge { position: absolute; top: 12px; left: 12px; z-index: 1; padding: 4px 10px; background: var(--ink); color: var(--parchment); border: 1px solid var(--brass); font: 600 .72rem var(--font-l); letter-spacing: .16em; text-transform: uppercase; }
+.card-body .eyebrow { margin-bottom: .3em; }
+.card-body h3 { font-size: 1.35rem; margin-bottom: .25em; }
+.card-facts { margin: 0 0 10px; color: #cbbfae; font-size: .9rem; }
+.card-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--espresso); }
+.card-foot .price { font-size: 1.5rem; }
+.card-facts + .card-foot, .strength + .card-foot { margin-top: auto; }
+.card-link { font: 600 .78rem var(--font-l); letter-spacing: .16em; text-transform: uppercase; text-decoration: none; color: var(--brass); white-space: nowrap; }
+.card-link:hover { color: var(--cream); }
+.strength { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 4px; font: 500 .78rem var(--font-l); letter-spacing: .12em; text-transform: uppercase; color: #cbbfae; }
+.strength-pips { display: inline-flex; gap: 3px; }
+.pip { width: 18px; height: 5px; background: var(--espresso); }
+.pip.on { background: var(--accent, var(--brass)); }
+.product-info .strength { margin: 4px 0 14px; }
+
+/* Delivery and returns facts beside Add to Cart. */
+.assure { list-style: none; margin: 20px 0 8px; padding: 16px 18px; border: 1px solid var(--espresso); background: var(--coal); font-size: .92rem; line-height: 1.5; color: var(--parchment); display: grid; gap: 8px; }
+.assure li { position: relative; padding-left: 22px; }
+.assure li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 8px; height: 8px; border: 2px solid var(--brass); border-radius: 50%; }
+
+/* Home hero: one primary button, the rest is a quiet text link. */
+.link-quiet { align-self: center; padding: 8px 2px; color: var(--parchment); font: 500 .82rem var(--font-l); letter-spacing: .18em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--brass); }
+.link-quiet:hover { color: var(--brass); }
+
+/* Brand story: the first paragraph leads. */
+.story-lead { font-family: var(--font-d); font-size: clamp(1.35rem, 2.6vw, 1.7rem) !important; line-height: 1.4; }
+@media (prefers-reduced-motion: reduce) { .card-media img { transition: none; } .card:hover .card-media img { transform: none; } }
