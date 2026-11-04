@@ -285,3 +285,8 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .hero-crest { position: relative; width: min(520px, 82vw); aspect-ratio: 1600 / 895; margin-bottom: 26px; }
 .hero-crest img { object-fit: contain; object-position: left center; }
 @media (max-width: 900px) { .hero-bg-shift { transform: none; } .hero-crest { width: min(340px, 82vw); } }
+
+/* Home hero: the Lion Cigars seal as a large, faint watermark behind the headline. */
+.hero-plain { overflow: hidden; }
+.hero-watermark { position: absolute; left: 50%; top: 50%; height: 94%; width: auto; aspect-ratio: 1; transform: translate(-50%, -50%); opacity: .18; z-index: -1; pointer-events: none; filter: drop-shadow(0 0 60px rgba(214, 173, 104, .22)); }
+@media (max-width: 700px) { .hero-watermark { height: 86%; opacity: .14; } }

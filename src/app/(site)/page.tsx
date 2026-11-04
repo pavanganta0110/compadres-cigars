@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getBrands, getProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { BrandTile } from "@/components/BrandTile";
+import { LionMark } from "@/components/LionMark";
 
 /** Lifestyle photography. `pos` keeps faces in frame when a portrait photo is cropped into a wider tile. */
 const MOSAIC = [
@@ -17,6 +18,7 @@ export default async function Home() {
   return (
     <main id="main">
       <section className="hero hero-plain" aria-label="Welcome">
+        <LionMark className="hero-watermark" size={640} />
         <div className="hero-copy">
           <p className="eyebrow">Kansas City · Dominican handcrafted</p>
           <h1>Premium cigars, by the box.</h1>
