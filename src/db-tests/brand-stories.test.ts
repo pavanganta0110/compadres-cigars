@@ -74,4 +74,14 @@ describe("brand stories", () => {
       }
     }
   });
+  it("the Double Maduro Toro four-pack is the sharp artwork and the Variety cigarillo has the flavor stack, safely run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000031_toro_4pk_and_cigarillo_stack.sql", "utf8");
+    const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
+    for (const twice of [false, true]) {
+      if (twice) { await db.exec(sql); await db.exec(sql); }
+      expect(await paths("LION-DMTORO-52X6-20")).toContain("/images/compadres-double-maduro-toro-4pk.png");
+      expect(await paths("LION-DMTORO-52X6-20")).not.toContain("/images/compadres-double-maduro-toro-4pk.jpg");
+      expect(await paths("LION-CIGARILLO-VARIETY-10")).toEqual(["/images/compadres-cigarillo-stack.jpg"]);
+    }
+  });
 });
