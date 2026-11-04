@@ -36,7 +36,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         <section className="story">
           <div className="story-inner">
             <h2>{brand.template === "isley" ? "The legend" : "The story"}</h2>
-            {story.map((p, i) => <p key={i}>{p}</p>)}
+            {story.map((p, i) => <p key={i} className={i === 0 ? "story-lead" : undefined}>{p}</p>)}
           </div>
         </section>
       )}

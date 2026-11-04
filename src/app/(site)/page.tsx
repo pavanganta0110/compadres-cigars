@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getBrands, getProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
+import { BrandTile } from "@/components/BrandTile";
 
 /** Lifestyle photography. `pos` keeps faces in frame when a portrait photo is cropped into a wider tile. */
 const MOSAIC = [
@@ -22,7 +23,7 @@ export default async function Home() {
           <p>Two brands. Ten cigars to a box. Delivered with an adult signature.</p>
           <div className="hero-actions">
             <Link className="btn" href="/shop">Shop the collection</Link>
-            <Link className="btn btn-ghost" href="#brands">Meet the brands</Link>
+            <Link className="link-quiet" href="#brands">Meet the brands<span aria-hidden="true"> ↓</span></Link>
           </div>
         </div>
       </section>
@@ -36,12 +37,7 @@ export default async function Home() {
       <section className="section" id="brands">
         <h2>Our brands</h2>
         <div className="brand-tiles">
-          {brands.map((b) => (
-            <Link key={b.id} href={`/brands/${b.slug}`} className={`tile tile-${b.template}`}>
-              <span className="eyebrow">{b.tagline}</span>
-              <span className="tile-name">{b.name}</span>
-            </Link>
-          ))}
+          {brands.map((b) => <BrandTile key={b.id} brand={b} />)}
         </div>
       </section>
 
