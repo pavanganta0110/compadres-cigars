@@ -37,7 +37,7 @@ export function PhotoStrip({ slug }: { slug: string }) {
   return (
     <section className="section photo-strip" aria-label={s.eyebrow}>
       <p className="eyebrow">{s.eyebrow}</p>
-      <div className="photo-strip-row" data-count={s.photos.length}>
+      <div className="photo-strip-row" data-count={s.photos.length} data-tall={s.tall ? "true" : undefined}>
         {s.photos.map((p) => (
           <figure key={p.src} className="strip-item">
             <Image src={p.src} alt={p.alt} fill sizes="(max-width: 700px) 50vw, 300px" style={{ objectPosition: p.pos }} />

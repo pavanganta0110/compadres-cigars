@@ -29,7 +29,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         {heroBg && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg hero-bg-shift" style={{ objectPosition: heroBg.pos }} />}
         <div className="hero-copy">
           {heroMark && (
-            <div className="hero-crest">
+            <div className="hero-crest" style={heroMark.markRatio ? { aspectRatio: heroMark.markRatio } : undefined}>
               <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 80vw, 520px" />
             </div>
           )}

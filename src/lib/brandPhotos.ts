@@ -7,7 +7,7 @@ export type BrandPhotos = {
   /** A full-width photo between the story and the boxes. */
   band?: Photo;
   /** A short row after the boxes. */
-  strip?: { eyebrow: string; photos: Photo[] };
+  strip?: { eyebrow: string; photos: Photo[]; /** Portrait photos: tiles keep a 3:4 shape instead of a fixed height. */ tall?: boolean };
 };
 
 /** Brand-page photography, keyed by brand slug. Photos are spread through the page instead of stacked in one place. */
@@ -33,5 +33,18 @@ export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
     hero: { src: "/images/compadres-hero-cigar-whiskey.jpg", alt: "", pos: "50% 50%" },
     side: { src: "/images/compadres-hand-rolling.jpg", alt: "Hands rolling a cigar at the rolling table, tobacco leaf spread out around the roller", pos: "55% 45%" },
     band: { src: "/images/compadres-lounge-red.jpg", alt: "A hand-carved Compadres ashtray with cigars resting on it, an open Compadres box and a Gran Corona box on the table, a woman in a red dress holding a cigar behind them", pos: "50% 62%" },
+  },
+  "jet-smoke-cigars": {
+    hero: { src: "/images/jet-smoke-founders.jpg", alt: "", pos: "50% 38%" },
+    side: { src: "/images/jet-smoke-basketball.jpg", alt: "A man in a black shirt lining up a jump shot with a basketball held over his head", pos: "50% 30%" },
+    strip: {
+      eyebrow: "Behind the brand",
+      tall: true,
+      photos: [
+        { src: "/images/jet-smoke-tobacco-bundles.jpg", alt: "Bundles of dark tobacco laid out in a long row on a warehouse floor", pos: "50% 50%" },
+        { src: "/images/jet-smoke-bundle-bands.jpg", alt: "A bundle of four cigars with black and gold bands", pos: "50% 50%" },
+        { src: "/images/jet-smoke-bundles-table.jpg", alt: "Rows of banded cigar bundles stacked on a packing table", pos: "50% 50%" },
+      ],
+    },
   },
 };

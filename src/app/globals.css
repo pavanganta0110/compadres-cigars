@@ -299,3 +299,13 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .soon-wrapper { font: 500 .78rem var(--font-l); letter-spacing: .22em; text-transform: uppercase; color: var(--brass); }
 .soon-badge { margin-top: 10px; align-self: flex-start; padding: 5px 12px; border: 1px solid var(--brass); color: var(--brass); font: 600 .72rem var(--font-l); letter-spacing: .18em; text-transform: uppercase; }
 
+/* Jet Smoke: black tile with the brand's olive and yellow. */
+.tile-b-jet { background: radial-gradient(420px 240px at 40% 45%, #1b1a10 0%, #0b0a08 78%); border-color: #7a6a1c; }
+.tile-b-jet .tile-mark img { object-fit: contain; padding: 16px 14px; }
+.tile-b-jet .tile-caption { background: #0b0a08; }
+.tile-b-jet .eyebrow { color: #e6c53a; }
+
+/* Strips of portrait photos keep a 3:4 tile instead of a fixed height. */
+.photo-strip-row[data-tall] .strip-item { height: auto; aspect-ratio: 3 / 4; }
+@media (max-width: 700px) { .photo-strip-row[data-tall] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } }
+
