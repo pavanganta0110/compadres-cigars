@@ -33,7 +33,7 @@ describe("brand stories", () => {
     expect(await paths()).toContain("/images/compadres-maduro-torpedo-4pk.png");
     expect(await paths()).not.toContain("/images/compadres-maduro-torpedo-pack.jpg");
     await db.exec(sql); await db.exec(sql);
-    expect(await paths()).toHaveLength(3); // box, four-pack, and the box-and-cigar photo added later
+    expect(await paths()).toContain("/images/compadres-maduro-torpedo-4pk.png"); // later migrations add more photos, so no exact count here
   });
   it("the Robusto and Maduro Torpedo box photos point at the new files and the migration is safe to run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000028_compadres_box_photos.sql", "utf8");
@@ -46,10 +46,32 @@ describe("brand stories", () => {
   it("Gran Corona gets the box-and-cigar photo first and Maduro Torpedo gets a third photo, safely run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000029_gran_corona_and_torpedo_photos.sql", "utf8");
     const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
-    expect((await paths("LION-GRANCORONA-60X6-20"))[0]).toBe("/images/compadres-gran-corona-box-cigar.jpg");
+    expect((await paths("LION-GRANCORONA-60X6-20"))[0]).toBe("/images/compadres-gran-corona-box-20.png"); // superseded by the studio photo set
     expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar.jpg");
     await db.exec(sql); await db.exec(sql);
-    expect(await paths("LION-MADTORPEDO-52X6-20")).toHaveLength(3);
-    expect(await paths("LION-GRANCORONA-60X6-20")).toHaveLength(2);
+    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar.jpg");
+  });
+  it("the studio photo set: every Compadres product leads with a sharp photo, has the expected photos, and the migration is safe to run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000030_compadres_product_photo_set.sql", "utf8");
+    const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
+    const expected: Record<string, [string, number]> = {
+      "LION-ROBUSTO-50X5-20": ["/images/compadres-robusto-box-20.png", 4],
+      "LION-MADTORPEDO-52X6-20": ["/images/compadres-maduro-torpedo-box-20.png", 5],
+      "LION-BELICOSO-50X525-20": ["/images/compadres-belicoso-box-20.png", 3],
+      "LION-GRANCORONA-60X6-20": ["/images/compadres-gran-corona-box-20.png", 4],
+      "LION-DMTORO-52X6-20": ["/images/compadres-double-maduro-toro-box-20.png", 4],
+      "LION-CIGARILLO-VANILLA-10": ["/images/compadres-cigarillo-vanilla-studio.jpg", 2],
+      "LION-CIGARILLO-COGNAC-10": ["/images/compadres-cigarillo-cognac-studio.jpg", 2],
+      "LION-CIGARILLO-CHERRY-10": ["/images/compadres-cigarillo-cherry-studio.jpg", 1],
+      "LION-CIGARILLO-CHOCOLATE-10": ["/images/compadres-cigarillo-chocolate-studio.jpg", 1],
+    };
+    for (const twice of [false, true]) {
+      if (twice) { await db.exec(sql); await db.exec(sql); }
+      for (const [sku, [lead, count]] of Object.entries(expected)) {
+        const p = await paths(sku);
+        expect(p[0], sku).toBe(lead);
+        expect(p, sku).toHaveLength(count);
+      }
+    }
   });
 });
