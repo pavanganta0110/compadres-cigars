@@ -55,8 +55,8 @@ describe("brand stories", () => {
     const sql = readFileSync("supabase/migrations/20261103000030_compadres_product_photo_set.sql", "utf8");
     const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
     const expected: Record<string, [string, number]> = {
-      "LION-ROBUSTO-50X5-20": ["/images/compadres-robusto-box-20.png", 4],
-      "LION-MADTORPEDO-52X6-20": ["/images/compadres-maduro-torpedo-box-20.png", 5],
+      "LION-ROBUSTO-50X5-20": ["/images/compadres-robusto-box-20.png", 5],
+      "LION-MADTORPEDO-52X6-20": ["/images/compadres-maduro-torpedo-box-20.png", 6],
       "LION-BELICOSO-50X525-20": ["/images/compadres-belicoso-box-20.png", 3],
       "LION-GRANCORONA-60X6-20": ["/images/compadres-gran-corona-box-20.png", 4],
       "LION-DMTORO-52X6-20": ["/images/compadres-double-maduro-toro-box-20.png", 4],
@@ -82,6 +82,17 @@ describe("brand stories", () => {
       expect(await paths("LION-DMTORO-52X6-20")).toContain("/images/compadres-double-maduro-toro-4pk.png");
       expect(await paths("LION-DMTORO-52X6-20")).not.toContain("/images/compadres-double-maduro-toro-4pk.jpg");
       expect(await paths("LION-CIGARILLO-VARIETY-10")).toEqual(["/images/compadres-cigarillo-stack.jpg"]);
+    }
+  });
+  it("the website composites: Robusto and Gran Corona four-packs and the Robusto and Torpedo box composites, safely run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000032_website_composites.sql", "utf8");
+    const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
+    for (const twice of [false, true]) {
+      if (twice) { await db.exec(sql); await db.exec(sql); }
+      expect(await paths("LION-ROBUSTO-50X5-20")).toEqual(expect.arrayContaining(["/images/compadres-robusto-4pk-website.png", "/images/compadres-robusto-box-website.png"]));
+      expect(await paths("LION-ROBUSTO-50X5-20")).not.toContain("/images/compadres-robusto-4pk.png");
+      expect(await paths("LION-GRANCORONA-60X6-20")).toContain("/images/compadres-gran-corona-4pk-website.png");
+      expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-website.png");
     }
   });
 });
