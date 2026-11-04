@@ -1,6 +1,11 @@
 import Image from "next/image";
 import { BRAND_PHOTOS, type Photo } from "@/lib/brandPhotos";
 
+/** Hero background used when the brand has no banner photo in the database. */
+export function heroPhoto(slug: string): Photo | undefined {
+  return BRAND_PHOTOS[slug]?.hero;
+}
+
 /** The photo shown beside the brand story, if the brand has one. */
 export function storyPhoto(slug: string): Photo | undefined {
   return BRAND_PHOTOS[slug]?.side;

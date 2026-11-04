@@ -1,5 +1,7 @@
 export type Photo = { src: string; alt: string; pos?: string };
 export type BrandPhotos = {
+  /** Hero background for a brand that has no banner photo set in the database. */
+  hero?: Photo;
   /** Sits beside the brand story. */
   side?: Photo;
   /** A full-width photo between the story and the boxes. */
@@ -28,8 +30,9 @@ export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
     },
   },
   "compadres-cigars": {
+    hero: { src: "/images/compadres-hero-cigar-whiskey.jpg", alt: "", pos: "50% 50%" },
     side: { src: "/images/compadres-hand-rolling.jpg", alt: "Hands rolling a cigar at the rolling table, tobacco leaf spread out around the roller", pos: "55% 45%" },
-    band: { src: "/images/compadres-open-box-cutter.jpg", alt: "An open black Compadres box of cigars with the lion crest, beside a glass of whiskey and a cigar cutter", pos: "50% 55%" },
+    band: { src: "/images/compadres-lounge-red.jpg", alt: "A hand-carved Compadres ashtray with cigars resting on it, an open Compadres box and a Gran Corona box on the table, a woman in a red dress holding a cigar behind them", pos: "50% 62%" },
     strip: {
       eyebrow: "From leaf to box",
       photos: [
