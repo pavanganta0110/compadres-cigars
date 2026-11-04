@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
-import { PhotoBand, PhotoStrip, StoryPhoto, storyPhoto } from "@/components/BrandPhotos";
+import { PhotoBand, PhotoStrip, StoryPhoto, heroPhoto, storyPhoto } from "@/components/BrandPhotos";
 import { BRAND_TILES } from "@/lib/brandTiles";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -20,16 +20,18 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const side = story.length > 0 ? storyPhoto(brand.slug) : undefined;
   const tile = BRAND_TILES[brand.slug];
   const heroMark = !brand.hero_path && tile?.heroMark ? tile : undefined;
+  const heroBg = !brand.hero_path ? heroPhoto(brand.slug) : undefined;
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
       <section className="brand-hero">
         {brand.hero_path && <Image src={brand.hero_path} alt="" fill priority sizes="100vw" className="hero-bg" />}
-        {heroMark && (
-          <div className="hero-mark">
-            <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 60vw, 560px" />
-          </div>
-        )}
+        {heroBg && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg hero-bg-shift" style={{ objectPosition: heroBg.pos }} />}
         <div className="hero-copy">
+          {heroMark && (
+            <div className="hero-crest">
+              <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="220px" />
+            </div>
+          )}
           <p className="eyebrow">{brand.tagline}</p>
           <h1 className="brand-title">{brand.name}</h1>
           <p>{brand.short_description}</p>
