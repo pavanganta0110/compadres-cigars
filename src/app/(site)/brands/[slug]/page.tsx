@@ -4,6 +4,7 @@ import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { PhotoBand, PhotoStrip, StoryPhoto, heroPhoto, storyPhoto } from "@/components/BrandPhotos";
 import { BRAND_TILES } from "@/lib/brandTiles";
+import { ComingSoonCollection } from "@/components/ComingSoonCollection";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const b = await getBrand((await params).slug);
@@ -55,10 +56,14 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         </section>
       )}
       <PhotoBand slug={brand.slug} />
-      <section className="section" id="boxes">
-        <h2>{brand.template === "isley" ? "The Plug" : "Boxes"}</h2>
-        <div className="grid">{products.map((p) => <ProductCard key={p.id} product={p} />)}</div>
-      </section>
+      {products.length > 0 ? (
+        <section className="section" id="boxes">
+          <h2>{brand.template === "isley" ? "The Plug" : "Boxes"}</h2>
+          <div className="grid">{products.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+        </section>
+      ) : (
+        <ComingSoonCollection slug={brand.slug} />
+      )}
       <PhotoStrip slug={brand.slug} />
     </main>
   );

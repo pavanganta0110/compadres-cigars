@@ -22,7 +22,7 @@ export default async function Home() {
         <div className="hero-copy">
           <p className="eyebrow">Kansas City · Dominican handcrafted</p>
           <h1>Premium cigars, by the box.</h1>
-          <p>Two brands. Ten cigars to a box. Delivered with an adult signature.</p>
+          <p>Handcrafted brands, sold by the box, delivered with an adult signature.</p>
           <div className="hero-actions">
             <Link className="btn" href="/shop">Shop the collection</Link>
             <Link className="link-quiet" href="#brands">Meet the brands<span aria-hidden="true"> ↓</span></Link>
