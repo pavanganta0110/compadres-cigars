@@ -29,11 +29,11 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         <div className="hero-copy">
           {heroMark && (
             <div className="hero-crest">
-              <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="220px" />
+              <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 80vw, 520px" />
             </div>
           )}
-          <p className="eyebrow">{brand.tagline}</p>
-          <h1 className="brand-title">{brand.name}</h1>
+          {!heroMark && <p className="eyebrow">{brand.tagline}</p>}
+          <h1 className={heroMark ? "brand-title sr-only" : "brand-title"}>{brand.name}</h1>
           <p>{brand.short_description}</p>
           {products[0] && <a className="btn" href="#boxes">Buy a box</a>}
         </div>
