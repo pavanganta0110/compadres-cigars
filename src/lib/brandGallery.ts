@@ -7,13 +7,9 @@ export const BRAND_GALLERIES: Partial<Record<"isley" | "sugarhill", BrandGallery
     eyebrow: "The Gold Standard",
     title: "Smooth, like the man himself",
     photos: [
-      { src: "/images/isley-box-and-cigar.jpg", alt: "An open box of ten Ronald Isley The Plug cigars with a single cigar standing beside it and the closed black box behind", pos: "40% 50%" },
+      { src: "/images/isley-box-open.jpg", alt: "An open box of ten Ronald Isley The Plug cigars on a marble table, the Gold Standard seal inside the lid", pos: "50% 62%" },
       { src: "/images/isley-sequin-tuxedo.jpg", alt: "Ronald Isley in a black sequined tuxedo, bow tie and round sunglasses, a cigar in his hand", pos: "50% 22%" },
-      { src: "/images/isley-cigar-standing.jpg", alt: "A single Ronald Isley The Plug cigar with its black and gold band, lit from behind", pos: "50% 40%" },
       { src: "/images/isley-cigar-in-hand.jpg", alt: "A cigar held between two fingers, a ring on the hand, against a black sequined jacket", pos: "40% 60%" },
-      { src: "/images/isley-box-closed-gold.jpg", alt: "The closed black lacquer Ronald Isley box with a gold trim and the Gold Standard seal", pos: "50% 45%" },
-      { src: "/images/isley-box-open.jpg", alt: "An open box of ten Ronald Isley The Plug cigars on a marble table, the Gold Standard seal inside the lid", pos: "50% 36%" },
-      { src: "/images/isley-box-spine.jpg", alt: "The Plug box spine reading 10 Cigars, 60 x 6.75, with the lid open", pos: "50% 40%" },
     ],
   },
   sugarhill: {

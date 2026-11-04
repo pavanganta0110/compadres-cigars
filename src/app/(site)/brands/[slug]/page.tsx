@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getBrand, getListing } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 import { BrandGallery } from "@/components/BrandGallery";
-import { BrandMilestones } from "@/components/BrandMilestones";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const b = await getBrand((await params).slug);
@@ -41,7 +40,6 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
           </div>
         </section>
       )}
-      <BrandMilestones template={brand.template} />
       <BrandGallery template={brand.template} />
       <section className="section" id="boxes">
         <h2>{brand.template === "isley" ? "The Plug" : "Boxes"}</h2>

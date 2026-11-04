@@ -67,15 +67,17 @@ describe("media storage", () => {
 });
 
 describe("Ronald Isley photography migration", () => {
-  it("puts the new photos first, keeps the old ones, and is safe to run again", async () => {
+  it("the seed holds only real photographs, and the cleanup migration removes the AI renders and is safe to run twice", async () => {
     const { readFileSync } = await import("node:fs");
-    const sql = readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8");
+    const real = ["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"];
     const paths = async () => (await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position, path")).rows.map((r) => r.path);
-    const before = await paths();
-    expect(before[0]).toBe("/images/isley-open-box.jpg");
-    await db.exec(sql);
-    expect(await paths()).toEqual(before);
-    expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-lounge.jpg");
+    expect(await paths()).toEqual(real);
+    expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-portrait-white-suit.jpg");
+    await db.exec(readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8"));
+    expect(await paths()).toHaveLength(7);
+    const cleanup = readFileSync("supabase/migrations/20261103000025_isley_remove_ai_images.sql", "utf8");
+    await db.exec(cleanup); await db.exec(cleanup);
+    expect(await paths()).toEqual(real);
   });
   it("on a database still holding the old gallery it prepends the new photos and keeps the old ones", async () => {
     const { readFileSync } = await import("node:fs");

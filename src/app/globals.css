@@ -242,9 +242,3 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .tile-b-americo .eyebrow { color: #d4b06a; }
 .tile-b-americo .tile-mark img { padding: 30px; }
 @media (prefers-reduced-motion: reduce) { .tile-branded { transition: none; } .tile-branded:hover { transform: none; } }
-
-/* Career milestones: a grid of year + line cards. */
-.milestone-list { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
-.milestone-list li { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; background: var(--coal); border: 1px solid var(--espresso); border-top: 3px solid var(--brass); }
-.milestone-year { font-family: var(--font-d); font-size: 2.1rem; line-height: 1; color: var(--brass); font-variant-numeric: lining-nums; }
-.milestone-text { color: var(--parchment); font-size: 1rem; line-height: 1.45; }
