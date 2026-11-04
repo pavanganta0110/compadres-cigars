@@ -27,4 +27,12 @@ describe("brand stories", () => {
     expect(await story("compadres-cigars")).toContain("GEO Foods");
     expect(await story("sugarhill")).toContain("Sugar Hill neighborhood of Harlem");
   });
+  it("the Maduro Torpedo four-pack photo points at the new artwork and the migration is safe to run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000027_maduro_torpedo_4pk_photo.sql", "utf8");
+    const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'LION-MADTORPEDO-52X6-20' order by i.position")).rows.map((r) => r.path);
+    expect(await paths()).toContain("/images/compadres-maduro-torpedo-4pk.png");
+    expect(await paths()).not.toContain("/images/compadres-maduro-torpedo-pack.jpg");
+    await db.exec(sql); await db.exec(sql);
+    expect(await paths()).toHaveLength(2);
+  });
 });
