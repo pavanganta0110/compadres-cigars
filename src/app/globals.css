@@ -290,3 +290,12 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .hero-plain { overflow: hidden; }
 .hero-watermark { position: absolute; left: 50%; top: 50%; height: 94%; width: auto; aspect-ratio: 1; transform: translate(-50%, -50%); opacity: .18; z-index: -1; pointer-events: none; filter: drop-shadow(0 0 60px rgba(214, 173, 104, .22)); }
 @media (max-width: 700px) { .hero-watermark { height: 86%; opacity: .14; } }
+
+/* "Coming soon" collection: announced blends without products yet. */
+.soon-grid { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+.soon-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 28px 24px 26px; background: var(--coal); border: 1px solid var(--espresso); border-top: 3px solid var(--brass); }
+.soon-card h3 { margin: 0; font-size: 1.8rem; }
+.soon-card p { margin: 0; color: var(--parchment); line-height: 1.55; }
+.soon-wrapper { font: 500 .78rem var(--font-l); letter-spacing: .22em; text-transform: uppercase; color: var(--brass); }
+.soon-badge { margin-top: 10px; align-self: flex-start; padding: 5px 12px; border: 1px solid var(--brass); color: var(--brass); font: 600 .72rem var(--font-l); letter-spacing: .18em; text-transform: uppercase; }
+

@@ -112,4 +112,13 @@ describe("brand stories", () => {
     await db.exec(sql); await db.exec(sql);
     expect(await paths()).toEqual(["/images/isley-box-open.jpg", "/images/isley-cigar-wide.jpg", "/images/isley-box-spine.jpg"]);
   });
+  it("Jet Smoke Cigars is a brand with a story, no products yet, and the migration is safe to run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000035_jet_smoke_brand.sql", "utf8");
+    await db.exec(sql); await db.exec(sql);
+    const { rows } = await db.query<{ name: string; tagline: string; story: string; template: string; active: boolean }>("select name, tagline, story, template, active from brands where slug = 'jet-smoke-cigars'");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ name: "Jet Smoke Cigars", tagline: "Premium Cigars for Champions", template: "default", active: true });
+    expect(rows[0].story).toContain("Jason “The Jet” Terry");
+    expect((await db.query("select 1 from products p join brands b on b.id = p.brand_id where b.slug = 'jet-smoke-cigars'")).rows).toHaveLength(0);
+  });
 });
