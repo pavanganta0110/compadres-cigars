@@ -95,4 +95,21 @@ describe("brand stories", () => {
       expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-website.png");
     }
   });
+  it("the Espresso cigarillo is hidden and the other cigarillo flavors stay active", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000033_hide_espresso_cigarillo.sql", "utf8");
+    const active = async (sku: string) => (await db.query<{ active: boolean }>("select active from products where sku = $1", [sku])).rows[0]?.active;
+    for (const twice of [false, true]) {
+      if (twice) { await db.exec(sql); await db.exec(sql); }
+      expect(await active("LION-CIGARILLO-ESPRESSO-10")).toBe(false);
+      for (const sku of ["LION-CIGARILLO-VANILLA-10", "LION-CIGARILLO-CHERRY-10", "LION-CIGARILLO-COGNAC-10", "LION-CIGARILLO-CHOCOLATE-10", "LION-CIGARILLO-VARIETY-10"]) expect(await active(sku), sku).toBe(true);
+    }
+  });
+  it("Ronald Isley The Plug always ends up with its real photos, even if none are left, safely run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000034_isley_real_photos.sql", "utf8");
+    const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position")).rows.map((r) => r.path);
+    await db.exec("delete from product_images where product_id in (select id from products where sku = 'ISLEY-PLUG-60X675-10')");
+    expect(await paths()).toEqual([]);
+    await db.exec(sql); await db.exec(sql);
+    expect(await paths()).toEqual(["/images/isley-box-open.jpg", "/images/isley-cigar-wide.jpg", "/images/isley-box-spine.jpg"]);
+  });
 });
