@@ -214,7 +214,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 
 .tile-b-sugarhill { background: #3fc6f3; border-color: #1f8fc0; }
 .tile-b-sugarhill .tile-mark { background: #3fc6f3; }
-.tile-b-sugarhill .tile-mark img { object-fit: cover; padding: 0; transform: scale(.8); }
+.tile-b-sugarhill .tile-mark img { object-fit: contain; padding: 18px 22px; }
 .tile-b-sugarhill .tile-caption { background: #1b1230; }
 .tile-b-sugarhill .eyebrow { color: #ffe14d; }
 
