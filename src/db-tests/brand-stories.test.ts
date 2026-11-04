@@ -33,7 +33,7 @@ describe("brand stories", () => {
     expect(await paths()).toContain("/images/compadres-maduro-torpedo-4pk.png");
     expect(await paths()).not.toContain("/images/compadres-maduro-torpedo-pack.jpg");
     await db.exec(sql); await db.exec(sql);
-    expect(await paths()).toHaveLength(2);
+    expect(await paths()).toHaveLength(3); // box, four-pack, and the box-and-cigar photo added later
   });
   it("the Robusto and Maduro Torpedo box photos point at the new files and the migration is safe to run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000028_compadres_box_photos.sql", "utf8");
@@ -42,5 +42,14 @@ describe("brand stories", () => {
     expect(await first("LION-MADTORPEDO-52X6-20")).toBe("/images/compadres-maduro-torpedo-box-20.png");
     await db.exec(sql); await db.exec(sql);
     expect(await first("LION-ROBUSTO-50X5-20")).toBe("/images/compadres-robusto-box-20.png");
+  });
+  it("Gran Corona gets the box-and-cigar photo first and Maduro Torpedo gets a third photo, safely run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000029_gran_corona_and_torpedo_photos.sql", "utf8");
+    const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
+    expect((await paths("LION-GRANCORONA-60X6-20"))[0]).toBe("/images/compadres-gran-corona-box-cigar.jpg");
+    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar.jpg");
+    await db.exec(sql); await db.exec(sql);
+    expect(await paths("LION-MADTORPEDO-52X6-20")).toHaveLength(3);
+    expect(await paths("LION-GRANCORONA-60X6-20")).toHaveLength(2);
   });
 });
