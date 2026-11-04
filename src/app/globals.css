@@ -40,7 +40,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 28px; }
 .card { background: var(--coal); border: 1px solid var(--espresso); }
 .card-media { position: relative; display: block; aspect-ratio: 4/3; background: #000; }
-.card-media img { object-fit: cover; }
+.card-media img { object-fit: contain; }
 .card-body { padding: 20px; }
 .card h3 a { color: var(--cream); text-decoration: none; }
 .price { font-family: var(--font-d); font-size: 1.7rem; color: var(--copper); margin: 0; font-weight: 600; font-variant-numeric: lining-nums; }
@@ -86,7 +86,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 
 .product { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
 .gallery-main { position: relative; aspect-ratio: 4/3; background: #000; }
-.gallery-main img, .thumb img { object-fit: cover; }
+.gallery-main img, .thumb img { object-fit: contain; }
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
 .thumb { position: relative; aspect-ratio: 1; background: #000; padding: 0; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: border-color .15s, opacity .15s; opacity: .75; }
 .thumb:hover { opacity: 1; } .thumb-active { border-color: var(--brass); opacity: 1; }
