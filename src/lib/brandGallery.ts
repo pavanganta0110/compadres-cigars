@@ -17,8 +17,12 @@ export const BRAND_GALLERIES: Partial<Record<"isley" | "sugarhill", BrandGallery
     title: "Godfathers of hip-hop",
     photos: [
       { src: "/images/sugarhill-bw-skull-cane.jpg", alt: "Four members of the Sugarhill Gang in black and white, one holding a gold skull-topped cane", pos: "40% 35%" },
+      { src: "/images/sugarhill-woman-floral-dress.jpg", alt: "A woman in an orange and navy floral wrap dress and strappy heels, posing against a blue backdrop", pos: "50% 25%" },
+      { src: "/images/sugarhill-woman-car-bw.jpg", alt: "A smiling woman in a beret and plaid trousers stepping out of a car on a city street, in black and white", pos: "50% 18%" },
+      { src: "/images/sugarhill-woman-award-bw.jpg", alt: "A woman in a studded jacket and tall boots holding a framed gold record plaque, in black and white", pos: "50% 22%" },
       { src: "/images/sugarhill-group-portrait.jpg", alt: "Five men in sunglasses and hats posing together in a bright room", pos: "50% 30%" },
-      { src: "/images/sugarhill-gang-logo-group.png", alt: "The Sugarhill Gang logo in colorful striped lettering above four members posing", pos: "50% 50%" },
+      { src: "/images/sugarhill-woman-purple-jacket.jpg", alt: "A smiling woman in a purple jacket and large hoop earrings leaning on an orange armchair beside red poinsettias", pos: "50% 40%" },
+      { src: "/images/sugarhill-gang-logo-group.png", alt: "The Sugarhill Gang logo in colorful striped lettering above four members posing", pos: "50% 45%" },
     ],
   },
 };
