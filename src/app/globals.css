@@ -264,7 +264,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 /* Brand photography, spread through the page: a photo beside the story, a full-width band, and a short strip after the boxes. */
 .story-grid { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
 .story-grid .story-inner { margin: 0; max-width: none; }
-.story-photo { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--espresso); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+.story-photo { position: relative; margin: 0; aspect-ratio: var(--ratio, 4 / 5); overflow: hidden; border: 1px solid var(--espresso); box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
 .story-photo img { object-fit: cover; }
 .photo-band { position: relative; margin: 0; height: clamp(280px, 42vw, 520px); overflow: hidden; background: #000; border-top: 1px solid var(--espresso); border-bottom: 1px solid var(--espresso); }
 .photo-band img { object-fit: cover; }
@@ -275,7 +275,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 .strip-item { position: relative; margin: 0; height: clamp(260px, 30vw, 400px); overflow: hidden; background: #000; border: 1px solid var(--espresso); }
 .strip-item img { object-fit: cover; transition: transform .6s ease; }
 .strip-item:hover img { transform: scale(1.04); }
-@media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; } .story-photo { aspect-ratio: 4 / 3; } }
+@media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; } .story-photo { aspect-ratio: var(--ratio, 4 / 3); max-width: 440px; width: 100%; margin: 0 auto; } }
 @media (max-width: 700px) { .photo-strip-row, .photo-strip-row[data-count="3"], .photo-strip-row[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); } .strip-item { height: 240px; } }
 @media (prefers-reduced-motion: reduce) { .strip-item img { transition: none; } .strip-item:hover img { transform: none; } }
 

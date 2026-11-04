@@ -13,7 +13,7 @@ export function storyPhoto(slug: string): Photo | undefined {
 
 export function StoryPhoto({ photo }: { photo: Photo }) {
   return (
-    <figure className="story-photo">
+    <figure className="story-photo" style={photo.ratio ? ({ "--ratio": photo.ratio } as React.CSSProperties) : undefined}>
       <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 900px) 100vw, 460px" style={{ objectPosition: photo.pos }} />
     </figure>
   );

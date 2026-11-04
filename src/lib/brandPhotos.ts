@@ -1,4 +1,4 @@
-export type Photo = { src: string; alt: string; pos?: string };
+export type Photo = { src: string; alt: string; pos?: string; /** CSS aspect-ratio for the beside-the-story slot, e.g. "2 / 3", so a tall photo is shown whole. */ ratio?: string };
 export type BrandPhotos = {
   /** Hero background for a brand that has no banner photo set in the database. */
   hero?: Photo;
@@ -31,7 +31,7 @@ export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
   },
   "compadres-cigars": {
     hero: { src: "/images/compadres-hero-cigar-whiskey.jpg", alt: "", pos: "50% 50%" },
-    side: { src: "/images/compadres-hand-rolling.jpg", alt: "Hands rolling a cigar at the rolling table, tobacco leaf spread out around the roller", pos: "55% 45%" },
+    side: { src: "/images/compadres-still-life.jpg", alt: "A vintage typewriter, a framed old portrait, a hand-carved Compadres ashtray with a cigar resting on it, two glasses of amber liqueur and two Compadres cigars on a weathered wooden table", pos: "50% 50%", ratio: "2 / 3" },
     band: { src: "/images/compadres-lounge-red.jpg", alt: "A hand-carved Compadres ashtray with cigars resting on it, an open Compadres box and a Gran Corona box on the table, a woman in a red dress holding a cigar behind them", pos: "50% 62%" },
   },
 };
