@@ -15,8 +15,7 @@ export default async function Home() {
   const [brands, products] = await Promise.all([getBrands(), getProducts()]);
   return (
     <main id="main">
-      <section className="hero hero-photo" aria-label="Welcome">
-        <Image src="/images/life-lounge-smoke.jpg" alt="" fill priority sizes="100vw" className="hero-bg hero-bg-blue" />
+      <section className="hero hero-plain" aria-label="Welcome">
         <div className="hero-copy">
           <p className="eyebrow">Kansas City · Dominican handcrafted</p>
           <h1>Premium cigars, by the box.</h1>

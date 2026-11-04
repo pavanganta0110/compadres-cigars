@@ -187,3 +187,19 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); } h2 { font-size: clamp(1.8rem, 4vw,
 
 .flavor-select { display: grid; gap: 6px; font-size: .9rem; color: var(--brass); max-width: 320px; margin: 0 0 16px; }
 .flavor-select select { background: var(--coal); color: var(--cream); border: 1px solid var(--espresso); padding: 12px; font: inherit; min-height: 44px; width: 100%; }
+
+/* Home hero without a photo: centered type on a warm radial glow. */
+.hero-plain { min-height: min(64vh, 560px); align-items: center; justify-content: center; text-align: center; background: radial-gradient(900px 420px at 50% 0%, #3a281d 0%, var(--ink) 72%); border-bottom: 1px solid var(--espresso); }
+.hero-plain::after { display: none; }
+.hero-plain .hero-copy { max-width: 760px; }
+.hero-plain .hero-actions { justify-content: center; }
+
+/* Brand-page photo gallery: one large lead photo beside two stacked ones. */
+.gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: repeat(2, 300px); gap: 14px; }
+.gallery-item { position: relative; margin: 0; overflow: hidden; background: #000; border: 1px solid var(--espresso); box-shadow: 0 18px 44px rgba(0, 0, 0, .4); }
+.gallery-item img { object-fit: cover; transition: transform .6s ease; }
+.gallery-item:hover img { transform: scale(1.04); }
+.gallery-lead { grid-row: span 2; }
+@media (max-width: 800px) { .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 380px 260px; } .gallery-lead { grid-column: span 2; grid-row: auto; } }
+@media (max-width: 480px) { .gallery { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: 340px; } .gallery-lead { grid-column: auto; } }
+@media (prefers-reduced-motion: reduce) { .gallery-item img { transition: none; } .gallery-item:hover img { transform: none; } }
