@@ -13,7 +13,7 @@ export type BrandPhotos = {
 /** Brand-page photography, keyed by brand slug. Photos are spread through the page instead of stacked in one place. */
 export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
   "ronald-isley": {
-    side: { src: "/images/isley-sequin-tuxedo.jpg", alt: "Ronald Isley in a black sequined tuxedo, bow tie and round sunglasses, a cigar in his hand", pos: "50% 20%" },
+    side: { src: "/images/isley-laughing.jpg", alt: "Ronald Isley in aviator sunglasses and a white suit, smiling as he holds a cigar", pos: "60% 40%", ratio: "8 / 7" },
     band: { src: "/images/isley-box-open.jpg", alt: "An open box of ten Ronald Isley The Plug cigars on a marble table, the Gold Standard seal inside the lid", pos: "50% 62%" },
   },
   sugarhill: {
