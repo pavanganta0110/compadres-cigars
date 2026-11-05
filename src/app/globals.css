@@ -204,24 +204,31 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .tile-caption .eyebrow { display: block; margin: 0; }
 .tile-caption .tile-name { display: block; font-size: 1.7rem; line-height: 1.15; }
 
-.tile-b-isley { background: radial-gradient(360px 240px at 50% 30%, #2a2113 0%, #000 78%); border-color: var(--brass); text-align: center; }
-.tile-b-isley .tile-mark { flex: 0 0 auto; width: 220px; height: 220px; min-height: 0; margin: 26px auto 6px; filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .6)); }
+/* Every brand is a round medallion with its caption underneath. */
+.tile-branded { background: transparent; border: 0; min-height: 0; align-items: center; text-align: center; padding: 8px 0 0; overflow: visible; }
+.tile-branded:hover { box-shadow: none; }
+.tile-branded .tile-mark { flex: 0 0 auto; width: min(280px, 72vw); height: min(280px, 72vw); min-height: 0; border-radius: 50%; overflow: hidden; border: 3px solid var(--brass); box-shadow: 0 0 0 6px var(--ink), 0 0 0 8px rgba(214, 173, 104, .5), 0 16px 40px rgba(0, 0, 0, .55); transition: box-shadow .35s ease; }
+.tile-branded:hover .tile-mark { box-shadow: 0 0 0 6px var(--ink), 0 0 0 9px var(--brass), 0 20px 46px rgba(0, 0, 0, .6); }
+.tile-branded .tile-mark img { object-fit: contain; padding: 14%; }
+.tile-branded .tile-caption { padding: 18px 8px 4px; background: transparent !important; }
+.tile-branded .tile-name { font-size: 1.5rem; color: var(--cream); }
+
+.tile-b-isley .tile-mark { border: 0; box-shadow: none; overflow: visible; background: none; }
+.tile-b-isley:hover .tile-mark { box-shadow: none; filter: drop-shadow(0 0 14px rgba(214, 173, 104, .45)); }
 .tile-b-isley .isley-seal { display: block; width: 100%; height: 100%; }
 .tile-b-isley .tile-name { color: var(--brass); }
 
-.tile-b-sugarhill { background: #3fc6f3; border-color: #1f8fc0; }
-.tile-b-sugarhill .tile-mark { background: #3fc6f3; }
-.tile-b-sugarhill .tile-mark img { object-fit: contain; padding: 18px 22px; }
-.tile-b-sugarhill .tile-caption { background: #1b1230; }
+.tile-b-sugarhill .tile-mark { background: #3fc6f3; border-color: #1f8fc0; }
+.tile-b-sugarhill .tile-mark img { padding: 12% 8%; }
 .tile-b-sugarhill .eyebrow { color: #ffe14d; }
 
-.tile-b-compadres { background: radial-gradient(420px 260px at 50% 40%, #2a1f19 0%, var(--ink) 80%); border-color: #6e5628; }
-.tile-b-compadres .tile-mark img { padding: 18px 26px; }
+.tile-b-compadres .tile-mark { background: radial-gradient(260px 200px at 50% 40%, #2a1f19 0%, var(--ink) 85%); border-color: #6e5628; }
+.tile-b-compadres .tile-mark img { padding: 12% 9%; }
 
-.tile-b-americo { background: #fff; border-color: #cfc7b8; }
-.tile-b-americo .tile-caption { background: #2f3550; }
+.tile-b-americo .tile-mark { background: #fff; border-color: #cfc7b8; }
+.tile-b-americo .tile-mark img { padding: 18%; }
 .tile-b-americo .eyebrow { color: #d4b06a; }
-.tile-b-americo .tile-mark img { padding: 30px; }
+
 @media (prefers-reduced-motion: reduce) { .tile-branded { transition: none; } .tile-branded:hover { transform: none; } }
 
 /* Product cards: size and box count, strength meter, price and a clear "View box" link. */
@@ -296,9 +303,8 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .soon-badge { margin-top: 10px; align-self: flex-start; padding: 5px 12px; border: 1px solid var(--brass); color: var(--brass); font: 600 .72rem var(--font-l); letter-spacing: .18em; text-transform: uppercase; }
 
 /* Jet Smoke: black tile with the brand's olive and yellow. */
-.tile-b-jet { background: radial-gradient(420px 240px at 40% 45%, #1b1a10 0%, #0b0a08 78%); border-color: #7a6a1c; }
-.tile-b-jet .tile-mark img { object-fit: contain; padding: 16px 14px; }
-.tile-b-jet .tile-caption { background: #0b0a08; }
+.tile-b-jet .tile-mark { background: radial-gradient(260px 200px at 40% 45%, #1b1a10 0%, #0b0a08 80%); border-color: #7a6a1c; }
+.tile-b-jet .tile-mark img { padding: 12% 8%; }
 .tile-b-jet .eyebrow { color: #e6c53a; }
 
 /* Strips of portrait photos keep a 3:4 tile instead of a fixed height. */
