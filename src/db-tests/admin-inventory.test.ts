@@ -67,17 +67,18 @@ describe("media storage", () => {
 });
 
 describe("Ronald Isley photography migration", () => {
-  it("the seed holds only real photographs, and the cleanup migration removes the AI renders and is safe to run twice", async () => {
+  it("the seed holds only the four product pictures; the black-backgrounds migration is safe to run twice", async () => {
     const { readFileSync } = await import("node:fs");
     const real = ["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"];
+    const ai = ["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"];
     const paths = async () => (await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position, path")).rows.map((r) => r.path);
-    expect(await paths()).toEqual(real);
+    expect(await paths()).toEqual(ai);
     expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-portrait-white-suit.jpg");
-    await db.exec(readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8"));
-    expect(await paths()).toHaveLength(7);
-    const cleanup = readFileSync("supabase/migrations/20261103000025_isley_remove_ai_images.sql", "utf8");
-    await db.exec(cleanup); await db.exec(cleanup);
-    expect(await paths()).toEqual(real);
+    await db.exec("insert into product_images (product_id, path, alt, position) select id, unnest(array['/images/isley-box-open.jpg','/images/isley-cigar.jpg','/images/isley-box-spine.jpg']), 'x', unnest(array[10,11,12]) from products where sku = 'ISLEY-PLUG-60X675-10'");
+    expect(await paths()).toEqual([...ai, ...real]);
+    const m = readFileSync("supabase/migrations/20261103000039_black_backgrounds_and_isley_ai_only.sql", "utf8");
+    await db.exec(m); await db.exec(m);
+    expect(await paths()).toEqual(ai);
   });
   it("on a database still holding the old gallery it prepends the new photos and keeps the old ones", async () => {
     const { readFileSync } = await import("node:fs");
@@ -85,8 +86,7 @@ describe("Ronald Isley photography migration", () => {
     await db.exec(readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8"));
     const { rows } = await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position");
     expect(rows.slice(0, 4).map((r) => r.path)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
-    expect(rows.map((r) => r.path)).toEqual(expect.arrayContaining(["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"]));
-    expect(rows).toHaveLength(7);
+    expect(rows).toHaveLength(4);
   });
 });
 

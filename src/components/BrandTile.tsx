@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND_TILES } from "@/lib/brandTiles";
 import type { Brand } from "@/lib/catalog";
+import { IsleySeal } from "@/components/IsleySeal";
 
 export function BrandTile({ brand }: { brand: Brand }) {
   const s = BRAND_TILES[brand.slug];
@@ -16,7 +17,11 @@ export function BrandTile({ brand }: { brand: Brand }) {
   return (
     <Link href={`/brands/${brand.slug}`} className={`tile tile-branded ${s.cls}`}>
       <span className="tile-mark">
-        <Image src={s.mark} alt={s.markAlt} fill sizes="(max-width: 700px) 90vw, 360px" style={{ objectPosition: s.pos }} />
+        {brand.slug === "ronald-isley" ? (
+          <IsleySeal portrait={s.mark} label={s.markAlt} />
+        ) : (
+          <Image src={s.mark} alt={s.markAlt} fill sizes="(max-width: 700px) 90vw, 360px" style={{ objectPosition: s.pos }} />
+        )}
       </span>
       <span className="tile-caption">
         {brand.tagline && <span className="eyebrow">{brand.tagline}</span>}
