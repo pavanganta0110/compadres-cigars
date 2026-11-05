@@ -7,6 +7,7 @@ let db: PGlite;
 beforeEach(async () => { db = await freshDb(); }, 60_000);
 const story = async (slug: string) => (await db.query<{ story: string | null }>("select story from brands where slug = $1", [slug])).rows[0]?.story ?? null;
 
+const m39 = () => readFileSync("supabase/migrations/20261103000039_black_backgrounds_and_isley_ai_only.sql", "utf8");
 describe("brand stories", () => {
   it("Sugarhill has real copy (no draft placeholder) and Compadres has its story", async () => {
     expect(await story("sugarhill")).toContain("Englewood, New Jersey");
@@ -47,26 +48,26 @@ describe("brand stories", () => {
     const sql = readFileSync("supabase/migrations/20261103000029_gran_corona_and_torpedo_photos.sql", "utf8");
     const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
     expect((await paths("LION-GRANCORONA-60X6-20"))[0]).toBe("/images/compadres-gran-corona-box-20.png"); // superseded by the studio photo set
-    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar.jpg");
-    await db.exec(sql); await db.exec(sql);
-    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar.jpg");
+    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar-black.jpg");
+    await db.exec(sql); await db.exec(sql); await db.exec(m39());
+    expect(await paths("LION-MADTORPEDO-52X6-20")).toContain("/images/compadres-torpedo-box-cigar-black.jpg");
   });
   it("the studio photo set: every Compadres product leads with a sharp photo, has the expected photos, and the migration is safe to run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000030_compadres_product_photo_set.sql", "utf8");
     const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
     const expected: Record<string, [string, number]> = {
-      "LION-ROBUSTO-50X5-20": ["/images/compadres-robusto-box-20.png", 5],
-      "LION-MADTORPEDO-52X6-20": ["/images/compadres-maduro-torpedo-box-20.png", 6],
-      "LION-BELICOSO-50X525-20": ["/images/compadres-belicoso-box-20.png", 3],
-      "LION-GRANCORONA-60X6-20": ["/images/compadres-gran-corona-box-20.png", 4],
-      "LION-DMTORO-52X6-20": ["/images/compadres-double-maduro-toro-box-20.png", 4],
-      "LION-CIGARILLO-VANILLA-10": ["/images/compadres-cigarillo-vanilla-studio.jpg", 2],
-      "LION-CIGARILLO-COGNAC-10": ["/images/compadres-cigarillo-cognac-studio.jpg", 2],
-      "LION-CIGARILLO-CHERRY-10": ["/images/compadres-cigarillo-cherry-studio.jpg", 1],
-      "LION-CIGARILLO-CHOCOLATE-10": ["/images/compadres-cigarillo-chocolate-studio.jpg", 1],
+      "LION-ROBUSTO-50X5-20": ["/images/compadres-robusto-box-20.png", 4],
+      "LION-MADTORPEDO-52X6-20": ["/images/compadres-maduro-torpedo-box-20.png", 5],
+      "LION-BELICOSO-50X525-20": ["/images/compadres-belicoso-box-20.png", 2],
+      "LION-GRANCORONA-60X6-20": ["/images/compadres-gran-corona-box-20.png", 2],
+      "LION-DMTORO-52X6-20": ["/images/compadres-double-maduro-toro-box-20.png", 2],
+      "LION-CIGARILLO-VANILLA-10": ["/images/compadres-cigarillo-vanilla-black.jpg", 1],
+      "LION-CIGARILLO-COGNAC-10": ["/images/compadres-cigarillo-cognac-black.jpg", 1],
+      "LION-CIGARILLO-CHERRY-10": ["/images/compadres-cigarillo-cherry-black.jpg", 1],
+      "LION-CIGARILLO-CHOCOLATE-10": ["/images/compadres-cigarillo-chocolate-black.jpg", 1],
     };
     for (const twice of [false, true]) {
-      if (twice) { await db.exec(sql); await db.exec(sql); }
+      if (twice) { await db.exec(sql); await db.exec(sql); await db.exec(m39()); }
       for (const [sku, [lead, count]] of Object.entries(expected)) {
         const p = await paths(sku);
         expect(p[0], sku).toBe(lead);
@@ -78,10 +79,10 @@ describe("brand stories", () => {
     const sql = readFileSync("supabase/migrations/20261103000031_toro_4pk_and_cigarillo_stack.sql", "utf8");
     const paths = async (sku: string) => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = $1 order by i.position", [sku])).rows.map((r) => r.path);
     for (const twice of [false, true]) {
-      if (twice) { await db.exec(sql); await db.exec(sql); }
+      if (twice) { await db.exec(sql); await db.exec(sql); await db.exec(m39()); }
       expect(await paths("LION-DMTORO-52X6-20")).toContain("/images/compadres-double-maduro-toro-4pk.png");
       expect(await paths("LION-DMTORO-52X6-20")).not.toContain("/images/compadres-double-maduro-toro-4pk.jpg");
-      expect(await paths("LION-CIGARILLO-VARIETY-10")).toEqual(["/images/compadres-cigarillo-stack.jpg"]);
+      expect(await paths("LION-CIGARILLO-VARIETY-10")).toEqual(["/images/compadres-cigarillo-stack.png"]);
     }
   });
   it("the website composites: Robusto and Gran Corona four-packs and the Robusto and Torpedo box composites, safely run twice", async () => {
@@ -127,13 +128,13 @@ describe("brand stories", () => {
     const { rows } = await db.query<{ slug: string }>("select slug from brands where active order by display_order, name");
     expect(rows[0].slug).toBe("compadres-cigars");
   });
-  it("the Isley product pictures lead again, followed by the real photographs, safely run twice", async () => {
+  it("the Isley product has only its four product pictures, safely run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000038_isley_product_pictures_restored.sql", "utf8");
     const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position, i.path")).rows.map((r) => r.path);
     for (let i = 0; i < 2; i++) await db.exec(sql);
+    await db.exec(m39());
     const p = await paths();
     expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
-    expect(p).toEqual(expect.arrayContaining(["/images/isley-box-open.jpg", "/images/isley-box-spine.jpg"]));
-    expect(new Set(p).size).toBe(p.length);
+    expect(p).toHaveLength(4);
   });
 });

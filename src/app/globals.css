@@ -205,8 +205,8 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .tile-caption .tile-name { display: block; font-size: 1.7rem; line-height: 1.15; }
 
 .tile-b-isley { background: radial-gradient(360px 240px at 50% 30%, #2a2113 0%, #000 78%); border-color: var(--brass); text-align: center; }
-.tile-b-isley .tile-mark { flex: 0 0 auto; width: 200px; height: 200px; min-height: 0; margin: 26px auto 6px; border-radius: 50%; overflow: hidden; border: 3px solid var(--brass); box-shadow: 0 0 0 6px #000, 0 0 0 8px rgba(214, 173, 104, .55), 0 14px 40px rgba(0, 0, 0, .6); }
-.tile-b-isley .tile-mark img { object-fit: cover; padding: 0; }
+.tile-b-isley .tile-mark { flex: 0 0 auto; width: 220px; height: 220px; min-height: 0; margin: 26px auto 6px; filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .6)); }
+.tile-b-isley .isley-seal { display: block; width: 100%; height: 100%; }
 .tile-b-isley .tile-name { color: var(--brass); }
 
 .tile-b-sugarhill { background: #3fc6f3; border-color: #1f8fc0; }
@@ -255,7 +255,6 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .link-quiet:hover { color: var(--brass); }
 
 /* Brand story: the first paragraph leads. */
-.story-lead { font-family: var(--font-d); font-size: clamp(1.35rem, 2.6vw, 1.7rem) !important; line-height: 1.4; }
 @media (prefers-reduced-motion: reduce) { .card-media img { transition: none; } .card:hover .card-media img { transform: none; } }
 
 /* Brand photography, spread through the page: a photo beside the story, a full-width band, and a short strip after the boxes. */
@@ -307,13 +306,13 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 @media (max-width: 700px) { .photo-strip-row[data-tall] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } }
 
 /* Brand hero with a logo and a photo: the logo sits on a solid panel and the photo beside it, so they never overlap. */
-.hero-split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: stretch; min-height: min(72vh, 620px); background: radial-gradient(700px 420px at 28% 45%, #2a1f19 0%, var(--ink) 75%); }
+.hero-split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: stretch; min-height: min(72vh, 620px); background: var(--ink); }
 .hero-split::after { display: none; }
 .hero-split .hero-copy { align-self: center; max-width: 600px; padding: 56px var(--gutter); }
 .hero-split .hero-crest { width: min(480px, 100%); }
-.hero-photo { position: relative; min-height: 360px; overflow: hidden; }
+.hero-photo { position: relative; min-height: 360px; overflow: hidden; margin-left: -1px; }
 .hero-photo img { object-fit: cover; }
-.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ink) 0%, rgba(23, 18, 15, .5) 14%, rgba(23, 18, 15, 0) 42%); }
+.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ink) 0%, rgba(23, 18, 15, .9) 8%, rgba(23, 18, 15, .55) 20%, rgba(23, 18, 15, .18) 34%, rgba(23, 18, 15, 0) 50%); }
 @media (max-width: 900px) {
   .hero-split { grid-template-columns: 1fr; min-height: 0; }
   .hero-photo { order: -1; min-height: 0; aspect-ratio: 16 / 10; }

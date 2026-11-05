@@ -14,7 +14,6 @@ export type BrandPhotos = {
 export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
   "ronald-isley": {
     side: { src: "/images/isley-laughing.jpg", alt: "Ronald Isley in aviator sunglasses and a white suit, smiling as he holds a cigar", pos: "60% 40%", ratio: "8 / 7" },
-    band: { src: "/images/isley-box-open.jpg", alt: "An open box of ten Ronald Isley The Plug cigars on a marble table, the Gold Standard seal inside the lid", pos: "50% 62%" },
   },
   sugarhill: {
     side: { src: "/images/sugarhill-group-portrait.jpg", alt: "Five men in sunglasses and hats posing together in a bright room", pos: "50% 30%" },
@@ -37,14 +36,5 @@ export const BRAND_PHOTOS: Record<string, BrandPhotos> = {
   "jet-smoke-cigars": {
     hero: { src: "/images/jet-smoke-founders.jpg", alt: "", pos: "50% 38%" },
     side: { src: "/images/jet-smoke-basketball.jpg", alt: "A man in a black shirt lining up a jump shot with a basketball held over his head", pos: "50% 30%" },
-    strip: {
-      eyebrow: "Behind the brand",
-      tall: true,
-      photos: [
-        { src: "/images/jet-smoke-tobacco-bundles.jpg", alt: "Bundles of dark tobacco laid out in a long row on a warehouse floor", pos: "50% 50%" },
-        { src: "/images/jet-smoke-bundle-bands.jpg", alt: "A bundle of four cigars with black and gold bands", pos: "50% 50%" },
-        { src: "/images/jet-smoke-bundles-table.jpg", alt: "Rows of banded cigar bundles stacked on a packing table", pos: "50% 50%" },
-      ],
-    },
   },
 };
