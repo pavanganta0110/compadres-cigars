@@ -121,4 +121,18 @@ describe("brand stories", () => {
     expect(rows[0].story).toContain("Jason “The Jet” Terry");
     expect((await db.query("select 1 from products p join brands b on b.id = p.brand_id where b.slug = 'jet-smoke-cigars'")).rows).toHaveLength(0);
   });
+  it("the Compadres story is about the cigars only, and the migration leaves an admin-edited story alone", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000036_compadres_story_cigars_only.sql", "utf8");
+    expect(await story("compadres-cigars")).not.toContain("GEO Foods");
+    expect(await story("compadres-cigars")).toContain("Gran Corona");
+    await db.exec(sql); await db.exec(sql);
+    expect(await story("compadres-cigars")).not.toContain("Spencer Woodard");
+    await db.exec("update brands set story = 'Edited in the admin.' where slug = 'compadres-cigars'");
+    await db.exec(sql);
+    expect(await story("compadres-cigars")).toBe("Edited in the admin.");
+    // and from the earlier long version it is replaced
+    await db.exec("update brands set story = 'Compadres Cigars is a division of GEO Foods.' where slug = 'compadres-cigars'");
+    await db.exec(sql);
+    expect(await story("compadres-cigars")).toContain("Main Line");
+  });
 });
