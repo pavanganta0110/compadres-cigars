@@ -133,8 +133,9 @@ describe("brand stories", () => {
     const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position, i.path")).rows.map((r) => r.path);
     for (let i = 0; i < 2; i++) await db.exec(sql);
     await db.exec(m39());
+    for (let i = 0; i < 2; i++) await db.exec(readFileSync("supabase/migrations/20261103000040_isley_cigar_tip_removed.sql", "utf8"));
     const p = await paths();
-    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
+    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
     expect(p).toHaveLength(4);
   });
   it("the Compadres story is about the cigars only, and the migration leaves an admin-edited story alone", async () => {
@@ -150,5 +151,15 @@ describe("brand stories", () => {
     await db.exec("update brands set story = 'Compadres Cigars is a division of GEO Foods.' where slug = 'compadres-cigars'");
     await db.exec(sql);
     expect(await story("compadres-cigars")).toContain("Main Line");
+  });
+});
+
+describe("natural premium and suarez on black", () => {
+  it("their pictures point at the black-background files, safely run twice", async () => {
+    const db2 = await freshDb();
+    const sql = readFileSync("supabase/migrations/20261103000041_natural_and_suarez_black.sql", "utf8");
+    await db2.exec(sql); await db2.exec(sql);
+    const { rows } = await db2.query<{ path: string }>("select path from product_images where path like '%natural-premium%' or path like '%suarez%' order by path");
+    expect(rows.map((r) => r.path)).toEqual(["/images/compadres-natural-premium-box-black.jpg", "/images/compadres-suarez-closed-black.jpg", "/images/compadres-suarez-open-lid-black.jpg"]);
   });
 });
