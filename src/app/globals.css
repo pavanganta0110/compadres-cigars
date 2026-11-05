@@ -327,3 +327,31 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
   .hero-split .hero-crest { width: min(340px, 86%); }
 }
 
+
+/* Motion: hover on desktop, press feedback on touch. All of it is switched off for people who ask for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes ring-glow { 0%, 100% { box-shadow: 0 0 0 6px var(--ink), 0 0 0 8px rgba(214, 173, 104, .5), 0 16px 40px rgba(0, 0, 0, .55); } 50% { box-shadow: 0 0 0 6px var(--ink), 0 0 0 11px rgba(214, 173, 104, .85), 0 20px 46px rgba(0, 0, 0, .6); } }
+  .brand-tiles > .tile-branded { animation: rise-in .7s cubic-bezier(.2, .7, .2, 1) backwards; }
+  .brand-tiles > .tile-branded:nth-child(2) { animation-delay: .1s; }
+  .brand-tiles > .tile-branded:nth-child(3) { animation-delay: .2s; }
+  .brand-tiles > .tile-branded:nth-child(4) { animation-delay: .3s; }
+  .brand-tiles > .tile-branded:nth-child(5) { animation-delay: .4s; }
+  .tile-branded { transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
+  .tile-branded .tile-mark img, .tile-branded .isley-seal { transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .tile-branded:hover, .tile-branded:focus-visible { transform: translateY(-8px); }
+  .tile-branded:hover .tile-mark img, .tile-branded:focus-visible .tile-mark img { transform: scale(1.07); }
+  .tile-branded:hover .isley-seal, .tile-branded:focus-visible .isley-seal { transform: rotate(-3deg) scale(1.05); }
+  .tile-branded:hover .tile-mark:not(:has(.isley-seal)), .tile-branded:focus-visible .tile-mark:not(:has(.isley-seal)) { animation: ring-glow 2.2s ease-in-out infinite; }
+  .tile-branded:active { transform: translateY(-2px) scale(.97); transition-duration: .12s; }
+  .tile-caption .tile-name { transition: letter-spacing .4s ease; }
+  .tile-branded:hover .tile-name { letter-spacing: .03em; }
+
+  .card { transition: transform .4s cubic-bezier(.2, .7, .2, 1), box-shadow .4s ease, border-color .3s; }
+  .card:hover, .card:focus-within { transform: translateY(-6px); box-shadow: 0 22px 44px rgba(0, 0, 0, .5); border-color: var(--brass); }
+  .card:active { transform: translateY(-2px) scale(.985); transition-duration: .12s; }
+  .btn { transition: background .2s, color .2s, transform .2s cubic-bezier(.2, .7, .2, 1), box-shadow .3s; }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(214, 173, 104, .25); }
+  .btn:active:not(:disabled) { transform: scale(.96); transition-duration: .08s; }
+}
+@media (hover: none) { .tile-branded:hover, .card:hover { transform: none; } }
