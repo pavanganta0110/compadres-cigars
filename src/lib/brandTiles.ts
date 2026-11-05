@@ -18,6 +18,6 @@ export const BRAND_TILES: Record<string, BrandTileStyle> = {
   "ronald-isley": { mark: "/images/isley-portrait-engraving.jpg", markAlt: "Engraved portrait of Ronald Isley in a wide-brim hat and round sunglasses", cls: "tile-b-isley" },
   sugarhill: { mark: "/images/sugarhill-logo-crop.jpg", markAlt: "Sugar Hill logo in striped lettering", cls: "tile-b-sugarhill", nameInMark: true },
   "compadres-cigars": { mark: "/images/compadres-crest.png", markAlt: "Compadres Premium Cigars crest with two lions", cls: "tile-b-compadres", nameInMark: true, heroMark: true },
-  "jet-smoke-cigars": { mark: "/images/jet-smoke-logo.png", markAlt: "Jet Smoke logo: a cigar shaped like a fighter jet trailing flame and smoke, with the words Jet Smoke on its wings", cls: "tile-b-jet", nameInMark: true, heroMark: true, markRatio: "1400 / 674" },
+  "jet-smoke-cigars": { mark: "/images/jet-smoke-mark.png", markAlt: "Jet Smoke logo: a cigar shaped like a fighter jet with the words Jet Smoke in gold on its wings", cls: "tile-b-jet", nameInMark: true, heroMark: true, markRatio: "1600 / 1177" },
   "americo-cigars": { mark: "/images/americo-logo.png", markAlt: "Americo Cigars logo", cls: "tile-b-americo", nameInMark: true },
 };

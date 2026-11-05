@@ -121,4 +121,19 @@ describe("brand stories", () => {
     expect(rows[0].story).toContain("Jason “The Jet” Terry");
     expect((await db.query("select 1 from products p join brands b on b.id = p.brand_id where b.slug = 'jet-smoke-cigars'")).rows).toHaveLength(0);
   });
+  it("Compadres is the first brand", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000037_compadres_first.sql", "utf8");
+    await db.exec(sql); await db.exec(sql);
+    const { rows } = await db.query<{ slug: string }>("select slug from brands where active order by display_order, name");
+    expect(rows[0].slug).toBe("compadres-cigars");
+  });
+  it("the Isley product pictures lead again, followed by the real photographs, safely run twice", async () => {
+    const sql = readFileSync("supabase/migrations/20261103000038_isley_product_pictures_restored.sql", "utf8");
+    const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position, i.path")).rows.map((r) => r.path);
+    for (let i = 0; i < 2; i++) await db.exec(sql);
+    const p = await paths();
+    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
+    expect(p).toEqual(expect.arrayContaining(["/images/isley-box-open.jpg", "/images/isley-box-spine.jpg"]));
+    expect(new Set(p).size).toBe(p.length);
+  });
 });

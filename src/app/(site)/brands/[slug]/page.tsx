@@ -24,13 +24,13 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const heroBg = !brand.hero_path ? heroPhoto(brand.slug) : undefined;
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
-      <section className="brand-hero">
+      <section className={`brand-hero${heroMark && heroBg ? " hero-split" : ""}`}>
         {brand.hero_path && <Image src={brand.hero_path} alt="" fill priority sizes="100vw" className="hero-bg" />}
-        {heroBg && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg hero-bg-shift" style={{ objectPosition: heroBg.pos }} />}
+        {heroBg && !heroMark && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg" style={{ objectPosition: heroBg.pos }} />}
         <div className="hero-copy">
           {heroMark && (
             <div className="hero-crest" style={heroMark.markRatio ? { aspectRatio: heroMark.markRatio } : undefined}>
-              <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 80vw, 520px" />
+              <Image src={heroMark.mark} alt={heroMark.markAlt} fill priority sizes="(max-width: 900px) 80vw, 480px" />
             </div>
           )}
           {!heroMark && <p className="eyebrow">{brand.tagline}</p>}
@@ -38,6 +38,11 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
           <p>{brand.short_description}</p>
           {products[0] && <a className="btn" href="#boxes">Buy a box</a>}
         </div>
+        {heroMark && heroBg && (
+          <div className="hero-photo">
+            <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectPosition: heroBg.pos }} />
+          </div>
+        )}
       </section>
       <ul className="trust" aria-label="Highlights">
         <li>Handcrafted in the Dominican Republic</li>
