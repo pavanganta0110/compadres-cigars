@@ -223,10 +223,10 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .tile-b-sugarhill .eyebrow { color: #ffe14d; }
 
 .tile-b-compadres .tile-mark { background: radial-gradient(260px 200px at 50% 40%, #2a1f19 0%, var(--ink) 85%); border-color: #6e5628; }
-.tile-b-compadres .tile-mark img { padding: 12% 9%; }
+.tile-b-compadres .tile-mark img { padding: 7% 5%; }
 
 .tile-b-americo .tile-mark { background: #fff; border-color: #cfc7b8; }
-.tile-b-americo .tile-mark img { padding: 18%; }
+.tile-b-americo .tile-mark img { padding: 9%; }
 .tile-b-americo .eyebrow { color: #d4b06a; }
 
 @media (prefers-reduced-motion: reduce) { .tile-branded { transition: none; } .tile-branded:hover { transform: none; } }
