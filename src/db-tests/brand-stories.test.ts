@@ -7,7 +7,7 @@ let db: PGlite;
 beforeEach(async () => { db = await freshDb(); }, 60_000);
 const story = async (slug: string) => (await db.query<{ story: string | null }>("select story from brands where slug = $1", [slug])).rows[0]?.story ?? null;
 
-const m39 = () => readFileSync("supabase/migrations/20261103000039_black_backgrounds_and_isley_ai_only.sql", "utf8");
+const m39 = () => readFileSync("supabase/migrations/20261103000039_black_backgrounds_and_isley_ai_only.sql", "utf8") + readFileSync("supabase/migrations/20261103000043_belicoso_robusto_whole_cutouts.sql", "utf8");
 describe("brand stories", () => {
   it("Sugarhill has real copy (no draft placeholder) and Compadres has its story", async () => {
     expect(await story("sugarhill")).toContain("Englewood, New Jersey");
@@ -165,5 +165,16 @@ describe("natural premium and suarez on black", () => {
     const m42 = readFileSync("supabase/migrations/20261103000042_isley_three_pictures_and_clean_cutouts.sql", "utf8");
     await db2.exec(m42); await db2.exec(m42);
     expect(await q()).toEqual(["/images/compadres-natural-premium-box-cut.jpg", "/images/compadres-suarez-closed-cut.jpg", "/images/compadres-suarez-open-lid-cut.jpg"]);
+  });
+});
+
+describe("belicoso and robusto whole cut-outs", () => {
+  it("point at the whole-band files, safely run twice", async () => {
+    const db2 = await freshDb();
+    await db2.exec("update product_images set path = '/images/compadres-belicoso-single-black.jpg' where path like '%belicoso-single%'; update product_images set path = '/images/compadres-robusto-single-black.jpg' where path like '%robusto-single%'");
+    const sql = readFileSync("supabase/migrations/20261103000043_belicoso_robusto_whole_cutouts.sql", "utf8");
+    await db2.exec(sql); await db2.exec(sql);
+    const { rows } = await db2.query<{ path: string }>("select distinct path from product_images where path like '%belicoso-single%' or path like '%robusto-single%' order by path");
+    expect(rows.map((r) => r.path)).toEqual(["/images/compadres-belicoso-single-whole.jpg", "/images/compadres-robusto-single-whole.jpg"]);
   });
 });
