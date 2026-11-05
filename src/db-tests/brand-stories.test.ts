@@ -153,3 +153,13 @@ describe("brand stories", () => {
     expect(await story("compadres-cigars")).toContain("Main Line");
   });
 });
+
+describe("natural premium and suarez on black", () => {
+  it("their pictures point at the black-background files, safely run twice", async () => {
+    const db2 = await freshDb();
+    const sql = readFileSync("supabase/migrations/20261103000041_natural_and_suarez_black.sql", "utf8");
+    await db2.exec(sql); await db2.exec(sql);
+    const { rows } = await db2.query<{ path: string }>("select path from product_images where path like '%natural-premium%' or path like '%suarez%' order by path");
+    expect(rows.map((r) => r.path)).toEqual(["/images/compadres-natural-premium-box-black.jpg", "/images/compadres-suarez-closed-black.jpg", "/images/compadres-suarez-open-lid-black.jpg"]);
+  });
+});
