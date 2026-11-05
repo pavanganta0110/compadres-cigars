@@ -133,8 +133,9 @@ describe("brand stories", () => {
     const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position, i.path")).rows.map((r) => r.path);
     for (let i = 0; i < 2; i++) await db.exec(sql);
     await db.exec(m39());
+    for (let i = 0; i < 2; i++) await db.exec(readFileSync("supabase/migrations/20261103000040_isley_cigar_tip_removed.sql", "utf8"));
     const p = await paths();
-    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
+    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
     expect(p).toHaveLength(4);
   });
   it("the Compadres story is about the cigars only, and the migration leaves an admin-edited story alone", async () => {

@@ -70,7 +70,7 @@ describe("Ronald Isley photography migration", () => {
   it("the seed holds only the four product pictures; the black-backgrounds migration is safe to run twice", async () => {
     const { readFileSync } = await import("node:fs");
     const real = ["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"];
-    const ai = ["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"];
+    const ai = ["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"];
     const paths = async () => (await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position, path")).rows.map((r) => r.path);
     expect(await paths()).toEqual(ai);
     expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-portrait-white-suit.jpg");
@@ -82,7 +82,7 @@ describe("Ronald Isley photography migration", () => {
   });
   it("on a database still holding the old gallery it prepends the new photos and keeps the old ones", async () => {
     const { readFileSync } = await import("node:fs");
-    await db.exec("delete from product_images where path in ('/images/isley-open-box.jpg','/images/isley-box-and-cigar.jpg','/images/isley-cigar-standing.jpg','/images/isley-box-closed-gold.jpg'); update product_images set position = position - 10 where path like '/images/isley-%' and position >= 10; update brands set hero_path = '/images/isley-box-open.jpg' where slug = 'ronald-isley'");
+    await db.exec("delete from product_images where path in ('/images/isley-open-box.jpg','/images/isley-box-and-cigar.jpg','/images/isley-box-and-cigar-clean.jpg','/images/isley-cigar-standing.jpg','/images/isley-box-closed-gold.jpg'); update product_images set position = position - 10 where path like '/images/isley-%' and position >= 10; update brands set hero_path = '/images/isley-box-open.jpg' where slug = 'ronald-isley'");
     await db.exec(readFileSync("supabase/migrations/20261010000008_isley_photography.sql", "utf8"));
     const { rows } = await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position");
     expect(rows.slice(0, 4).map((r) => r.path)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
