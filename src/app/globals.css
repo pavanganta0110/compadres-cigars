@@ -215,7 +215,7 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 
 .tile-b-isley .tile-mark { border: 0; box-shadow: none; overflow: visible; background: none; }
 .tile-b-isley:hover .tile-mark { box-shadow: none; filter: drop-shadow(0 0 14px rgba(214, 173, 104, .45)); }
-.tile-b-isley .isley-seal { display: block; width: 100%; height: 100%; }
+.tile-b-isley .tile-mark img { padding: 0; }
 .tile-b-isley .tile-name { color: var(--brass); }
 
 .tile-b-sugarhill .tile-mark { background: #3fc6f3; border-color: #1f8fc0; }
@@ -338,11 +338,10 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
   .brand-tiles > .tile-branded:nth-child(4) { animation-delay: .3s; }
   .brand-tiles > .tile-branded:nth-child(5) { animation-delay: .4s; }
   .tile-branded { transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
-  .tile-branded .tile-mark img, .tile-branded .isley-seal { transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .tile-branded .tile-mark img { transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
   .tile-branded:hover, .tile-branded:focus-visible { transform: translateY(-8px); }
   .tile-branded:hover .tile-mark img, .tile-branded:focus-visible .tile-mark img { transform: scale(1.07); }
-  .tile-branded:hover .isley-seal, .tile-branded:focus-visible .isley-seal { transform: rotate(-3deg) scale(1.05); }
-  .tile-branded:hover .tile-mark:not(:has(.isley-seal)), .tile-branded:focus-visible .tile-mark:not(:has(.isley-seal)) { animation: ring-glow 2.2s ease-in-out infinite; }
+  .tile-branded:not(.tile-b-isley):hover .tile-mark, .tile-branded:not(.tile-b-isley):focus-visible .tile-mark { animation: ring-glow 2.2s ease-in-out infinite; }
   .tile-branded:active { transform: translateY(-2px) scale(.97); transition-duration: .12s; }
   .tile-caption .tile-name { transition: letter-spacing .4s ease; }
   .tile-branded:hover .tile-name { letter-spacing: .03em; }

@@ -67,10 +67,10 @@ describe("media storage", () => {
 });
 
 describe("Ronald Isley photography migration", () => {
-  it("the seed holds only the four product pictures; the black-backgrounds migration is safe to run twice", async () => {
+  it("the seed holds only the three product pictures; the black-backgrounds migration is safe to run twice", async () => {
     const { readFileSync } = await import("node:fs");
     const real = ["/images/isley-box-open.jpg", "/images/isley-cigar.jpg", "/images/isley-box-spine.jpg"];
-    const ai = ["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"];
+    const ai = ["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg"];
     const paths = async () => (await db.query<{ path: string }>("select path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by position, path")).rows.map((r) => r.path);
     expect(await paths()).toEqual(ai);
     expect((await db.query<{ h: string }>("select hero_path h from brands where slug = 'ronald-isley'")).rows[0].h).toBe("/images/isley-portrait-white-suit.jpg");

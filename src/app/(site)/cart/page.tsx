@@ -13,7 +13,7 @@ export default async function CartPage() {
     <main id="main" className="section">
       <h1>Your cart</h1>
       {lines.length === 0 ? (
-        <p>Your cart is empty. <Link href="/shop">Browse the collection</Link>.</p>
+        <p>Your cart is empty. <Link href="/#brands">Browse the brands</Link>.</p>
       ) : (
         <>
           <ul className="cart-lines">

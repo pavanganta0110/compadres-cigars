@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getBrands, getProducts } from "@/lib/catalog";
-import { ProductCard } from "@/components/ProductCard";
+import { getBrands } from "@/lib/catalog";
 import { BrandTile } from "@/components/BrandTile";
 import { LionMark } from "@/components/LionMark";
 
@@ -14,7 +13,7 @@ const MOSAIC = [
 ] as const;
 
 export default async function Home() {
-  const [brands, products] = await Promise.all([getBrands(), getProducts()]);
+  const brands = await getBrands();
   return (
     <main id="main">
       <section className="hero hero-plain" aria-label="Welcome">
@@ -24,8 +23,7 @@ export default async function Home() {
           <h1>Premium cigars, by the box.</h1>
           <p>Handcrafted brands, sold by the box, delivered with an adult signature.</p>
           <div className="hero-actions">
-            <Link className="btn" href="/shop">Shop the collection</Link>
-            <Link className="link-quiet" href="#brands">Meet the brands<span aria-hidden="true"> ↓</span></Link>
+            <Link className="btn" href="#brands">Meet the brands<span aria-hidden="true"> ↓</span></Link>
           </div>
         </div>
       </section>
@@ -51,7 +49,7 @@ export default async function Home() {
           <p className="eyebrow">The Lion Cigars life</p>
           <h2 id="life-title">Good cigars. Better company.</h2>
           <p>Slow evenings, a friendly game, and a box worth sharing. Every Lion Cigars cigar is rolled by hand in the Dominican Republic and made for the moments you want to last a little longer.</p>
-          <Link className="btn" href="/shop">Find your box</Link>
+          <Link className="btn" href="#brands">Choose a brand</Link>
         </div>
       </section>
 
@@ -67,15 +65,10 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section">
-        <h2>Featured boxes</h2>
-        <div className="grid">{products.map((p) => <ProductCard key={p.id} product={p} />)}</div>
-      </section>
-
       <section className="cta-band">
         <h2>Ready when you are.</h2>
-        <p>Choose a box, check out in minutes, and we ship it with an adult signature.</p>
-        <Link className="btn" href="/shop">Shop the collection</Link>
+        <p>Pick a brand, choose your box, and we ship it with an adult signature.</p>
+        <Link className="btn" href="#brands">Choose a brand</Link>
       </section>
     </main>
   );
