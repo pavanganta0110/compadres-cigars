@@ -10,7 +10,7 @@ export const metadata = { title: "Checkout" };
 export default async function Checkout({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const lines = await resolveLines(await readCart());
-  if (lines.length === 0) return <main id="main" className="section"><h1>Checkout</h1><p>Your cart is empty. <Link href="/shop">Browse the collection</Link>.</p></main>;
+  if (lines.length === 0) return <main id="main" className="section"><h1>Checkout</h1><p>Your cart is empty. <Link href="/#brands">Browse the brands</Link>.</p></main>;
   const { tokenizer } = await paymentSetup();
   const subtotal = lines.reduce((n, l) => n + l.unitPriceCents * l.quantity, 0);
   return (

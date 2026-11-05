@@ -128,15 +128,17 @@ describe("brand stories", () => {
     const { rows } = await db.query<{ slug: string }>("select slug from brands where active order by display_order, name");
     expect(rows[0].slug).toBe("compadres-cigars");
   });
-  it("the Isley product has only its four product pictures, safely run twice", async () => {
+  it("the Isley product ends with its three product pictures, safely run twice", async () => {
     const sql = readFileSync("supabase/migrations/20261103000038_isley_product_pictures_restored.sql", "utf8");
     const paths = async () => (await db.query<{ path: string }>("select i.path from product_images i join products p on p.id = i.product_id where p.sku = 'ISLEY-PLUG-60X675-10' order by i.position, i.path")).rows.map((r) => r.path);
     for (let i = 0; i < 2; i++) await db.exec(sql);
     await db.exec(m39());
     for (let i = 0; i < 2; i++) await db.exec(readFileSync("supabase/migrations/20261103000040_isley_cigar_tip_removed.sql", "utf8"));
+    expect((await paths())).toHaveLength(4);
+    const m42 = readFileSync("supabase/migrations/20261103000042_isley_three_pictures_and_clean_cutouts.sql", "utf8");
+    for (let i = 0; i < 2; i++) await db.exec(m42);
     const p = await paths();
-    expect(p.slice(0, 4)).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg", "/images/isley-box-closed-gold.jpg"]);
-    expect(p).toHaveLength(4);
+    expect(p).toEqual(["/images/isley-open-box.jpg", "/images/isley-box-and-cigar-clean.jpg", "/images/isley-cigar-standing.jpg"]);
   });
   it("the Compadres story is about the cigars only, and the migration leaves an admin-edited story alone", async () => {
     const sql = readFileSync("supabase/migrations/20261103000036_compadres_story_cigars_only.sql", "utf8");
@@ -159,7 +161,9 @@ describe("natural premium and suarez on black", () => {
     const db2 = await freshDb();
     const sql = readFileSync("supabase/migrations/20261103000041_natural_and_suarez_black.sql", "utf8");
     await db2.exec(sql); await db2.exec(sql);
-    const { rows } = await db2.query<{ path: string }>("select path from product_images where path like '%natural-premium%' or path like '%suarez%' order by path");
-    expect(rows.map((r) => r.path)).toEqual(["/images/compadres-natural-premium-box-black.jpg", "/images/compadres-suarez-closed-black.jpg", "/images/compadres-suarez-open-lid-black.jpg"]);
+    const q = async () => (await db2.query<{ path: string }>("select path from product_images where path like '%natural-premium%' or path like '%suarez%' order by path")).rows.map((r) => r.path);
+    const m42 = readFileSync("supabase/migrations/20261103000042_isley_three_pictures_and_clean_cutouts.sql", "utf8");
+    await db2.exec(m42); await db2.exec(m42);
+    expect(await q()).toEqual(["/images/compadres-natural-premium-box-cut.jpg", "/images/compadres-suarez-closed-cut.jpg", "/images/compadres-suarez-open-lid-cut.jpg"]);
   });
 });
