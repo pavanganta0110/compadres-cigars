@@ -22,11 +22,13 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const tile = BRAND_TILES[brand.slug];
   const heroMark = !brand.hero_path && tile?.heroMark ? tile : undefined;
   const heroBg = !brand.hero_path ? heroPhoto(brand.slug) : undefined;
+  /** Ronald Isley's supplied "The Plug" cover graphic, shown whole beside the intro. */
+  const poster = brand.slug === "ronald-isley";
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
-      <section className={`brand-hero${heroMark && heroBg ? " hero-split" : ""}`}>
-        {brand.hero_path && <Image src={brand.hero_path} alt="" fill priority sizes="100vw" className="hero-bg" />}
-        {heroBg && !heroMark && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg" style={{ objectPosition: heroBg.pos }} />}
+      <section className={`brand-hero${heroMark && heroBg ? " hero-split" : ""}${poster ? " hero-poster" : ""}`}>
+        {brand.hero_path && !poster && <Image src={brand.hero_path} alt="" fill priority sizes="100vw" className="hero-bg" />}
+        {heroBg && !heroMark && !poster && <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="100vw" className="hero-bg" style={{ objectPosition: heroBg.pos }} />}
         <div className="hero-copy">
           {heroMark && (
             <div className="hero-crest" style={heroMark.markRatio ? { aspectRatio: heroMark.markRatio } : undefined}>
@@ -38,6 +40,11 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
           <p>{brand.short_description}</p>
           {products[0] && <a className="btn" href="#boxes">Buy a box</a>}
         </div>
+        {poster && (
+          <div className="hero-poster-art">
+            <Image src="/images/isley-the-plug-cover.jpg" alt="Ronald Isley in a white suit and aviator sunglasses holding a cigar, with the words The Plug Cigars by Ronald Isley" width={2000} height={2162} priority sizes="(max-width: 900px) 100vw, 900px" />
+          </div>
+        )}
         {heroMark && heroBg && (
           <div className="hero-photo">
             <Image src={heroBg.src} alt={heroBg.alt} fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectPosition: heroBg.pos }} />

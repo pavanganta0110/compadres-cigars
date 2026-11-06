@@ -354,3 +354,18 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
   .btn:active:not(:disabled) { transform: scale(.96); transition-duration: .08s; }
 }
 @media (hover: none) { .tile-branded:hover, .card:hover { transform: none; } }
+
+/* Ronald Isley: the supplied cover graphic fills the hero (full height, nothing cropped); its black base blends into the page and the intro text sits over the faded left side. */
+.hero-poster { position: relative; display: flex; align-items: center; min-height: min(92vh, 900px); background: #000; overflow: hidden; }
+.hero-poster::after { display: none; }
+.hero-poster .hero-copy { position: relative; z-index: 2; max-width: 520px; padding: 56px var(--gutter); }
+.hero-poster-art { position: absolute; top: 0; bottom: 0; right: 0; aspect-ratio: 2000 / 2162; z-index: 0; }
+.hero-poster-art img { display: block; width: auto; height: 100%; max-width: none; }
+.hero-poster-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .75) 14%, rgba(0, 0, 0, 0) 42%); }
+@media (max-width: 900px) {
+  .hero-poster { display: block; min-height: 0; }
+  .hero-poster-art { position: relative; aspect-ratio: auto; }
+  .hero-poster-art img { width: 100%; height: auto; }
+  .hero-poster-art::after { background: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0) 30%); }
+  .hero-poster .hero-copy { padding: 8px var(--gutter) 40px; max-width: none; }
+}
