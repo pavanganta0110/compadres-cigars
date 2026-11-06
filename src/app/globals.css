@@ -354,3 +354,16 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
   .btn:active:not(:disabled) { transform: scale(.96); transition-duration: .08s; }
 }
 @media (hover: none) { .tile-branded:hover, .card:hover { transform: none; } }
+
+/* Ronald Isley: the supplied cover graphic is shown whole next to the intro. */
+.hero-poster { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; min-height: 0; background: var(--ink); gap: 8px; }
+.hero-poster::after { display: none; }
+.hero-poster .hero-copy { max-width: 560px; padding: 56px var(--gutter); }
+.hero-poster-art { padding: 24px var(--gutter) 24px 0; }
+.hero-poster-art img { display: block; width: 100%; height: auto; max-height: min(88vh, 860px); object-fit: contain; }
+@media (max-width: 900px) {
+  .hero-poster { grid-template-columns: 1fr; }
+  .hero-poster-art { order: -1; padding: 0; }
+  .hero-poster-art img { max-height: none; width: 100%; }
+  .hero-poster .hero-copy { padding: 24px var(--gutter) 40px; }
+}
