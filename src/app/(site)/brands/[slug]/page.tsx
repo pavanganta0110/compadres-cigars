@@ -22,7 +22,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const tile = BRAND_TILES[brand.slug];
   const heroMark = !brand.hero_path && tile?.heroMark ? tile : undefined;
   const heroBg = !brand.hero_path ? heroPhoto(brand.slug) : undefined;
-  /** Ronald Isley's supplied "The Plug" cover graphic, shown whole beside the intro. */
+  /** Ronald Isley's supplied "The Plug" cover graphic, shown exactly as supplied, with the intro below it. */
   const poster = brand.slug === "ronald-isley";
   return (
     <main id="main" className={`brand brand-${brand.template}`} style={{ "--accent": accent } as React.CSSProperties}>
@@ -42,7 +42,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         </div>
         {poster && (
           <div className="hero-poster-art">
-            <Image src="/images/isley-the-plug-cover.jpg" alt="Ronald Isley in a white suit and aviator sunglasses holding a cigar, with the words The Plug Cigars by Ronald Isley" width={2000} height={2162} priority sizes="(max-width: 900px) 100vw, 900px" />
+            <Image src="/images/isley-the-plug-cover.jpg" alt="Ronald Isley in a white suit and aviator sunglasses holding a cigar, with the words The Plug Cigars by Ronald Isley" width={2000} height={2162} priority sizes="100vw" />
           </div>
         )}
         {heroMark && heroBg && (
