@@ -42,7 +42,7 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
         </div>
         {poster && (
           <div className="hero-poster-art">
-            <Image src="/images/isley-the-plug-cover.jpg" alt="Ronald Isley in a white suit and aviator sunglasses holding a cigar, with the words The Plug Cigars by Ronald Isley" width={2000} height={2162} priority sizes="(max-width: 900px) 100vw, 52vw" />
+            <Image src="/images/isley-the-plug-cover.jpg" alt="Ronald Isley in a white suit and aviator sunglasses holding a cigar, with the words The Plug Cigars by Ronald Isley" width={2000} height={2162} priority sizes="(max-width: 900px) 100vw, 900px" />
           </div>
         )}
         {heroMark && heroBg && (
