@@ -3,7 +3,7 @@ import type { Transport } from "./client";
 import { diagnoseFedEx } from "./diagnose";
 
 const ENV = { APP_ENV: "staging", COMPADRES_SHIPPING_PROVIDER: "fedex", COMPADRES_FEDEX_API_BASE_URL: "https://apis-sandbox.fedex.com", COMPADRES_FEDEX_CLIENT_ID: "cid", COMPADRES_FEDEX_CLIENT_SECRET: "SECRET-VALUE",
-  COMPADRES_FEDEX_ACCOUNT_NUMBER: "740561073", COMPADRES_FEDEX_ORIGIN_COUNTRY: "US", COMPADRES_FEDEX_ORIGIN_STATE: "MO", COMPADRES_FEDEX_ORIGIN_POSTAL_CODE: "64131" };
+  COMPADRES_FEDEX_ACCOUNT_NUMBER: "123456789", COMPADRES_FEDEX_ORIGIN_COUNTRY: "US", COMPADRES_FEDEX_ORIGIN_STATE: "MO", COMPADRES_FEDEX_ORIGIN_POSTAL_CODE: "64131" };
 const t = (rate: { status: number; body: unknown }, auth: { status: number; body: unknown } = { status: 200, body: { access_token: "TOK" } }): Transport => async (url) => {
   const r = url.endsWith("/oauth/token") ? auth : rate;
   return { status: r.status, text: JSON.stringify(r.body) };
@@ -30,7 +30,7 @@ describe("diagnoseFedEx", () => {
   it("shows which key is configured (first 4 chars) and explains HTTP 403", async () => {
     const d = await diagnoseFedEx({ ...ENV, COMPADRES_FEDEX_CLIENT_ID: "l737abcdef" }, t({ status: 403, body: { errors: [{ code: "FORBIDDEN.ERROR" }] } }));
     expect(d.summary).toContain("key l737…");
-    expect(d.summary).toContain("account …073");
+    expect(d.summary).toContain("account …789");
     expect(d.summary).toMatch(/not allowed to use the Rates API/);
     expect(d.summary).not.toContain("l737abcdef");
   });
