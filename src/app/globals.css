@@ -362,3 +362,11 @@ h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
 .hero-poster-art img { display: block; width: 100%; height: auto; }
 .hero-poster .hero-copy { order: 2; position: relative; z-index: 2; width: 100%; max-width: 760px; padding: 32px var(--gutter) 56px; text-align: center; }
 .hero-poster .hero-crest { display: none; }
+
+/* Ronald Isley: key accomplishments from the official bio. */
+.accolades { background: #000; color: var(--parchment); padding: 64px var(--gutter); }
+.accolades h2 { max-width: 1100px; margin: 0 auto 28px; }
+.accolades ul { list-style: none; margin: 0 auto; padding: 0; max-width: 1100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.accolades li { border: 1px solid rgba(214, 173, 104, .35); padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 10px; }
+.accolades strong { color: var(--brass); font-size: 1.6rem; font-weight: 500; letter-spacing: .02em; }
+.accolades span { font-size: 1.02rem; line-height: 1.5; }
