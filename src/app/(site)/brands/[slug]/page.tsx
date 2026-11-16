@@ -11,6 +11,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: b?.name ?? "Not found", description: b?.short_description ?? undefined };
 }
 
+/** Photos supplied by the Isley team, shown whole (never cropped). */
+const ISLEY_GALLERY = [
+  { src: "/images/isley-green-sequin-suit.jpg", w: 854, h: 1280, alt: "Ronald Isley in a green sequined double-breasted suit and round sunglasses, against a green mosaic wall" },
+  { src: "/images/isley-cigar-conversation.jpg", w: 1280, h: 854, alt: "Ronald Isley in a white suit and aviator sunglasses laughing, holding a cigar" },
+  { src: "/images/isley-balcony-sunset.jpg", w: 1280, h: 856, alt: "Ronald Isley in a black brocade suit with a cane on a balcony at sunset" },
+  { src: "/images/isley-gold-mosaic.jpg", w: 1280, h: 854, alt: "Ronald Isley in a black hat and a yellow floral suit, with a cane, against a gold and black mosaic" },
+];
+
 /** From the official Ronald Isley biography (supplied by the Isley team). */
 const ISLEY_ACCOMPLISHMENTS = [
   { head: "1959", text: "Co-wrote the hit “Shout”" },
@@ -85,6 +93,15 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
               <li key={a.head}><strong>{a.head}</strong><span>{a.text}</span></li>
             ))}
           </ul>
+        </section>
+      )}
+      {brand.template === "isley" && (
+        <section className="isley-gallery" aria-label="Ronald Isley photos">
+          {ISLEY_GALLERY.map((g) => (
+            <figure key={g.src}>
+              <Image src={g.src} alt={g.alt} width={g.w} height={g.h} sizes="(max-width: 800px) 100vw, 50vw" />
+            </figure>
+          ))}
         </section>
       )}
       <PhotoBand slug={brand.slug} />
