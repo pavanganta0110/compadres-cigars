@@ -11,6 +11,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: b?.name ?? "Not found", description: b?.short_description ?? undefined };
 }
 
+/** From the official Ronald Isley biography (supplied by the Isley team). */
+const ISLEY_ACCOMPLISHMENTS = [
+  { head: "1959", text: "Co-wrote the hit “Shout”" },
+  { head: "Grammy", text: "Lifetime Achievement Award, 2014, with The Isley Brothers" },
+  { head: "2026", text: "Star on the Hollywood Walk of Fame" },
+  { head: "8 decades", text: "Chart appearances spanning eight decades" },
+  { head: "No. 1", text: "“Make Me Say It Again, Girl” with Beyoncé held the top spot on Billboard’s Adult R&B Airplay chart for five weeks" },
+  { head: "Today", text: "Still recording and performing for audiences around the world" },
+];
+
 export default async function BrandPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const brand = await getBrand(slug);
@@ -65,6 +75,16 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
             </div>
             {side && <StoryPhoto photo={side} />}
           </div>
+        </section>
+      )}
+      {brand.template === "isley" && (
+        <section className="accolades" aria-labelledby="accolades-h">
+          <h2 id="accolades-h">Key accomplishments</h2>
+          <ul>
+            {ISLEY_ACCOMPLISHMENTS.map((a) => (
+              <li key={a.head}><strong>{a.head}</strong><span>{a.text}</span></li>
+            ))}
+          </ul>
         </section>
       )}
       <PhotoBand slug={brand.slug} />
