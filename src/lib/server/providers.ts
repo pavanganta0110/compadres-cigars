@@ -63,7 +63,10 @@ export async function paymentSetup(): Promise<PaymentSetup> {
   const env = process.env;
   const qb = quickbooksConfigFromEnv(env);
   const an = authorizenetConfigFromEnv(env);
-  const sel = selectPayment({ appEnv: env.APP_ENV, provider: env.COMPADRES_PAYMENT_PROVIDER, approved: env.COMPADRES_PAYMENT_PRODUCTION_APPROVED, quickbooksConfigured: quickbooksConfigured(qb), authorizenetConfigured: authorizenetConfigured(an) });
+  // Stray spaces from pasting into a dashboard must not silently keep payments in sandbox.
+  const appEnv = env.APP_ENV?.trim();
+  const approved = env.COMPADRES_PAYMENT_PRODUCTION_APPROVED?.trim().toLowerCase();
+  const sel = selectPayment({ appEnv, provider: env.COMPADRES_PAYMENT_PROVIDER?.trim().toLowerCase(), approved, quickbooksConfigured: quickbooksConfigured(qb), authorizenetConfigured: authorizenetConfigured(an) });
   if (sel.kind === "unavailable") {
     return { provider: new UnavailablePaymentProvider(), mode: "disabled", paymentMode: "disabled", name: "none", connected: null, productionReady: false, detail: `Unavailable: ${sel.reason} Checkout cannot take payments.`, tokenizer: null };
   }
@@ -77,7 +80,9 @@ export async function paymentSetup(): Promise<PaymentSetup> {
     return {
       provider: new AuthorizeNetProvider(sel.mode, an, fetchTransport), mode: sel.mode, paymentMode: sel.mode, name: "authorizenet", connected: true,
       productionReady: sel.mode === "live",
-      detail: sel.mode === "live" ? "Authorize.net, LIVE gates satisfied." : "Authorize.net sandbox (no real money).",
+      // Names the failing gate (APP_ENV and the approval flag are not secrets) so the admin page says exactly why it is not live.
+      detail: sel.mode === "live" ? "Authorize.net, LIVE gates satisfied."
+        : `Authorize.net sandbox (no real money). Why not live: APP_ENV is ${appEnv === "production" ? "production (ok)" : JSON.stringify(appEnv ?? null)}; COMPADRES_PAYMENT_PRODUCTION_APPROVED is ${approved === "true" ? "true (ok)" : JSON.stringify(approved ?? null)}.`,
       tokenizer: { kind: "authorizenet", scriptUrl: authorizenetAcceptJsUrl(sel.mode), apiLoginId: an.apiLoginId, clientKey: an.clientKey },
     };
   }
