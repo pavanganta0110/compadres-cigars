@@ -15,7 +15,7 @@ function ask(q, hidden = false) {
 }
 const clientId = await ask("FedEx API key (client ID): ");
 const secret = await ask("FedEx secret key (hidden): ", true);
-const account = (await ask("FedEx account number [740561073]: ")) || "740561073";
+const account = await ask("FedEx account number (9 digits): ");
 if (!/^[A-Za-z0-9._-]{10,128}$/.test(clientId) || secret.length < 8 || !/^\d{9}$/.test(account)) { console.error("Those values do not look right; nothing was written."); process.exit(1); }
 
 let text = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
