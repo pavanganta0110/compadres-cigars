@@ -10,23 +10,11 @@ import { loadRoyalties } from "@/lib/server/royalty-data";
 import { RoyaltyPanel } from "./RoyaltyPanel";
 import { SalesPanel, StockAlerts } from "./SalesPanel";
 import { serviceClient } from "@/lib/server/db";
-import { paymentSetup, shippingProvider } from "@/lib/server/providers";
 import { requireStaff } from "@/lib/server/staff";
 import { markPackedAction } from "./orders/actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
-
-async function healthRows() {
-  const ship = shippingProvider();
-  const pay = await paymentSetup();
-  const detail = ship.name === "fedex" ? "FedEx REST (adult signature rates, tracking)." : ship.name === "mock" ? "Mock rates (not FedEx)." : `Unavailable: ${ship.name}. Checkout cannot quote shipping.`;
-  return [
-    { name: "Age verification", mode: "sandbox", detail: "Self-attestation (checkbox). Not identity verification; carries regulatory and underwriting risk.", prod: false },
-    { name: "Shipping", mode: ship.mode, detail, prod: ship.mode === "live" },
-    { name: "Payments", mode: pay.mode, detail: pay.detail, prod: pay.productionReady },
-  ];
-}
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
   const staff = await requireStaff();
@@ -63,16 +51,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       {stateReport && <><h2>Sales and estimated tax by state</h2><StateTaxPanel report={stateReport} outstanding={owedByState} label={`Month to date (${month.from.toISOString().slice(0, 10)} onward).`} /></>}
 
       {canRoyalties && <><h2>Royalties</h2><RoyaltyPanel rows={royalties ?? null} /></>}
-
-      <h2>Integration health</h2>
-      <ul className="adm-health">
-        {(await healthRows()).map((h) => (
-          <li key={h.name}>
-            <span><strong>{h.name}</strong><br /><small>{h.detail}</small></span>
-            <span><span className={`adm-pill ${h.mode === "disabled" ? "warn" : ""}`}>{h.mode}</span>{" "}<span className={`adm-pill ${h.prod ? "" : "warn"}`}>{h.prod ? "production-ready" : "not production-ready"}</span></span>
-          </li>
-        ))}
-      </ul>
 
       <h2>Orders and fulfillment</h2>
       <p className="adm-note">Paid orders received: <strong>{s.received.today}</strong> today · <strong>{s.received.days7}</strong> in 7 days · <strong>{s.received.days30}</strong> in 30 days</p>
