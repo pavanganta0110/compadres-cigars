@@ -30,6 +30,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             </nav>
           </div>
           <p className="fine">Tobacco products are for adults 21+ only. Shipments require an adult signature. We do not ship to restricted jurisdictions.</p>
+          <p className="fine"><Link href="/admin/login">Admin login</Link></p>
         </footer>
     </>
   );
