@@ -19,7 +19,14 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
   return (
     <>
       {sp.retried && <p className="adm-note" role="status">Retried.</p>}
-      <form action={sendTestEmailAction}><button className="adm-btn" type="submit">Send a test email to me</button></form>
+      <form action={sendTestEmailAction} className="adm-inline">
+        <label>Email to test
+          <select name="kind" defaultValue="admin_test">
+            {Object.entries(KIND).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+          </select>
+        </label>
+        <button className="adm-btn" type="submit">Send a test email to me</button>
+      </form>
       <h2>Recent emails</h2>
       <p className="adm-muted">{Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(" · ") || "Nothing yet."}</p>
       {(data ?? []).length > 0 && (
