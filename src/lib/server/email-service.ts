@@ -20,13 +20,16 @@ export function emailSetup(env: Record<string, string | undefined> = process.env
   const adminEmails = parseList(env.COMPADRES_ADMIN_ALERT_EMAILS);
   const allowlist = [...new Set([...adminEmails, ...parseList(env.COMPADRES_EMAIL_TEST_ALLOWLIST)])];
   const siteUrl = (env.COMPADRES_SITE_URL ?? "").trim().replace(/\/+$/, "") || undefined;
-  const sel = selectEmail({ appEnv: env.APP_ENV, provider: env.COMPADRES_EMAIL_PROVIDER, approved: env.COMPADRES_EMAIL_PRODUCTION_APPROVED, resendConfigured: key.length >= 8 && fromAddressOk(from) });
+  // Stray spaces or capitals from pasting into a dashboard must not silently keep email in sandbox.
+  const appEnv = env.APP_ENV?.trim();
+  const approved = env.COMPADRES_EMAIL_PRODUCTION_APPROVED?.trim().toLowerCase();
+  const sel = selectEmail({ appEnv, provider: env.COMPADRES_EMAIL_PROVIDER, approved, resendConfigured: key.length >= 8 && fromAddressOk(from) });
   const common = { from, adminEmails, allowlist, siteUrl };
   if (sel.kind === "unavailable") return { ...common, provider: new UnavailableEmailProvider(), mode: "disabled", name: "none", detail: `Unavailable: ${sel.reason} Emails queue but are not sent.`, productionReady: false };
   if (sel.kind === "mock") return { ...common, provider: new MockEmailProvider(), mode: "mock", name: "mock", detail: "Mock email (local/staging only). Nothing is delivered.", productionReady: false };
   return {
     ...common, provider: new ResendEmailProvider(key, from), mode: sel.mode, name: "resend", productionReady: sel.mode === "live",
-    detail: sel.mode === "live" ? "Resend, LIVE gates satisfied: customers receive real email." : "Resend, sandbox: only staff and allowlisted addresses receive real email; customers' emails are skipped.",
+    detail: sel.mode === "live" ? "Resend, LIVE gates satisfied: customers receive real email." : `Resend, sandbox: only staff and allowlisted addresses receive real email; customers' emails are skipped. Why not live: APP_ENV is ${appEnv === "production" ? "production (ok)" : JSON.stringify(appEnv ?? null)}; COMPADRES_EMAIL_PRODUCTION_APPROVED is ${approved === "true" ? "true (ok)" : JSON.stringify(approved ?? null)}.`,
   };
 }
 
