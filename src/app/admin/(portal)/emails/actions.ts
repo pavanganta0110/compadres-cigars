@@ -24,13 +24,16 @@ const SAMPLES = {
 type SampleKind = keyof typeof SAMPLES;
 const Kind = z.enum(Object.keys(SAMPLES) as [SampleKind, ...SampleKind[]]);
 
-/** Sends a sample of the chosen email type to the signed-in staff member's own address (never to a typed-in recipient). */
+/** Sends a sample of the chosen email type to the typed address, or to the signed-in staff member's own address when left empty. */
 export async function sendTestEmailAction(formData: FormData) {
   const staff = await requireStaff("manage_email");
   const kind = Kind.safeParse(formData.get("kind")).data ?? "admin_test";
-  await enqueue(kind, `${kind}_test:${staff.id}:${Date.now()}`, staff.email, SAMPLES[kind](staff.email));
+  // Optional "send to": staff with email permission only. Empty means the signed-in staff member's own address.
+  const typed = z.string().trim().toLowerCase().email().max(254).safeParse(formData.get("to"));
+  const to = typed.success ? typed.data : staff.email;
+  await enqueue(kind, `${kind}_test:${staff.id}:${Date.now()}`, to, SAMPLES[kind](to));
   const r = await processOutbox(5);
-  await auditAdmin(staff.id, "email.test_sent", "email", null, { kind, ...r });
+  await auditAdmin(staff.id, "email.test_sent", "email", null, { kind, to_other: to !== staff.email, ...r });
   revalidatePath("/admin/emails");
   redirect("/admin/emails");
 }

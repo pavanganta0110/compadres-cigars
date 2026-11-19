@@ -25,7 +25,10 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
             {Object.entries(KIND).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
           </select>
         </label>
-        <button className="adm-btn" type="submit">Send a test email to me</button>
+        <label>Send to (optional)
+          <input name="to" type="email" placeholder="your own address if empty" autoComplete="off" />
+        </label>
+        <button className="adm-btn" type="submit">Send test email</button>
       </form>
       <h2>Recent emails</h2>
       <p className="adm-muted">{Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(" · ") || "Nothing yet."}</p>
