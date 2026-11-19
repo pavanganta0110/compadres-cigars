@@ -11,15 +11,13 @@ const KIND: Record<string, string> = {
 };
 const PILL: Record<string, string> = { sent: "", queued: "amber", sending: "amber", failed: "amber", skipped: "amber", dead: "warn" };
 
-export default async function Emails({ searchParams }: { searchParams: Promise<{ test?: string; retried?: string }> }) {
+export default async function Emails({ searchParams }: { searchParams: Promise<{ retried?: string }> }) {
   await requireStaff("manage_email");
   const sp = await searchParams;
   const { data } = await serviceClient().from("email_outbox").select("id, kind, to_email, subject, status, attempts, last_error, created_at, sent_at").order("created_at", { ascending: false }).limit(60);
   const counts = (data ?? []).reduce<Record<string, number>>((m, e) => ({ ...m, [e.status]: (m[e.status] ?? 0) + 1 }), {});
   return (
     <>
-      <h1>Emails</h1>
-      {sp.test && <p className={sp.test === "sent" ? "adm-note" : "adm-alert"} role={sp.test === "sent" ? "status" : "alert"}>{sp.test === "sent" ? "Test email sent to your own address." : sp.test === "skipped" ? "Test email skipped: add your address to COMPADRES_ADMIN_ALERT_EMAILS." : "Test email is queued but could not be sent yet. See the list below."}</p>}
       {sp.retried && <p className="adm-note" role="status">Retried.</p>}
       <form action={sendTestEmailAction}><button className="adm-btn" type="submit">Send a test email to me</button></form>
       <h2>Recent emails</h2>
