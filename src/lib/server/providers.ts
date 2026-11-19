@@ -80,9 +80,7 @@ export async function paymentSetup(): Promise<PaymentSetup> {
     return {
       provider: new AuthorizeNetProvider(sel.mode, an, fetchTransport), mode: sel.mode, paymentMode: sel.mode, name: "authorizenet", connected: true,
       productionReady: sel.mode === "live",
-      // Names the failing gate (APP_ENV and the approval flag are not secrets) so the admin page says exactly why it is not live.
-      detail: sel.mode === "live" ? "Authorize.net, LIVE gates satisfied."
-        : `Authorize.net sandbox (no real money). Why not live: APP_ENV is ${appEnv === "production" ? "production (ok)" : JSON.stringify(appEnv ?? null)}; COMPADRES_PAYMENT_PRODUCTION_APPROVED is ${approved === "true" ? "true (ok)" : JSON.stringify(approved ?? null)}.`,
+      detail: sel.mode === "live" ? "Authorize.net, LIVE gates satisfied." : "Authorize.net sandbox (no real money).",
       tokenizer: { kind: "authorizenet", scriptUrl: authorizenetAcceptJsUrl(sel.mode), apiLoginId: an.apiLoginId, clientKey: an.clientKey },
     };
   }
