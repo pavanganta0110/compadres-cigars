@@ -5,6 +5,7 @@ import { can } from "@/lib/domain/permissions";
 import { serviceClient } from "@/lib/server/db";
 import { requireStaff } from "@/lib/server/staff";
 import { refundAction, saveTrackingAction } from "../actions";
+import { CopyAddress } from "./CopyAddress";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Order" };
@@ -42,7 +43,12 @@ export default async function OrderDetail({ params, searchParams }: { params: Pr
       </tbody></table></div>
       <p>Subtotal {formatUsd(o.subtotal_cents)} · Shipping {formatUsd(o.shipping_cents)} · Estimated tax {formatUsd(o.tax_cents)} · <strong>Total {formatUsd(o.total_cents)}</strong></p>
       <h2>Ship to (adult signature required)</h2>
-      {addr && <p>{addr.recipient}<br />{addr.line1} {addr.line2}<br />{addr.city}, {addr.state} {addr.postal_code}<br />Service: {o.shipping_service}</p>}
+      {addr && (
+        <>
+          <p>{addr.recipient}<br />{addr.line1} {addr.line2}<br />{addr.city}, {addr.state} {addr.postal_code}<br />Service: {o.shipping_service}</p>
+          <p><CopyAddress text={[addr.recipient, [addr.line1, addr.line2].filter(Boolean).join(" "), `${addr.city}, ${addr.state} ${addr.postal_code}`, o.email].filter(Boolean).join("\n")} /></p>
+        </>
+      )}
       <h2>Compliance</h2>
       {age && <p>Age verification: {age.provider} · ref {age.reference} · verified {new Date(age.verified_at).toLocaleString()} · expires {new Date(age.expires_at).toLocaleString()}</p>}
       <details><summary>Immutable compliance snapshot (v{o.compliance_snapshot_version})</summary><pre style={{ overflow: "auto" }}>{JSON.stringify(o.compliance_snapshot, null, 2)}</pre></details>
