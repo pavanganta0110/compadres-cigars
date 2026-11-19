@@ -29,7 +29,7 @@ export function emailSetup(env: Record<string, string | undefined> = process.env
   if (sel.kind === "mock") return { ...common, provider: new MockEmailProvider(), mode: "mock", name: "mock", detail: "Mock email (local/staging only). Nothing is delivered.", productionReady: false };
   return {
     ...common, provider: new ResendEmailProvider(key, from), mode: sel.mode, name: "resend", productionReady: sel.mode === "live",
-    detail: sel.mode === "live" ? "Resend, LIVE gates satisfied: customers receive real email." : `Resend, sandbox: only staff and allowlisted addresses receive real email; customers' emails are skipped. Why not live: APP_ENV is ${appEnv === "production" ? "production (ok)" : JSON.stringify(appEnv ?? null)}; COMPADRES_EMAIL_PRODUCTION_APPROVED is ${approved === "true" ? "true (ok)" : JSON.stringify(approved ?? null)}.`,
+    detail: sel.mode === "live" ? "Resend, LIVE gates satisfied: customers receive real email." : `Resend, sandbox: only staff and allowlisted addresses receive real email; customers' emails are skipped.`,
   };
 }
 
